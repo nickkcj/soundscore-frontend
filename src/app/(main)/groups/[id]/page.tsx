@@ -90,7 +90,23 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
   const { isConnected, sendMessage, sendTyping } = useGroupWebSocket({
     groupId,
     onMessage: (message) => {
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => {
+        // Evita duplicação - se já existe uma mensagem com mesmo id ou
+        // uma mensagem optimistic do mesmo usuário com mesmo conteúdo, substitui
+        const existingIndex = prev.findIndex(
+          (m) => m.id === message.id ||
+          (m.id < 0 && m.user_id === message.user_id && m.content === message.content)
+        );
+
+        if (existingIndex !== -1) {
+          // Substitui a mensagem optimistic pela real do servidor
+          const newMessages = [...prev];
+          newMessages[existingIndex] = message;
+          return newMessages;
+        }
+
+        return [...prev, message];
+      });
       // Só faz scroll automático se usuário não scrollou pra cima
       if (!userScrolledUp.current) {
         setTimeout(scrollToBottom, 50);
@@ -213,9 +229,11 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!messageInput.trim() && !selectedImage) || !isConnected) return;
+    if ((!messageInput.trim() && !selectedImage) || !isConnected || !user) return;
 
+    const content = messageInput.trim();
     let imagePath: string | undefined;
+    let imageUrl: string | undefined;
 
     // Upload image if selected
     if (selectedImage) {
@@ -229,6 +247,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
           formData
         );
         imagePath = response.image_path;
+        imageUrl = response.image_url;
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Falha ao enviar imagem');
         setIsUploading(false);
@@ -237,7 +256,22 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
       setIsUploading(false);
     }
 
-    sendMessage(messageInput.trim(), imagePath);
+    // Optimistic update - adiciona mensagem imediatamente com id negativo temporário
+    const optimisticMessage: GroupMessage = {
+      id: -Date.now(), // ID negativo para identificar como optimistic
+      group_id: groupId,
+      user_id: user.id,
+      content,
+      image_url: imageUrl || null,
+      created_at: new Date().toISOString(),
+      username: user.username,
+      profile_picture: user.profile_picture || null,
+    };
+
+    setMessages((prev) => [...prev, optimisticMessage]);
+
+    // Envia via WebSocket
+    sendMessage(content, imagePath);
     setMessageInput('');
     clearSelectedImage();
     inputRef.current?.focus();

@@ -238,6 +238,15 @@ export function useReview() {
     }
   }, []);
 
+  const toggleLike = useCallback(async (reviewId: number): Promise<LikeResponse | null> => {
+    try {
+      const response = await api.post<LikeResponse>(`/reviews/${reviewId}/like`);
+      return response;
+    } catch {
+      return null;
+    }
+  }, []);
+
   return {
     isLoading,
     error,
@@ -245,6 +254,7 @@ export function useReview() {
     updateReview,
     deleteReview,
     getReview,
+    toggleLike,
     clearError: () => setError(null),
   };
 }

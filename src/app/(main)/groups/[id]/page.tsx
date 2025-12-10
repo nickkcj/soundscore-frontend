@@ -120,7 +120,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
             role: 'member' as const,
             joined_at: new Date().toISOString(),
             username,
-            profile_picture: profilePicture,
+            profile_picture: profilePicture ?? null,
             is_online: true,
           },
         ];

@@ -2,6 +2,7 @@
 export interface User {
   id: number;
   username: string;
+  email: string;
   profile_picture: string | null;
   banner_image: string | null;
   bio: string | null;
@@ -9,7 +10,6 @@ export interface User {
 }
 
 export interface UserProfile extends User {
-  email: string;
   review_count: number;
   followers_count: number;
   following_count: number;

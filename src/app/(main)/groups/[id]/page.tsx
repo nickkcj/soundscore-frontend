@@ -537,6 +537,13 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
 function MessageItem({ message, isOwn }: { message: GroupMessage; isOwn: boolean }) {
   const [isImageLoading, setIsImageLoading] = useState(true);
 
+  // Reset loading state quando a imagem URL muda
+  useEffect(() => {
+    if (message.image_url) {
+      setIsImageLoading(true);
+    }
+  }, [message.image_url]);
+
   return (
     <div className={cn('flex gap-3', isOwn && 'flex-row-reverse')}>
       <div className="flex-shrink-0">
@@ -575,11 +582,13 @@ function MessageItem({ message, isOwn }: { message: GroupMessage; isOwn: boolean
                 alt="Message image"
                 width={250}
                 height={200}
+                unoptimized
                 className={cn(
                   'rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity',
                   isImageLoading && 'hidden'
                 )}
                 onLoad={() => setIsImageLoading(false)}
+                onError={() => setIsImageLoading(false)}
                 onClick={() => window.open(message.image_url!, '_blank')}
               />
             </div>

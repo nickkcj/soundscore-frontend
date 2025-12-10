@@ -53,7 +53,7 @@ export default function FeedPage() {
     if (!authLoading) {
       fetchFeed(true, sortOrder);
       // Fetch trending albums
-      homeApi.getTrendingAlbums(5)
+      homeApi.getTrendingAlbums(3)
         .then((response) => {
           setTrendingAlbums(response.albums);
         })
@@ -97,15 +97,28 @@ export default function FeedPage() {
   const handleDelete = async () => {
     if (!reviewToDelete) return;
 
-    const success = await deleteReview(reviewToDelete);
-    if (success) {
-      removeReviewFromFeed(reviewToDelete);
-      toast.success('Review deleted');
-    } else {
-      toast.error('Failed to delete review');
-    }
+    // Close dialog immediately for responsiveness
+    const reviewId = reviewToDelete;
     setDeleteDialogOpen(false);
     setReviewToDelete(null);
+
+    // Optimistic removal - remove from UI immediately
+    removeReviewFromFeed(reviewId);
+    toast.success('Review deleted');
+
+    // API call in background
+    try {
+      const success = await deleteReview(reviewId);
+      if (!success) {
+        // If API returns false, restore feed
+        fetchFeed(true, sortOrder);
+        toast.error('Failed to delete review. Restoring...');
+      }
+    } catch {
+      // Revert on error - refetch feed
+      fetchFeed(true, sortOrder);
+      toast.error('Failed to delete review. Restoring...');
+    }
   };
 
   const openDeleteDialog = (reviewId: number) => {
@@ -328,7 +341,7 @@ export default function FeedPage() {
                 </h3>
                 <div className="space-y-4">
                   {trendingAlbumsLoading ? (
-                    Array.from({ length: 5 }).map((_, i) => (
+                    Array.from({ length: 3 }).map((_, i) => (
                       <TrendingAlbumSkeleton key={i} />
                     ))
                   ) : trendingAlbums.length === 0 ? (

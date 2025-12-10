@@ -96,7 +96,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   // Banner upload handler
   const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !profile) return;
 
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
@@ -108,15 +108,28 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
       return;
     }
 
+    // Create local preview URL for optimistic update
+    const previewUrl = URL.createObjectURL(file);
+    const previousBanner = profile.banner_image;
+
+    // Optimistic update - show preview immediately
+    setProfile((prev) => prev ? { ...prev, banner_image: previewUrl } : null);
+    toast.success('Banner updated!');
+
+    // Upload in background
     setIsUploadingBanner(true);
     try {
       const formData = new FormData();
       formData.append('file', file);
 
       const updatedProfile = await api.postForm<UserProfile>('/users/profile/banner', formData);
+      // Replace preview with actual URL from server
+      URL.revokeObjectURL(previewUrl);
       setProfile(updatedProfile);
-      toast.success('Banner updated!');
     } catch (err) {
+      // Revert on error
+      URL.revokeObjectURL(previewUrl);
+      setProfile((prev) => prev ? { ...prev, banner_image: previousBanner } : null);
       toast.error(err instanceof Error ? err.message : 'Failed to upload banner');
     } finally {
       setIsUploadingBanner(false);
@@ -176,15 +189,27 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const handleDelete = async (reviewId: number) => {
     if (!confirm('Are you sure you want to delete this review?')) return;
 
+    // Save current state for potential rollback
+    const previousReviews = [...reviews];
+    const previousReviewCount = profile?.review_count ?? 0;
+
+    // Optimistic delete - remove immediately
+    setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+    setProfile((prev) =>
+      prev ? { ...prev, review_count: prev.review_count - 1 } : null
+    );
+    toast.success('Review deleted');
+
+    // API call in background
     try {
       await api.delete(`/reviews/${reviewId}`);
-      setReviews((prev) => prev.filter((r) => r.id !== reviewId));
-      setProfile((prev) =>
-        prev ? { ...prev, review_count: prev.review_count - 1 } : null
-      );
-      toast.success('Review deleted');
     } catch {
-      toast.error('Failed to delete review');
+      // Revert on error
+      setReviews(previousReviews);
+      setProfile((prev) =>
+        prev ? { ...prev, review_count: previousReviewCount } : null
+      );
+      toast.error('Failed to delete review. Restoring...');
     }
   };
 

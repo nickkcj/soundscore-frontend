@@ -185,6 +185,7 @@ export interface GroupMessage {
   group_id: number;
   user_id: number;
   content: string;
+  image_url?: string | null;
   created_at: string;
   username: string;
   profile_picture: string | null;
@@ -277,6 +278,7 @@ export interface MessageResponse {
 export interface WSMessage {
   type: 'message' | 'user_joined' | 'user_left' | 'online_users' | 'typing';
   content?: string;
+  image_url?: string;
   user_id?: number;
   username?: string;
   profile_picture?: string;

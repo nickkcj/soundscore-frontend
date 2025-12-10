@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, use, useCallback } from 'react';
 import Image from 'next/image';
-import { ArrowLeft, Send, Users, Music, Loader2 } from 'lucide-react';
+import { ArrowLeft, Send, Users, Music, Loader2, ImageIcon, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -31,8 +31,12 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
   const [messageInput, setMessageInput] = useState('');
   const [onlineUsers, setOnlineUsers] = useState<Set<number>>(new Set());
   const [typingUsers, setTypingUsers] = useState<Map<number, { username: string; timestamp: number }>>(new Map());
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const userScrolledUp = useRef(false);
@@ -175,12 +179,67 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
     return () => clearInterval(interval);
   }, []);
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!messageInput.trim() || !isConnected) return;
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    sendMessage(messageInput.trim());
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Tipo de arquivo inválido. Use JPG, PNG, WebP ou GIF.');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Arquivo muito grande. Máximo: 5MB');
+      return;
+    }
+
+    setSelectedImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const clearSelectedImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if ((!messageInput.trim() && !selectedImage) || !isConnected) return;
+
+    let imagePath: string | undefined;
+
+    // Upload image if selected
+    if (selectedImage) {
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', selectedImage);
+
+        const response = await api.postForm<{ image_url: string; image_path: string }>(
+          `/groups/${groupId}/messages/image`,
+          formData
+        );
+        imagePath = response.image_path;
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Falha ao enviar imagem');
+        setIsUploading(false);
+        return;
+      }
+      setIsUploading(false);
+    }
+
+    sendMessage(messageInput.trim(), imagePath);
     setMessageInput('');
+    clearSelectedImage();
     inputRef.current?.focus();
     // Força scroll quando o próprio usuário envia
     userScrolledUp.current = false;
@@ -188,9 +247,29 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
   };
 
   const handleJoinGroup = async () => {
+    if (!group) return;
+
     try {
       await api.post(`/groups/${groupId}/join`);
-      setGroup((prev) => prev ? { ...prev, is_member: true } : null);
+
+      // Refetch group data to get updated members list including the new member
+      interface GroupDetailResponse {
+        group: Group;
+        members: GroupMember[];
+        recent_messages: GroupMessage[];
+        is_member: boolean;
+        user_role: string | null;
+      }
+
+      const data = await api.get<GroupDetailResponse>(`/groups/${groupId}`);
+      setGroup({
+        ...data.group,
+        is_member: data.is_member,
+        role: data.user_role as Group['role'],
+      });
+      setMembers(data.members);
+      setMessages(data.recent_messages);
+
       toast.success('Joined group!');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to join group');
@@ -348,8 +427,47 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
             {/* Typing Indicator */}
             <TypingIndicator typingUsers={typingUsers} />
 
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="px-3 py-2 border-t bg-muted/30">
+                <div className="relative inline-block">
+                  <Image
+                    src={imagePreview}
+                    alt="Preview"
+                    width={120}
+                    height={120}
+                    className="rounded-lg object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={clearSelectedImage}
+                    className="absolute -top-2 -right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Input */}
             <form onSubmit={handleSendMessage} className="flex gap-2 p-3 border-t bg-muted/30">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={!isConnected || isUploading}
+                className="h-10 w-10 flex-shrink-0"
+              >
+                <ImageIcon className="h-5 w-5" />
+              </Button>
               <Input
                 ref={inputRef}
                 placeholder="Type a message..."
@@ -365,11 +483,14 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
                     sendTyping();
                   }, 500);
                 }}
-                disabled={!isConnected}
+                disabled={!isConnected || isUploading}
                 className="h-10"
               />
-              <Button type="submit" disabled={!isConnected || !messageInput.trim()}>
-                <Send className="h-4 w-4" />
+              <Button
+                type="submit"
+                disabled={!isConnected || isUploading || (!messageInput.trim() && !selectedImage)}
+              >
+                {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </Button>
             </form>
           </div>
@@ -380,6 +501,8 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
 }
 
 function MessageItem({ message, isOwn }: { message: GroupMessage; isOwn: boolean }) {
+  const [isImageLoading, setIsImageLoading] = useState(true);
+
   return (
     <div className={cn('flex gap-3', isOwn && 'flex-row-reverse')}>
       <div className="flex-shrink-0">
@@ -401,11 +524,35 @@ function MessageItem({ message, isOwn }: { message: GroupMessage; isOwn: boolean
         </div>
         <div
           className={cn(
-            'rounded-lg px-3 py-2 inline-block',
+            'rounded-lg inline-block overflow-hidden',
+            message.content ? 'px-3 py-2' : 'p-1',
             isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'
           )}
         >
-          <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+          {message.image_url && (
+            <div className="relative mb-2 last:mb-0">
+              {isImageLoading && (
+                <div className="w-[250px] h-[200px] bg-muted-foreground/20 animate-pulse rounded-lg flex items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              )}
+              <Image
+                src={message.image_url}
+                alt="Message image"
+                width={250}
+                height={200}
+                className={cn(
+                  'rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity',
+                  isImageLoading && 'hidden'
+                )}
+                onLoad={() => setIsImageLoading(false)}
+                onClick={() => window.open(message.image_url!, '_blank')}
+              />
+            </div>
+          )}
+          {message.content && (
+            <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+          )}
         </div>
       </div>
     </div>

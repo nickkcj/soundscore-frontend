@@ -88,6 +88,7 @@ export function useGroupWebSocket({
                 group_id: groupId,
                 user_id: data.user_id,
                 content: data.content || '',
+                image_url: data.image_url || null,
                 created_at: data.timestamp || new Date().toISOString(),
                 username: data.username,
                 profile_picture: data.profile_picture || null,
@@ -167,9 +168,13 @@ export function useGroupWebSocket({
     setIsConnected(false);
   }, []);
 
-  const sendMessage = useCallback((content: string) => {
+  const sendMessage = useCallback((content: string, imageUrl?: string) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'message', content }));
+      wsRef.current.send(JSON.stringify({
+        type: 'message',
+        content,
+        image_url: imageUrl
+      }));
     }
   }, []);
 

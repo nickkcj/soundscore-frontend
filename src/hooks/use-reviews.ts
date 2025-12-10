@@ -108,6 +108,21 @@ export function useFeed() {
     setReviews((prev) => prev.filter((r) => r.id !== reviewId));
   }, []);
 
+  // Optimistic review creation methods
+  const addOptimisticReview = useCallback((review: OptimisticReview) => {
+    setReviews((prev) => [review, ...prev]);
+  }, []);
+
+  const replaceOptimisticReview = useCallback((optimisticId: string, realReview: Review) => {
+    setReviews((prev) =>
+      prev.map((r) => (r._optimisticId === optimisticId ? realReview : r))
+    );
+  }, []);
+
+  const removeOptimisticReview = useCallback((optimisticId: string) => {
+    setReviews((prev) => prev.filter((r) => r._optimisticId !== optimisticId));
+  }, []);
+
   return {
     reviews,
     isLoading,
@@ -118,6 +133,9 @@ export function useFeed() {
     toggleLike,
     updateReviewInFeed,
     removeReviewFromFeed,
+    addOptimisticReview,
+    replaceOptimisticReview,
+    removeOptimisticReview,
   };
 }
 

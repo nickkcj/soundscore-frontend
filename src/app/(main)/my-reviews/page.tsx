@@ -51,15 +51,21 @@ export default function MyReviewsPage() {
   const handleDelete = async () => {
     if (!reviewToDelete) return;
 
-    const success = await deleteReview(reviewToDelete.id);
+    const reviewId = reviewToDelete.id;
+
+    // Close dialog immediately for responsiveness
+    setDeleteDialogOpen(false);
+    setReviewToDelete(null);
+    toast.success('Review deleted');
+
+    // API call in background, then refetch to sync
+    const success = await deleteReview(reviewId);
     if (success) {
-      toast.success('Review deleted');
       fetchReviews(true);
     } else {
       toast.error('Failed to delete review');
+      fetchReviews(true); // Refetch to restore accurate state
     }
-    setDeleteDialogOpen(false);
-    setReviewToDelete(null);
   };
 
   const openDeleteDialog = (review: Review) => {

@@ -16,15 +16,33 @@ import { Input } from '@/components/ui/input';
 import { StarRating } from '@/components/common/star-rating';
 import { useReview, useAlbumSearch } from '@/hooks/use-reviews';
 import { useDebouncedCallback } from '@/hooks/use-debounce';
-import type { SpotifyAlbumResult } from '@/types';
+import type { SpotifyAlbumResult, OptimisticReview, Review } from '@/types';
 
 interface CreateReviewModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  // Optimistic update callbacks
+  onOptimisticCreate?: (review: OptimisticReview) => void;
+  onReviewCreated?: (optimisticId: string, review: Review) => void;
+  onOptimisticError?: (optimisticId: string) => void;
+  // Current user info for optimistic review
+  currentUser?: {
+    id: number;
+    username: string;
+    profile_picture: string | null;
+  };
 }
 
-export function CreateReviewModal({ open, onOpenChange, onSuccess }: CreateReviewModalProps) {
+export function CreateReviewModal({
+  open,
+  onOpenChange,
+  onSuccess,
+  onOptimisticCreate,
+  onReviewCreated,
+  onOptimisticError,
+  currentUser,
+}: CreateReviewModalProps) {
   const { createReview, isLoading, error } = useReview();
   const { results, isLoading: searchLoading, search, clearResults } = useAlbumSearch();
 
@@ -85,21 +103,86 @@ export function CreateReviewModal({ open, onOpenChange, onSuccess }: CreateRevie
       return;
     }
 
-    const review = await createReview({
-      spotify_id: selectedAlbum.spotify_id,
-      title: selectedAlbum.title,
-      artist: selectedAlbum.artist,
-      cover_image: selectedAlbum.cover_image,
-      release_date: selectedAlbum.release_date,
-      rating,
-      text: text.trim() || undefined,
-      is_favorite: isFavorite,
-    });
+    // Generate optimistic ID
+    const optimisticId = `temp-${Date.now()}`;
 
-    if (review) {
-      toast.success('Review created!');
+    // If we have optimistic callbacks and current user, use optimistic update
+    if (onOptimisticCreate && currentUser) {
+      // Create optimistic review object
+      const optimisticReview: OptimisticReview = {
+        id: -1,
+        _optimistic: true,
+        _optimisticId: optimisticId,
+        rating,
+        text: text.trim() || null,
+        is_favorite: isFavorite,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        album: {
+          id: -1,
+          spotify_id: selectedAlbum.spotify_id,
+          title: selectedAlbum.title,
+          artist: selectedAlbum.artist,
+          cover_image: selectedAlbum.cover_image,
+          release_date: selectedAlbum.release_date,
+        },
+        user_id: currentUser.id,
+        username: currentUser.username,
+        user_profile_picture: currentUser.profile_picture,
+        like_count: 0,
+        comment_count: 0,
+        is_liked: false,
+      };
+
+      // Close modal immediately and add optimistic review to feed
       handleClose();
-      onSuccess?.();
+      onOptimisticCreate(optimisticReview);
+      toast.success('Review created!');
+
+      // Make API call in background
+      try {
+        const realReview = await createReview({
+          spotify_id: selectedAlbum.spotify_id,
+          title: selectedAlbum.title,
+          artist: selectedAlbum.artist,
+          cover_image: selectedAlbum.cover_image,
+          release_date: selectedAlbum.release_date,
+          rating,
+          text: text.trim() || undefined,
+          is_favorite: isFavorite,
+        });
+
+        if (realReview) {
+          onReviewCreated?.(optimisticId, realReview);
+          onSuccess?.();
+        } else {
+          // API returned null (error handled in hook)
+          onOptimisticError?.(optimisticId);
+          toast.error('Failed to create review');
+        }
+      } catch {
+        // Remove optimistic review on error
+        onOptimisticError?.(optimisticId);
+        toast.error('Failed to create review');
+      }
+    } else {
+      // Fallback to non-optimistic behavior
+      const review = await createReview({
+        spotify_id: selectedAlbum.spotify_id,
+        title: selectedAlbum.title,
+        artist: selectedAlbum.artist,
+        cover_image: selectedAlbum.cover_image,
+        release_date: selectedAlbum.release_date,
+        rating,
+        text: text.trim() || undefined,
+        is_favorite: isFavorite,
+      });
+
+      if (review) {
+        toast.success('Review created!');
+        handleClose();
+        onSuccess?.();
+      }
     }
   };
 

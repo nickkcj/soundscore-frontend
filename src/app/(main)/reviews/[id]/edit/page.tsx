@@ -57,20 +57,60 @@ export default function EditReviewPage({ params }: { params: Promise<{ id: strin
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (rating === 0) {
+    if (rating === 0 || !review) {
       toast.error('Please select a rating');
       return;
     }
 
-    const updatedReview = await updateReview(parseInt(id), {
-      rating,
-      text: text.trim() || undefined,
-      is_favorite: isFavorite,
-    });
+    // Save previous state for potential rollback
+    const previousState = {
+      rating: review.rating,
+      text: review.text,
+      is_favorite: review.is_favorite,
+    };
 
-    if (updatedReview) {
-      toast.success('Review updated!');
-      router.push('/feed');
+    // Optimistic update - update local state immediately
+    setReview((prev) =>
+      prev
+        ? {
+            ...prev,
+            rating,
+            text: text.trim() || null,
+            is_favorite: isFavorite,
+            updated_at: new Date().toISOString(),
+          }
+        : null
+    );
+
+    // Show success and navigate immediately
+    toast.success('Review updated!');
+    router.push('/feed');
+
+    // API call in background
+    try {
+      const updatedReview = await updateReview(parseInt(id), {
+        rating,
+        text: text.trim() || undefined,
+        is_favorite: isFavorite,
+      });
+
+      if (!updatedReview) {
+        // API returned null - show error (user already navigated)
+        toast.error('Failed to save changes. Please try again.');
+      }
+    } catch {
+      // Revert state (though user may have navigated away)
+      setReview((prev) =>
+        prev
+          ? {
+              ...prev,
+              rating: previousState.rating,
+              text: previousState.text,
+              is_favorite: previousState.is_favorite,
+            }
+          : null
+      );
+      toast.error('Failed to save changes. Please try again.');
     }
   };
 

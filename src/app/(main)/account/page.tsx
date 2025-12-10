@@ -75,7 +75,7 @@ export default function AccountPage() {
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !user) return;
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -89,6 +89,15 @@ export default function AccountPage() {
       return;
     }
 
+    // Create local preview URL for optimistic update
+    const previewUrl = URL.createObjectURL(file);
+    const previousPicture = user.profile_picture;
+
+    // Optimistic update - show preview immediately
+    setUser({ ...user, profile_picture: previewUrl });
+    toast.success('Profile picture updated!');
+
+    // Upload in background
     setIsUploadingPhoto(true);
     try {
       const formData = new FormData();
@@ -96,10 +105,14 @@ export default function AccountPage() {
 
       const updatedUser = await api.postForm<UserType>('/users/profile/picture', formData);
       if (updatedUser) {
+        // Replace preview with actual URL from server
+        URL.revokeObjectURL(previewUrl);
         setUser(updatedUser);
-        toast.success('Profile picture updated!');
       }
     } catch (err) {
+      // Revert on error
+      URL.revokeObjectURL(previewUrl);
+      setUser({ ...user, profile_picture: previousPicture });
       toast.error(err instanceof Error ? err.message : 'Failed to upload photo');
     } finally {
       setIsUploadingPhoto(false);
@@ -111,6 +124,21 @@ export default function AccountPage() {
   };
 
   const onProfileSubmit = async (data: ProfileForm) => {
+    if (!user) return;
+
+    // Save previous state for rollback
+    const previousUser = { ...user };
+
+    // Optimistic update - update immediately
+    const optimisticUser = {
+      ...user,
+      username: data.username || user.username,
+      bio: data.bio ?? user.bio,
+    };
+    setUser(optimisticUser);
+    toast.success('Profile updated!');
+
+    // API call in background
     setIsUpdating(true);
     try {
       const updatedUser = await api.patch<UserType>('/users/profile', {
@@ -118,10 +146,12 @@ export default function AccountPage() {
         bio: data.bio,
       });
       if (updatedUser) {
+        // Sync with server response
         setUser(updatedUser);
-        toast.success('Profile updated successfully');
       }
     } catch (err) {
+      // Revert on error
+      setUser(previousUser);
       toast.error(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
       setIsUpdating(false);

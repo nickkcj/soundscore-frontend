@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ArrowLeft, Users, Lock, Globe, Check, ImagePlus, X, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -111,26 +112,26 @@ export default function CreateGroupPage() {
 
       const group = await api.post<Group>('/groups', payload);
 
-      // If there's a cover image, upload it
-      if (coverImage && group.id) {
-        try {
-          const formDataUpload = new FormData();
-          formDataUpload.append('file', coverImage);
-          await api.postForm<Group>(`/groups/${group.id}/cover`, formDataUpload);
-        } catch (uploadErr) {
-          // Group was created, but image upload failed - continue anyway
-          console.error('Failed to upload cover image:', uploadErr);
-        }
-      }
-
+      // Navigate immediately after group creation for instant feedback
+      toast.success('Group created!');
       router.push(`/groups/${group.id}`);
+
+      // Upload cover image in background (fire and forget)
+      if (coverImage && group.id) {
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', coverImage);
+        api.postForm<Group>(`/groups/${group.id}/cover`, formDataUpload).catch((uploadErr) => {
+          // Group was created, but image upload failed - show a toast
+          console.error('Failed to upload cover image:', uploadErr);
+          toast.error('Cover image upload failed. You can add it later in group settings.');
+        });
+      }
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError('Failed to create group. Please try again.');
       }
-    } finally {
       setIsSubmitting(false);
     }
   };

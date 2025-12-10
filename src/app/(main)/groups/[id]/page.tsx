@@ -577,14 +577,12 @@ function MessageItem({ message, isOwn }: { message: GroupMessage; isOwn: boolean
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 </div>
               )}
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={message.image_url}
                 alt="Message image"
-                width={250}
-                height={200}
-                unoptimized
                 className={cn(
-                  'rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity',
+                  'max-w-[250px] max-h-[300px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity',
                   isImageLoading && 'hidden'
                 )}
                 onLoad={() => setIsImageLoading(false)}

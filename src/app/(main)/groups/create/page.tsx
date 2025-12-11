@@ -114,13 +114,13 @@ export default function CreateGroupPage() {
 
       // Navigate immediately after group creation for instant feedback
       toast.success('Group created!');
-      router.push(`/groups/${group.id}`);
+      router.push(`/groups/${group.uuid}`);
 
       // Upload cover image in background (fire and forget)
-      if (coverImage && group.id) {
+      if (coverImage && group.uuid) {
         const formDataUpload = new FormData();
         formDataUpload.append('file', coverImage);
-        api.postForm<Group>(`/groups/${group.id}/cover`, formDataUpload).catch((uploadErr) => {
+        api.postForm<Group>(`/groups/${group.uuid}/cover`, formDataUpload).catch((uploadErr) => {
           // Group was created, but image upload failed - show a toast
           console.error('Failed to upload cover image:', uploadErr);
           toast.error('Cover image upload failed. You can add it later in group settings.');

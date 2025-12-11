@@ -6,6 +6,15 @@ import type { WSMessage, GroupMessage } from '@/types';
 
 const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
 
+interface MemberJoinedData {
+  user_id: number;
+  username: string;
+  profile_picture: string | null;
+  role: 'admin' | 'moderator' | 'member';
+  joined_at: string;
+  member_count: number;
+}
+
 interface UseWebSocketOptions {
   groupId: number;
   onMessage?: (message: GroupMessage) => void;
@@ -13,6 +22,7 @@ interface UseWebSocketOptions {
   onUserLeft?: (userId: number, username: string) => void;
   onOnlineUsers?: (users: { user_id: number; username: string; profile_picture: string }[]) => void;
   onTyping?: (userId: number, username: string) => void;
+  onMemberJoined?: (data: MemberJoinedData) => void;
 }
 
 export function useGroupWebSocket({
@@ -22,6 +32,7 @@ export function useGroupWebSocket({
   onUserLeft,
   onOnlineUsers,
   onTyping,
+  onMemberJoined,
 }: UseWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -36,6 +47,7 @@ export function useGroupWebSocket({
   const onUserLeftRef = useRef(onUserLeft);
   const onOnlineUsersRef = useRef(onOnlineUsers);
   const onTypingRef = useRef(onTyping);
+  const onMemberJoinedRef = useRef(onMemberJoined);
 
   // Update refs when callbacks change
   useEffect(() => {
@@ -44,7 +56,8 @@ export function useGroupWebSocket({
     onUserLeftRef.current = onUserLeft;
     onOnlineUsersRef.current = onOnlineUsers;
     onTypingRef.current = onTyping;
-  }, [onMessage, onUserJoined, onUserLeft, onOnlineUsers, onTyping]);
+    onMemberJoinedRef.current = onMemberJoined;
+  }, [onMessage, onUserJoined, onUserLeft, onOnlineUsers, onTyping, onMemberJoined]);
 
   const connect = useCallback(() => {
     // Prevent multiple simultaneous connection attempts
@@ -117,6 +130,19 @@ export function useGroupWebSocket({
           case 'typing':
             if (onTypingRef.current && data.user_id && data.username) {
               onTypingRef.current(data.user_id, data.username);
+            }
+            break;
+
+          case 'member_joined':
+            if (onMemberJoinedRef.current && data.user_id && data.username) {
+              onMemberJoinedRef.current({
+                user_id: data.user_id,
+                username: data.username,
+                profile_picture: data.profile_picture || null,
+                role: data.role || 'member',
+                joined_at: data.joined_at || new Date().toISOString(),
+                member_count: data.member_count || 0,
+              });
             }
             break;
         }

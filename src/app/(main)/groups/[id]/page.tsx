@@ -121,30 +121,9 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
         return prev;
       });
     },
-    onUserJoined: (userId, username, profilePicture) => {
+    onUserJoined: (userId) => {
+      // User connected to chat (came online)
       setOnlineUsers((prev) => new Set(prev).add(userId));
-      // Adicionar novo membro à lista se não existir
-      setMembers((prev) => {
-        const alreadyMember = prev.some((m) => m.user_id === userId);
-        if (alreadyMember) return prev;
-
-        // Só incrementa o contador se realmente é um novo membro
-        setGroup((g) => (g ? { ...g, member_count: g.member_count + 1 } : null));
-
-        return [
-          ...prev,
-          {
-            id: Date.now(),
-            user_id: userId,
-            group_id: groupId,
-            role: 'member' as const,
-            joined_at: new Date().toISOString(),
-            username,
-            profile_picture: profilePicture ?? null,
-            is_online: true,
-          },
-        ];
-      });
     },
     onUserLeft: (userId) => {
       setOnlineUsers((prev) => {
@@ -165,6 +144,29 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
         newMap.set(userId, { username, timestamp: Date.now() });
         return newMap;
       });
+    },
+    onMemberJoined: (data) => {
+      // New member joined the group - update members list and count
+      setMembers((prev) => {
+        const alreadyMember = prev.some((m) => m.user_id === data.user_id);
+        if (alreadyMember) return prev;
+
+        return [
+          ...prev,
+          {
+            id: Date.now(),
+            user_id: data.user_id,
+            group_id: groupId,
+            role: data.role,
+            joined_at: data.joined_at,
+            username: data.username,
+            profile_picture: data.profile_picture,
+            is_online: false,
+          },
+        ];
+      });
+      // Update member count from server
+      setGroup((g) => (g ? { ...g, member_count: data.member_count } : null));
     },
   });
 

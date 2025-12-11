@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Plus, Search, Users, Lock, Globe, TrendingUp, Music, Loader2 } from 'lucide-react';
@@ -33,6 +35,7 @@ const CATEGORIES = [
 
 export default function GroupsPage() {
   const { isLoading: authLoading } = useRequireAuth();
+  const router = useRouter();
   const [groups, setGroups] = useState<Group[]>([]);
   const [trendingGroups, setTrendingGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +44,21 @@ export default function GroupsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState('all');
   const initialLoadDone = useRef(false);
+
+  // Handle join success - atualiza estado e redireciona para o grupo
+  const handleJoinSuccess = useCallback((groupId: number) => {
+    // Atualiza a lista principal
+    setGroups(prev => prev.map(g =>
+      g.id === groupId ? { ...g, is_member: true, member_count: g.member_count + 1 } : g
+    ));
+    // Atualiza trending groups
+    setTrendingGroups(prev => prev.map(g =>
+      g.id === groupId ? { ...g, is_member: true, member_count: g.member_count + 1 } : g
+    ));
+
+    toast.success('Joined group!');
+    router.push(`/groups/${groupId}`);
+  }, [router]);
 
   // Debounce search input
   useEffect(() => {
@@ -128,7 +146,7 @@ export default function GroupsPage() {
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {trendingGroups.map((group) => (
-              <GroupCard key={group.id} group={group} />
+              <GroupCard key={group.id} group={group} onJoinSuccess={handleJoinSuccess} />
             ))}
           </div>
         </div>
@@ -180,7 +198,7 @@ export default function GroupsPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {groups.map((group) => (
-            <GroupCard key={group.id} group={group} />
+            <GroupCard key={group.id} group={group} onJoinSuccess={handleJoinSuccess} />
           ))}
         </div>
       )}
@@ -188,46 +206,74 @@ export default function GroupsPage() {
   );
 }
 
-function GroupCard({ group }: { group: Group }) {
+function GroupCard({ group, onJoinSuccess }: { group: Group; onJoinSuccess?: (groupId: number) => void }) {
+  const [isJoining, setIsJoining] = useState(false);
+  const router = useRouter();
+
+  const handleJoin = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isJoining) return;
+
+    setIsJoining(true);
+    try {
+      await api.post(`/groups/${group.id}/join`);
+      onJoinSuccess?.(group.id);
+    } catch {
+      // Error handled silently, button returns to normal state
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push(`/groups/${group.id}`);
+  };
+
   return (
-    <Link href={`/groups/${group.id}`}>
-      <Card className="overflow-hidden hover:shadow-md transition-shadow h-full p-0">
-        {/* Cover Image - fills to top with rounded corners */}
-        <div className="relative h-28 bg-gradient-to-br from-primary/20 to-accent/20">
-          {group.cover_image ? (
-            <Image
-              src={group.cover_image}
-              alt={group.name}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Music className="h-10 w-10 text-muted-foreground/30" />
-            </div>
-          )}
-          <div className="absolute top-2 right-2">
-            {group.privacy === 'private' ? (
-              <Badge variant="secondary" className="gap-1 text-xs">
-                <Lock className="h-3 w-3" />
-                Private
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="gap-1 bg-background/80 text-xs">
-                <Globe className="h-3 w-3" />
-                Public
-              </Badge>
-            )}
+    <Card className="overflow-hidden hover:shadow-md transition-shadow h-full p-0">
+      {/* Cover Image - fills to top with rounded corners */}
+      <div className="relative h-28 bg-gradient-to-br from-primary/20 to-accent/20">
+        {group.cover_image ? (
+          <Image
+            src={group.cover_image}
+            alt={group.name}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Music className="h-10 w-10 text-muted-foreground/30" />
           </div>
+        )}
+        <div className="absolute top-2 right-2">
+          {group.privacy === 'private' ? (
+            <Badge variant="secondary" className="gap-1 text-xs">
+              <Lock className="h-3 w-3" />
+              Private
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="gap-1 bg-background/80 text-xs">
+              <Globe className="h-3 w-3" />
+              Public
+            </Badge>
+          )}
         </div>
-        <div className="p-4">
+      </div>
+      <div className="p-4 flex flex-col h-[calc(100%-7rem)]">
+        <div className="flex-1 min-h-0">
           <h3 className="font-semibold truncate">{group.name}</h3>
           {group.description && (
             <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
               {group.description}
             </p>
           )}
-          <div className="flex items-center gap-3 mt-3 text-sm text-muted-foreground">
+        </div>
+        <div className="flex items-center justify-between mt-3 pt-2">
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Users className="h-4 w-4" />
               {group.member_count} members
@@ -238,9 +284,32 @@ function GroupCard({ group }: { group: Group }) {
               </Badge>
             )}
           </div>
+          {group.is_member ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleOpen}
+              className="ml-2 cursor-pointer"
+            >
+              Open
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={handleJoin}
+              disabled={isJoining}
+              className="ml-2 cursor-pointer"
+            >
+              {isJoining ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Join'
+              )}
+            </Button>
+          )}
         </div>
-      </Card>
-    </Link>
+      </div>
+    </Card>
   );
 }
 

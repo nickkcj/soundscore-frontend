@@ -17,7 +17,7 @@ function StarRating({ rating }: { rating: number }) {
           <span key={star} className="text-sm relative">
             {halfFilled ? (
               <>
-                <span className="text-gray-500">★</span>
+                <span className="text-gray-600">★</span>
                 <span
                   className="text-yellow-400 absolute left-0 top-0 overflow-hidden"
                   style={{ width: '50%' }}
@@ -26,7 +26,7 @@ function StarRating({ rating }: { rating: number }) {
                 </span>
               </>
             ) : (
-              <span className={filled ? 'text-yellow-400' : 'text-gray-500'}>
+              <span className={filled ? 'text-yellow-400' : 'text-gray-600'}>
                 ★
               </span>
             )}
@@ -39,15 +39,15 @@ function StarRating({ rating }: { rating: number }) {
 
 function ReviewCardSkeleton() {
   return (
-    <div className="bg-[#1A1A1A] rounded-lg overflow-hidden shadow-xl border border-pink-600/20 animate-pulse">
-      <div className="aspect-square bg-gray-800" />
+    <div className="bg-card/80 dark:bg-[#1A1A1A] rounded-lg overflow-hidden shadow-xl border border-pink-600/20 animate-pulse">
+      <div className="aspect-square bg-muted dark:bg-gray-800" />
       <div className="p-4">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-gray-700" />
-          <div className="h-5 w-20 bg-gray-700 rounded" />
+          <div className="w-8 h-8 rounded-full bg-muted dark:bg-gray-700" />
+          <div className="h-5 w-20 bg-muted dark:bg-gray-700 rounded" />
         </div>
-        <div className="h-4 w-24 bg-gray-700 rounded mb-2" />
-        <div className="h-3 w-full bg-gray-700 rounded" />
+        <div className="h-4 w-24 bg-muted dark:bg-gray-700 rounded mb-2" />
+        <div className="h-3 w-full bg-muted dark:bg-gray-700 rounded" />
       </div>
     </div>
   );
@@ -55,13 +55,13 @@ function ReviewCardSkeleton() {
 
 function AlbumCardSkeleton() {
   return (
-    <div className="bg-[#1A1A1A] rounded-lg overflow-hidden shadow-xl border-2 border-pink-600/50 animate-pulse">
-      <div className="aspect-square bg-gray-800" />
+    <div className="bg-card/80 dark:bg-[#1A1A1A] rounded-lg overflow-hidden shadow-xl border-2 border-pink-600/50 animate-pulse">
+      <div className="aspect-square bg-muted dark:bg-gray-800" />
       <div className="p-4">
-        <div className="h-5 w-32 bg-gray-700 rounded mb-2" />
-        <div className="h-4 w-24 bg-gray-700 rounded mb-2" />
-        <div className="h-4 w-20 bg-gray-700 rounded mb-2" />
-        <div className="h-3 w-full bg-gray-700 rounded" />
+        <div className="h-5 w-32 bg-muted dark:bg-gray-700 rounded mb-2" />
+        <div className="h-4 w-24 bg-muted dark:bg-gray-700 rounded mb-2" />
+        <div className="h-4 w-20 bg-muted dark:bg-gray-700 rounded mb-2" />
+        <div className="h-3 w-full bg-muted dark:bg-gray-700 rounded" />
       </div>
     </div>
   );

@@ -10,14 +10,14 @@ import { CommentItem } from './comment-item';
 import { CommentListSkeleton } from './comment-skeleton';
 
 interface CommentThreadProps {
-  reviewId: number;
+  reviewUuid: string;
   onCommentCountChange?: (delta: number) => void;
 }
 
-export function CommentThread({ reviewId, onCommentCountChange }: CommentThreadProps) {
+export function CommentThread({ reviewUuid, onCommentCountChange }: CommentThreadProps) {
   const { user } = useAuthStore();
   const { comments, isLoading, hasMore, fetchComments, addComment, deleteComment, toggleCommentLike } =
-    useComments(reviewId);
+    useComments(reviewUuid);
   const [activeReplyId, setActiveReplyId] = useState<number | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
@@ -90,25 +90,30 @@ export function CommentThread({ reviewId, onCommentCountChange }: CommentThreadP
 
   if (isInitialLoad) {
     return (
-      <div className="space-y-6">
-        <CommentForm onSubmit={handleAddComment} placeholder="Write a comment..." />
+      <div className="space-y-0">
+        <CommentForm onSubmit={handleAddComment} placeholder="Post your reply" />
         <CommentListSkeleton count={3} />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-0">
       {/* New Comment Form */}
-      <CommentForm onSubmit={handleAddComment} placeholder="Write a comment..." />
+      <CommentForm onSubmit={handleAddComment} placeholder="Post your reply" />
 
       {/* Comments List */}
       {comments.length === 0 ? (
-        <p className="text-center text-muted-foreground text-sm py-8">
-          No comments yet. Be the first to comment!
-        </p>
+        <div className="py-10 text-center">
+          <p className="text-muted-foreground text-[15px]">
+            No comments yet
+          </p>
+          <p className="text-muted-foreground/70 text-sm mt-1">
+            Be the first to share your thoughts!
+          </p>
+        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="divide-y divide-border">
           {comments.map((comment) => (
             <CommentItem
               key={comment.id}
@@ -127,13 +132,13 @@ export function CommentThread({ reviewId, onCommentCountChange }: CommentThreadP
 
       {/* Load More */}
       {hasMore && (
-        <div className="flex justify-center">
+        <div className="pt-4 flex justify-center border-t border-border">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleLoadMore}
             disabled={isLoading}
-            className="text-muted-foreground"
+            className="text-primary hover:text-primary hover:bg-primary/10 rounded-full"
           >
             {isLoading ? (
               <>
@@ -141,7 +146,7 @@ export function CommentThread({ reviewId, onCommentCountChange }: CommentThreadP
                 Loading...
               </>
             ) : (
-              'Load more comments'
+              'Show more replies'
             )}
           </Button>
         </div>

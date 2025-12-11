@@ -93,8 +93,8 @@ function FloatingHearts({ show }: { show: boolean }) {
 
 interface ReviewCardProps {
   review: Review;
-  onLike?: (reviewId: number) => void;
-  onDelete?: (reviewId: number) => void;
+  onLike?: (reviewUuid: string) => void;
+  onDelete?: (reviewUuid: string) => void;
   showComments?: boolean;
   showCommentPreview?: boolean;
 }
@@ -117,7 +117,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
     }
 
     setIsLiking(true);
-    await onLike(review.id);
+    await onLike(review.uuid);
     setIsLiking(false);
   };
 
@@ -151,13 +151,13 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link href={`/reviews/${review.id}/edit`}>
+                    <Link href={`/reviews/${review.uuid}/edit`}>
                       <Pencil className="mr-2 h-4 w-4" />
                       Edit
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => onDelete?.(review.id)}
+                    onClick={() => onDelete?.(review.uuid)}
                     className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
@@ -233,7 +233,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
           </div>
 
           {showComments && (
-            <Link href={`/reviews/${review.id}`}>
+            <Link href={`/reviews/${review.uuid}`}>
               <Button variant="ghost" size="sm" className="gap-2 h-8">
                 <MessageCircle className="h-4 w-4" />
                 <span>{review.comment_count}</span>
@@ -245,7 +245,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
         {/* Comment Preview */}
         {showCommentPreview && review.comment_count > 0 && (
           <div className="w-full">
-            <CommentPreview reviewId={review.id} commentCount={review.comment_count} />
+            <CommentPreview reviewUuid={review.uuid} commentCount={review.comment_count} />
           </div>
         )}
       </CardFooter>

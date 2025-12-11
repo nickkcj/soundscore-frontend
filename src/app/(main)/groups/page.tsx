@@ -46,18 +46,18 @@ export default function GroupsPage() {
   const initialLoadDone = useRef(false);
 
   // Handle join success - atualiza estado e redireciona para o grupo
-  const handleJoinSuccess = useCallback((groupId: number) => {
+  const handleJoinSuccess = useCallback((groupUuid: string) => {
     // Atualiza a lista principal
     setGroups(prev => prev.map(g =>
-      g.id === groupId ? { ...g, is_member: true, member_count: g.member_count + 1 } : g
+      g.uuid === groupUuid ? { ...g, is_member: true, member_count: g.member_count + 1 } : g
     ));
     // Atualiza trending groups
     setTrendingGroups(prev => prev.map(g =>
-      g.id === groupId ? { ...g, is_member: true, member_count: g.member_count + 1 } : g
+      g.uuid === groupUuid ? { ...g, is_member: true, member_count: g.member_count + 1 } : g
     ));
 
     toast.success('Joined group!');
-    router.push(`/groups/${groupId}`);
+    router.push(`/groups/${groupUuid}`);
   }, [router]);
 
   // Debounce search input
@@ -206,7 +206,7 @@ export default function GroupsPage() {
   );
 }
 
-function GroupCard({ group, onJoinSuccess }: { group: Group; onJoinSuccess?: (groupId: number) => void }) {
+function GroupCard({ group, onJoinSuccess }: { group: Group; onJoinSuccess?: (groupUuid: string) => void }) {
   const [isJoining, setIsJoining] = useState(false);
   const router = useRouter();
 
@@ -218,8 +218,8 @@ function GroupCard({ group, onJoinSuccess }: { group: Group; onJoinSuccess?: (gr
 
     setIsJoining(true);
     try {
-      await api.post(`/groups/${group.id}/join`);
-      onJoinSuccess?.(group.id);
+      await api.post(`/groups/${group.uuid}/join`);
+      onJoinSuccess?.(group.uuid);
     } catch {
       // Error handled silently, button returns to normal state
     } finally {
@@ -230,7 +230,7 @@ function GroupCard({ group, onJoinSuccess }: { group: Group; onJoinSuccess?: (gr
   const handleOpen = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/groups/${group.id}`);
+    router.push(`/groups/${group.uuid}`);
   };
 
   return (

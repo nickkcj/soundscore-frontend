@@ -16,7 +16,7 @@ interface MemberJoinedData {
 }
 
 interface UseWebSocketOptions {
-  groupId: number;
+  groupUuid: string;
   onMessage?: (message: GroupMessage) => void;
   onUserJoined?: (userId: number, username: string, profilePicture?: string) => void;
   onUserLeft?: (userId: number, username: string) => void;
@@ -26,7 +26,7 @@ interface UseWebSocketOptions {
 }
 
 export function useGroupWebSocket({
-  groupId,
+  groupUuid,
   onMessage,
   onUserJoined,
   onUserLeft,
@@ -79,7 +79,7 @@ export function useGroupWebSocket({
       wsRef.current = null;
     }
 
-    const url = `${WS_BASE_URL}/ws/group/${groupId}?token=${token}`;
+    const url = `${WS_BASE_URL}/ws/group/${groupUuid}?token=${token}`;
     const ws = new WebSocket(url);
 
     ws.onopen = () => {
@@ -98,7 +98,7 @@ export function useGroupWebSocket({
             if (onMessageRef.current && data.message_id && data.user_id && data.username) {
               onMessageRef.current({
                 id: data.message_id,
-                group_id: groupId,
+                group_id: 0, // Internal ID not needed on frontend
                 user_id: data.user_id,
                 content: data.content || '',
                 image_url: data.image_url || null,
@@ -179,7 +179,7 @@ export function useGroupWebSocket({
     };
 
     wsRef.current = ws;
-  }, [groupId]);
+  }, [groupUuid]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -213,7 +213,7 @@ export function useGroupWebSocket({
   useEffect(() => {
     connect();
     return () => disconnect();
-  }, [groupId]); // Only reconnect when groupId changes
+  }, [groupUuid]); // Only reconnect when groupUuid changes
 
   return {
     isConnected,

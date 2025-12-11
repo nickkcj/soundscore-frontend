@@ -13,15 +13,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { UserAvatar } from '@/components/common/user-avatar';
+import { InviteMemberModal } from '@/components/groups/invite-member-modal';
 import { useRequireAuth } from '@/hooks/use-auth';
 import { useGroupWebSocket } from '@/hooks/use-websocket';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import type { Group, GroupMember, GroupMessage } from '@/types';
 
-export default function GroupChatPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const groupId = parseInt(id);
+export default function GroupChatPage({ params }: { params: Promise<{ uuid: string }> }) {
+  const { uuid: groupUuid } = use(params);
   const { user, isLoading: authLoading } = useRequireAuth();
 
   const [group, setGroup] = useState<Group | null>(null);
@@ -66,7 +66,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
           user_role: string | null;
         }
 
-        const data = await api.get<GroupDetailResponse>(`/groups/${groupId}`);
+        const data = await api.get<GroupDetailResponse>(`/groups/${groupUuid}`);
         setGroup({
           ...data.group,
           is_member: data.is_member,
@@ -84,11 +84,11 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
     if (!authLoading) {
       fetchGroup();
     }
-  }, [groupId, authLoading]);
+  }, [groupUuid, authLoading]);
 
   // WebSocket connection
   const { isConnected, sendMessage, sendTyping } = useGroupWebSocket({
-    groupId,
+    groupUuid,
     onMessage: (message) => {
       setMessages((prev) => {
         // Evita duplicação - se já existe uma mensagem com mesmo id ou
@@ -156,7 +156,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
           {
             id: Date.now(),
             user_id: data.user_id,
-            group_id: groupId,
+            group_id: group?.id || 0,
             role: data.role,
             joined_at: data.joined_at,
             username: data.username,
@@ -245,7 +245,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
         formData.append('file', selectedImage);
 
         const response = await api.postForm<{ image_url: string; image_path: string }>(
-          `/groups/${groupId}/messages/image`,
+          `/groups/${groupUuid}/messages/image`,
           formData
         );
         imagePath = response.image_path;
@@ -261,7 +261,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
     // Optimistic update - adiciona mensagem imediatamente com id negativo temporário
     const optimisticMessage: GroupMessage = {
       id: -Date.now(), // ID negativo para identificar como optimistic
-      group_id: groupId,
+      group_id: group?.id || 0,
       user_id: user.id,
       content,
       image_url: imageUrl || null,
@@ -286,7 +286,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
     if (!group) return;
 
     try {
-      await api.post(`/groups/${groupId}/join`);
+      await api.post(`/groups/${groupUuid}/join`);
 
       // Refetch group data to get updated members list including the new member
       interface GroupDetailResponse {
@@ -297,7 +297,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
         user_role: string | null;
       }
 
-      const data = await api.get<GroupDetailResponse>(`/groups/${groupId}`);
+      const data = await api.get<GroupDetailResponse>(`/groups/${groupUuid}`);
       setGroup({
         ...data.group,
         is_member: data.is_member,
@@ -383,6 +383,12 @@ export default function GroupChatPage({ params }: { params: Promise<{ id: string
                 <Users className="h-4 w-4" />
                 Members ({members.length})
               </CardTitle>
+              {/* Invite button for private groups - admin only */}
+              {group.privacy === 'private' && group.role === 'admin' && (
+                <div className="pt-2">
+                  <InviteMemberModal groupUuid={groupUuid} />
+                </div>
+              )}
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
               <ScrollArea className="h-full">

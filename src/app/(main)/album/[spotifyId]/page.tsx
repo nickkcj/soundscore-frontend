@@ -109,12 +109,12 @@ export default function AlbumPage({ params }: PageProps) {
     fetchReviews();
   }, [spotifyId, reviewsPage, album]);
 
-  const handleLike = async (reviewId: number) => {
-    const result = await toggleLike(reviewId);
+  const handleLike = async (reviewUuid: string) => {
+    const result = await toggleLike(reviewUuid);
     if (result) {
       setReviews((prev) =>
         prev.map((r) =>
-          r.id === reviewId
+          r.uuid === reviewUuid
             ? { ...r, is_liked: result.liked, like_count: result.like_count }
             : r
         )
@@ -122,11 +122,11 @@ export default function AlbumPage({ params }: PageProps) {
     }
   };
 
-  const handleDelete = async (reviewId: number) => {
+  const handleDelete = async (reviewUuid: string) => {
     if (confirm('Are you sure you want to delete this review?')) {
-      const success = await deleteReview(reviewId);
+      const success = await deleteReview(reviewUuid);
       if (success) {
-        setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+        setReviews((prev) => prev.filter((r) => r.uuid !== reviewUuid));
         setTotalReviews((prev) => prev - 1);
       }
     }
@@ -153,7 +153,7 @@ export default function AlbumPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
       <div className="container mx-auto max-w-5xl px-4 py-8">
         {/* Back Button */}
         <Button variant="ghost" onClick={() => router.back()} className="mb-6">

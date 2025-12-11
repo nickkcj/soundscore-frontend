@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, Heart, MessageCircle, UserPlus, Check } from 'lucide-react';
+import { Bell, Heart, MessageCircle, UserPlus, Check, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,13 +16,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNotificationStore } from '@/stores/notification-store';
 import { cn } from '@/lib/utils';
+import { GroupInviteNotification } from '@/components/notifications/group-invite-notification';
 import type { Notification } from '@/types';
 
-const notificationIcons = {
+const notificationIcons: Record<string, typeof Heart> = {
   like: Heart,
   comment: MessageCircle,
   reply: MessageCircle,
   follow: UserPlus,
+  group_invite: Users,
 };
 
 function NotificationItem({
@@ -35,8 +37,8 @@ function NotificationItem({
   const Icon = notificationIcons[notification.notification_type];
 
   const getLink = () => {
-    if (notification.review_id) {
-      return `/reviews/${notification.review_id}`;
+    if (notification.review_uuid) {
+      return `/reviews/${notification.review_uuid}`;
     }
     return `/profile/${notification.actor_username}`;
   };
@@ -149,13 +151,24 @@ export function NotificationDropdown() {
               <p className="text-sm text-muted-foreground">No notifications yet</p>
             </div>
           ) : (
-            notifications.map((notification) => (
-              <NotificationItem
-                key={notification.id}
-                notification={notification}
-                onRead={markAsRead}
-              />
-            ))
+            notifications.map((notification) =>
+              notification.notification_type === 'group_invite' ? (
+                <GroupInviteNotification
+                  key={notification.id}
+                  notification={notification}
+                  onAction={() => {
+                    // Refresh notifications after action
+                    useNotificationStore.getState().fetchNotifications(true);
+                  }}
+                />
+              ) : (
+                <NotificationItem
+                  key={notification.id}
+                  notification={notification}
+                  onRead={markAsRead}
+                />
+              )
+            )
           )}
         </ScrollArea>
       </DropdownMenuContent>

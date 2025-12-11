@@ -45,7 +45,7 @@ export default function FeedPage() {
   const [suggestedUsers, setSuggestedUsers] = useState<UserListItem[]>([]);
   const [suggestedUsersLoading, setSuggestedUsersLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [reviewToDelete, setReviewToDelete] = useState<number | null>(null);
+  const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [isReloading, setIsReloading] = useState(false);
 
@@ -98,17 +98,21 @@ export default function FeedPage() {
     if (!reviewToDelete) return;
 
     // Close dialog immediately for responsiveness
-    const reviewId = reviewToDelete;
+    const reviewUuid = reviewToDelete;
     setDeleteDialogOpen(false);
     setReviewToDelete(null);
 
-    // Optimistic removal - remove from UI immediately
-    removeReviewFromFeed(reviewId);
+    // Find the review to get its id for UI removal
+    const reviewToRemove = reviews.find(r => r.uuid === reviewUuid);
+    if (reviewToRemove) {
+      // Optimistic removal - remove from UI immediately
+      removeReviewFromFeed(reviewToRemove.id);
+    }
     toast.success('Review deleted');
 
     // API call in background
     try {
-      const success = await deleteReview(reviewId);
+      const success = await deleteReview(reviewUuid);
       if (!success) {
         // If API returns false, restore feed
         fetchFeed(true, sortOrder);
@@ -121,8 +125,8 @@ export default function FeedPage() {
     }
   };
 
-  const openDeleteDialog = (reviewId: number) => {
-    setReviewToDelete(reviewId);
+  const openDeleteDialog = (reviewUuid: string) => {
+    setReviewToDelete(reviewUuid);
     setDeleteDialogOpen(true);
   };
 
@@ -183,7 +187,7 @@ export default function FeedPage() {
                     myGroups.slice(0, 5).map((group) => (
                       <Link
                         key={group.id}
-                        href={`/groups/${group.id}`}
+                        href={`/groups/${group.uuid}`}
                         className="flex items-center gap-3 p-2.5 hover:bg-muted rounded-lg transition-colors"
                       >
                         <div className="w-14 h-9 rounded-md bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center overflow-hidden flex-shrink-0">

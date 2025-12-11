@@ -56,9 +56,9 @@ export function useFeed() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSort]);
 
-  const toggleLike = useCallback(async (reviewId: number) => {
+  const toggleLike = useCallback(async (reviewUuid: string) => {
     // Find current state
-    const review = reviews.find((r) => r.id === reviewId);
+    const review = reviews.find((r) => r.uuid === reviewUuid);
     if (!review) return;
 
     const wasLiked = review.is_liked;
@@ -66,7 +66,7 @@ export function useFeed() {
     // Optimistic update
     setReviews((prev) =>
       prev.map((r) =>
-        r.id === reviewId
+        r.uuid === reviewUuid
           ? {
               ...r,
               is_liked: !wasLiked,
@@ -77,11 +77,11 @@ export function useFeed() {
     );
 
     try {
-      const response = await api.post<LikeResponse>(`/reviews/${reviewId}/like`);
+      const response = await api.post<LikeResponse>(`/reviews/${reviewUuid}/like`);
       // Update with server response
       setReviews((prev) =>
         prev.map((r) =>
-          r.id === reviewId
+          r.uuid === reviewUuid
             ? { ...r, is_liked: response.liked, like_count: response.like_count }
             : r
         )
@@ -90,7 +90,7 @@ export function useFeed() {
       // Revert on error
       setReviews((prev) =>
         prev.map((r) =>
-          r.id === reviewId
+          r.uuid === reviewUuid
             ? { ...r, is_liked: wasLiked, like_count: review.like_count }
             : r
         )
@@ -209,14 +209,14 @@ export function useReview() {
   }, []);
 
   const updateReview = useCallback(async (
-    reviewId: number,
+    reviewUuid: string,
     data: ReviewUpdate
   ): Promise<Review | null> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const review = await api.patch<Review>(`/reviews/${reviewId}`, data);
+      const review = await api.patch<Review>(`/reviews/${reviewUuid}`, data);
       return review;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update review');
@@ -226,12 +226,12 @@ export function useReview() {
     }
   }, []);
 
-  const deleteReview = useCallback(async (reviewId: number): Promise<boolean> => {
+  const deleteReview = useCallback(async (reviewUuid: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      await api.delete(`/reviews/${reviewId}`);
+      await api.delete(`/reviews/${reviewUuid}`);
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete review');
@@ -241,12 +241,12 @@ export function useReview() {
     }
   }, []);
 
-  const getReview = useCallback(async (reviewId: number): Promise<Review | null> => {
+  const getReview = useCallback(async (reviewUuid: string): Promise<Review | null> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const review = await api.get<Review>(`/reviews/${reviewId}`);
+      const review = await api.get<Review>(`/reviews/${reviewUuid}`);
       return review;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch review');
@@ -256,9 +256,9 @@ export function useReview() {
     }
   }, []);
 
-  const toggleLike = useCallback(async (reviewId: number): Promise<LikeResponse | null> => {
+  const toggleLike = useCallback(async (reviewUuid: string): Promise<LikeResponse | null> => {
     try {
-      const response = await api.post<LikeResponse>(`/reviews/${reviewId}/like`);
+      const response = await api.post<LikeResponse>(`/reviews/${reviewUuid}/like`);
       return response;
     } catch {
       return null;
@@ -278,7 +278,7 @@ export function useReview() {
 }
 
 // Comments hook with optimistic updates
-export function useComments(reviewId: number) {
+export function useComments(reviewUuid: string) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -290,7 +290,7 @@ export function useComments(reviewId: number) {
 
     try {
       const response = await api.get<CommentListResponse>(
-        `/reviews/${reviewId}/comments?page=${currentPage}&per_page=20`
+        `/reviews/${reviewUuid}/comments?page=${currentPage}&per_page=20`
       );
 
       setComments((prev) =>
@@ -304,7 +304,7 @@ export function useComments(reviewId: number) {
       setIsLoading(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reviewId]);
+  }, [reviewUuid]);
 
   const addComment = useCallback(async (
     data: CommentCreate,
@@ -339,7 +339,7 @@ export function useComments(reviewId: number) {
 
     try {
       const comment = await api.post<Comment>(
-        `/reviews/${reviewId}/comments`,
+        `/reviews/${reviewUuid}/comments`,
         data
       );
 
@@ -379,7 +379,7 @@ export function useComments(reviewId: number) {
       }
       return null;
     }
-  }, [reviewId]);
+  }, [reviewUuid]);
 
   const deleteComment = useCallback(async (commentId: number): Promise<boolean> => {
     const previousComments = [...comments];
@@ -395,14 +395,14 @@ export function useComments(reviewId: number) {
     );
 
     try {
-      await api.delete(`/reviews/${reviewId}/comments/${commentId}`);
+      await api.delete(`/reviews/${reviewUuid}/comments/${commentId}`);
       return true;
     } catch {
       // Revert on error
       setComments(previousComments);
       return false;
     }
-  }, [reviewId, comments]);
+  }, [reviewUuid, comments]);
 
   const toggleCommentLike = useCallback(async (commentId: number): Promise<void> => {
     // Helper to update like state in comments tree
@@ -452,7 +452,7 @@ export function useComments(reviewId: number) {
     );
 
     try {
-      const response = await api.post<LikeResponse>(`/reviews/${reviewId}/comments/${commentId}/like`);
+      const response = await api.post<LikeResponse>(`/reviews/${reviewUuid}/comments/${commentId}/like`);
       // Update with server response
       setComments((prev) =>
         updateCommentLike(prev, commentId, response.liked, response.like_count)
@@ -463,7 +463,7 @@ export function useComments(reviewId: number) {
         updateCommentLike(prev, commentId, wasLiked ?? false, prevLikeCount)
       );
     }
-  }, [reviewId, comments]);
+  }, [reviewUuid, comments]);
 
   return {
     comments,

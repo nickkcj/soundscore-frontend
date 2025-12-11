@@ -33,7 +33,7 @@ export default function MyReviewsPage() {
   const { deleteReview } = useReview();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [reviewToDelete, setReviewToDelete] = useState<{ id: number; title: string } | null>(null);
+  const [reviewToDelete, setReviewToDelete] = useState<{ uuid: string; title: string } | null>(null);
   const [createReviewOpen, setCreateReviewOpen] = useState(false);
   const [viewReview, setViewReview] = useState<Review | null>(null);
 
@@ -51,7 +51,7 @@ export default function MyReviewsPage() {
   const handleDelete = async () => {
     if (!reviewToDelete) return;
 
-    const reviewId = reviewToDelete.id;
+    const reviewUuid = reviewToDelete.uuid;
 
     // Close dialog immediately for responsiveness
     setDeleteDialogOpen(false);
@@ -59,7 +59,7 @@ export default function MyReviewsPage() {
     toast.success('Review deleted');
 
     // API call in background, then refetch to sync
-    const success = await deleteReview(reviewId);
+    const success = await deleteReview(reviewUuid);
     if (success) {
       fetchReviews(true);
     } else {
@@ -69,7 +69,7 @@ export default function MyReviewsPage() {
   };
 
   const openDeleteDialog = (review: Review) => {
-    setReviewToDelete({ id: review.id, title: review.album.title });
+    setReviewToDelete({ uuid: review.uuid, title: review.album.title });
     setDeleteDialogOpen(true);
   };
 
@@ -78,7 +78,7 @@ export default function MyReviewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/50">
       <main className="container mx-auto max-w-7xl px-4 py-12 md:py-20">
         {/* User Profile Section */}
         <section className="mb-16 md:mb-20">
@@ -131,7 +131,7 @@ export default function MyReviewsPage() {
               <div className="md:ml-auto">
                 <button
                   onClick={() => setCreateReviewOpen(true)}
-                  className="inline-flex items-center px-6 py-3 bg-white text-pink-600 font-medium rounded-full hover:bg-pink-50 transition duration-300 shadow-md"
+                  className="inline-flex items-center px-6 py-3 bg-background text-pink-600 dark:text-pink-400 font-medium rounded-full hover:bg-muted transition duration-300 shadow-md"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Create New Review
@@ -143,7 +143,7 @@ export default function MyReviewsPage() {
 
         {/* Favorite Albums Section */}
         <section className="mb-16 md:mb-20">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-3 flex items-center">
+          <h2 className="text-3xl font-bold text-foreground mb-6 border-b border-border pb-3 flex items-center">
             <Heart className="w-8 h-8 mr-2 text-pink-500 fill-pink-500" />
             Favorite Albums
           </h2>
@@ -152,7 +152,7 @@ export default function MyReviewsPage() {
               {favoriteAlbums.map((review) => (
                 <div
                   key={review.id}
-                  className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 transform hover:-translate-y-1 group"
+                  className="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border transform hover:-translate-y-1 group"
                 >
                   <div className="aspect-square overflow-hidden relative">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-start p-3 z-10">
@@ -170,23 +170,23 @@ export default function MyReviewsPage() {
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 truncate mb-1">{review.album.title}</h3>
-                    <p className="text-sm text-gray-500 mb-2">{review.album.artist}</p>
+                    <h3 className="text-lg font-semibold text-foreground truncate mb-1">{review.album.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{review.album.artist}</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-              <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 italic">You haven&apos;t marked any albums as favorites yet.</p>
+            <div className="bg-card border border-border rounded-lg p-8 text-center">
+              <Heart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-muted-foreground italic">You haven&apos;t marked any albums as favorites yet.</p>
             </div>
           )}
         </section>
 
         {/* All Reviews Section */}
         <section>
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-3 flex items-center">
+          <h2 className="text-3xl font-bold text-foreground mb-6 border-b border-border pb-3 flex items-center">
             <ClipboardList className="w-8 h-8 mr-2 text-pink-500" />
             All Reviews
           </h2>
@@ -197,12 +197,12 @@ export default function MyReviewsPage() {
               ))}
             </div>
           ) : reviews.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="bg-pink-50 w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6">
+            <div className="text-center py-16 bg-card rounded-xl shadow-sm border border-border">
+              <div className="bg-pink-50 dark:bg-pink-950/30 w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6">
                 <ClipboardList className="w-12 h-12 text-pink-400" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">No Reviews Yet</h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto">
+              <h3 className="text-xl font-bold text-foreground mb-2">No Reviews Yet</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 Start sharing your thoughts on your favorite music by creating your first review.
               </p>
               <button
@@ -223,7 +223,7 @@ export default function MyReviewsPage() {
                 {reviews.map((review) => (
                   <div
                     key={review.id}
-                    className="flex bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden relative min-h-[140px] cursor-pointer"
+                    className="flex bg-card rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-border overflow-hidden relative min-h-[140px] cursor-pointer"
                     onClick={() => setViewReview(review)}
                   >
                     {/* Album Cover */}
@@ -239,19 +239,19 @@ export default function MyReviewsPage() {
 
                     {/* Review Content */}
                     <div className="flex-1 p-4 pr-12 flex flex-col">
-                      <h3 className="text-lg font-semibold text-gray-800 truncate">{review.album.title}</h3>
-                      <p className="text-sm text-gray-500 mb-2">{review.album.artist}</p>
+                      <h3 className="text-lg font-semibold text-foreground truncate">{review.album.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-2">{review.album.artist}</p>
 
                       {review.text && (
-                        <p className="text-sm text-gray-600 italic line-clamp-2 mb-2">&quot;{review.text}&quot;</p>
+                        <p className="text-sm text-muted-foreground italic line-clamp-2 mb-2">&quot;{review.text}&quot;</p>
                       )}
 
                       <div className="mt-auto flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <StarRating rating={review.rating} size="sm" />
-                          <span className="text-sm text-gray-500">{review.rating}/5</span>
+                          <span className="text-sm text-muted-foreground">{review.rating}/5</span>
                         </div>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-muted-foreground/70">
                           {review.created_at?.slice(0, 10) || 'N/A'}
                         </span>
                       </div>
@@ -261,7 +261,7 @@ export default function MyReviewsPage() {
                     <div className="absolute top-2 right-2 flex flex-col gap-2">
                       <button
                         onClick={(e) => { e.stopPropagation(); openDeleteDialog(review); }}
-                        className="p-1.5 bg-pink-50 text-pink-600 rounded-full hover:bg-pink-100 transition-colors duration-200"
+                        className="p-1.5 bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-100 dark:hover:bg-pink-950/50 transition-colors duration-200"
                         title="Delete Review"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -270,7 +270,7 @@ export default function MyReviewsPage() {
                         href={`/reviews/${review.id}/edit`}
                         onClick={(e) => e.stopPropagation()}
                         title="Edit Review"
-                        className="p-1.5 bg-pink-50 text-pink-600 rounded-full hover:bg-pink-100 transition-colors duration-200"
+                        className="p-1.5 bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-100 dark:hover:bg-pink-950/50 transition-colors duration-200"
                       >
                         <Pencil className="w-4 h-4" />
                       </Link>
@@ -307,40 +307,40 @@ export default function MyReviewsPage() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-bold text-gray-800">{viewReview.album.title}</h2>
-                  <p className="text-gray-600">{viewReview.album.artist}</p>
+                  <h2 className="text-xl font-bold text-foreground">{viewReview.album.title}</h2>
+                  <p className="text-muted-foreground">{viewReview.album.artist}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <StarRating rating={viewReview.rating} size="md" />
-                    <span className="text-gray-500">{viewReview.rating}/5</span>
+                    <span className="text-muted-foreground">{viewReview.rating}/5</span>
                   </div>
                 </div>
               </div>
 
               {/* Review Text */}
               {viewReview.text ? (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-gray-700 whitespace-pre-wrap">{viewReview.text}</p>
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <p className="text-foreground whitespace-pre-wrap">{viewReview.text}</p>
                 </div>
               ) : (
-                <p className="text-gray-400 italic text-center py-4">No review text</p>
+                <p className="text-muted-foreground italic text-center py-4">No review text</p>
               )}
 
               {/* Footer */}
-              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                <span className="text-sm text-gray-400">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span className="text-sm text-muted-foreground">
                   {viewReview.created_at?.slice(0, 10)}
                 </span>
                 <div className="flex gap-2">
                   <Link
                     href={`/reviews/${viewReview.id}/edit`}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-100 transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-950/50 transition-colors"
                   >
                     <Pencil className="w-4 h-4" />
                     Edit
                   </Link>
                   <button
                     onClick={() => { setViewReview(null); openDeleteDialog(viewReview); }}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete
@@ -359,17 +359,17 @@ export default function MyReviewsPage() {
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
               <Trash2 className="h-10 w-10 text-red-500" />
             </div>
-            <DialogTitle className="text-center text-xl font-bold text-gray-800">Delete Review</DialogTitle>
-            <DialogDescription className="text-center text-gray-600">
+            <DialogTitle className="text-center text-xl font-bold text-foreground">Delete Review</DialogTitle>
+            <DialogDescription className="text-center text-muted-foreground">
               Are you sure you want to delete your review of <span className="font-medium">{reviewToDelete?.title || 'this album'}</span>?
             </DialogDescription>
-            <p className="text-gray-500 text-sm mt-2 text-center">This action cannot be undone.</p>
+            <p className="text-muted-foreground text-sm mt-2 text-center">This action cannot be undone.</p>
           </DialogHeader>
           <DialogFooter className="flex justify-center gap-4 sm:justify-center">
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              className="rounded-xl flex-1 border-gray-300"
+              className="rounded-xl flex-1 border-border"
             >
               Cancel
             </Button>
@@ -389,15 +389,15 @@ export default function MyReviewsPage() {
 
 function ReviewItemSkeleton() {
   return (
-    <div className="flex bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden">
+    <div className="flex bg-card rounded-lg shadow-md border border-border overflow-hidden">
       <div className="w-1/3 max-w-[120px]">
-        <div className="w-full aspect-square bg-gray-200 animate-pulse" />
+        <div className="w-full aspect-square bg-muted animate-pulse" />
       </div>
       <div className="w-2/3 p-4 space-y-3">
-        <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse" />
-        <div className="h-4 w-1/2 bg-gray-200 rounded animate-pulse" />
-        <div className="h-3 w-full bg-gray-200 rounded animate-pulse" />
-        <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse" />
+        <div className="h-5 w-3/4 bg-muted rounded animate-pulse" />
+        <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
+        <div className="h-3 w-full bg-muted rounded animate-pulse" />
+        <div className="h-3 w-2/3 bg-muted rounded animate-pulse" />
       </div>
     </div>
   );
@@ -405,7 +405,7 @@ function ReviewItemSkeleton() {
 
 function MyReviewsSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/50">
       <main className="container mx-auto max-w-7xl px-4 py-12 md:py-20">
         {/* Profile Header Skeleton */}
         <section className="mb-16 md:mb-20">
@@ -425,14 +425,14 @@ function MyReviewsSkeleton() {
 
         {/* Favorites Skeleton */}
         <section className="mb-16">
-          <div className="h-10 w-48 bg-gray-200 rounded mb-6 animate-pulse" />
+          <div className="h-10 w-48 bg-muted rounded mb-6 animate-pulse" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg overflow-hidden shadow-md">
-                <div className="aspect-square bg-gray-200 animate-pulse" />
+              <div key={i} className="bg-card rounded-lg overflow-hidden shadow-md">
+                <div className="aspect-square bg-muted animate-pulse" />
                 <div className="p-4 space-y-2">
-                  <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse" />
-                  <div className="h-4 w-1/2 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-5 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
                 </div>
               </div>
             ))}
@@ -441,7 +441,7 @@ function MyReviewsSkeleton() {
 
         {/* Reviews Skeleton */}
         <section>
-          <div className="h-10 w-36 bg-gray-200 rounded mb-6 animate-pulse" />
+          <div className="h-10 w-36 bg-muted rounded mb-6 animate-pulse" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <ReviewItemSkeleton key={i} />

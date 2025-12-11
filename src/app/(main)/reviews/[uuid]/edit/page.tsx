@@ -17,8 +17,8 @@ import { useReview } from '@/hooks/use-reviews';
 import type { Review } from '@/types';
 import Link from 'next/link';
 
-export default function EditReviewPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function EditReviewPage({ params }: { params: Promise<{ uuid: string }> }) {
+  const { uuid } = use(params);
   const router = useRouter();
   const { user, isLoading: authLoading } = useRequireAuth();
   const { getReview, updateReview, isLoading, error } = useReview();
@@ -31,7 +31,7 @@ export default function EditReviewPage({ params }: { params: Promise<{ id: strin
 
   useEffect(() => {
     const fetchReview = async () => {
-      const reviewData = await getReview(parseInt(id));
+      const reviewData = await getReview(uuid);
       if (reviewData) {
         setReview(reviewData);
         setRating(reviewData.rating);
@@ -44,7 +44,7 @@ export default function EditReviewPage({ params }: { params: Promise<{ id: strin
     if (!authLoading) {
       fetchReview();
     }
-  }, [id, authLoading, getReview]);
+  }, [uuid, authLoading, getReview]);
 
   // Check ownership
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function EditReviewPage({ params }: { params: Promise<{ id: strin
 
     // API call in background
     try {
-      const updatedReview = await updateReview(parseInt(id), {
+      const updatedReview = await updateReview(uuid, {
         rating,
         text: text.trim() || undefined,
         is_favorite: isFavorite,
@@ -120,11 +120,11 @@ export default function EditReviewPage({ params }: { params: Promise<{ id: strin
 
   if (!review) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-12">
         <div className="container max-w-2xl mx-auto px-4">
-          <Card className="shadow-md border-gray-200">
+          <Card className="shadow-md border-border">
             <CardContent className="py-12 text-center">
-              <p className="text-gray-500">Review not found</p>
+              <p className="text-muted-foreground">Review not found</p>
               <Link href="/my-reviews">
                 <Button className="mt-4 bg-pink-600 hover:bg-pink-700">Back to My Reviews</Button>
               </Link>
@@ -136,14 +136,14 @@ export default function EditReviewPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-12">
       <div className="container max-w-2xl mx-auto px-4">
-        <Link href="/my-reviews" className="inline-flex items-center gap-2 text-gray-500 hover:text-pink-600 transition-colors mb-6">
+        <Link href="/my-reviews" className="inline-flex items-center gap-2 text-muted-foreground hover:text-pink-600 dark:hover:text-pink-400 transition-colors mb-6">
           <ArrowLeft className="h-4 w-4" />
           Back to My Reviews
         </Link>
 
-        <Card className="shadow-md border-gray-200">
+        <Card className="shadow-md border-border">
         <CardHeader>
           <CardTitle>Edit Review</CardTitle>
         </CardHeader>
@@ -248,15 +248,15 @@ export default function EditReviewPage({ params }: { params: Promise<{ id: strin
 
 function EditReviewSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-12">
       <div className="container max-w-2xl mx-auto px-4">
         <Skeleton className="h-6 w-32 mb-6" />
-        <Card className="shadow-md border-gray-200">
+        <Card className="shadow-md border-border">
           <CardHeader>
             <Skeleton className="h-6 w-24" />
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex gap-4 p-4 rounded-lg bg-gray-50">
+            <div className="flex gap-4 p-4 rounded-lg bg-muted/50">
               <Skeleton className="h-24 w-24 rounded-lg" />
               <div className="space-y-2">
                 <Skeleton className="h-5 w-32" />

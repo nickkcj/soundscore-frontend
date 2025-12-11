@@ -10,11 +10,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { Comment, CommentListResponse } from '@/types';
 
 interface CommentPreviewProps {
-  reviewId: number;
+  reviewUuid: string;
   commentCount: number;
 }
 
-export function CommentPreview({ reviewId, commentCount }: CommentPreviewProps) {
+export function CommentPreview({ reviewUuid, commentCount }: CommentPreviewProps) {
   const [previewComments, setPreviewComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,7 +22,7 @@ export function CommentPreview({ reviewId, commentCount }: CommentPreviewProps) 
     const fetchPreview = async () => {
       try {
         const response = await api.get<CommentListResponse>(
-          `/reviews/${reviewId}/comments?page=1&per_page=3`
+          `/reviews/${reviewUuid}/comments?page=1&per_page=3`
         );
         setPreviewComments(response.comments.slice(0, 3));
       } catch {
@@ -37,7 +37,7 @@ export function CommentPreview({ reviewId, commentCount }: CommentPreviewProps) 
     } else {
       setIsLoading(false);
     }
-  }, [reviewId, commentCount]);
+  }, [reviewUuid, commentCount]);
 
   if (commentCount === 0) return null;
 
@@ -87,7 +87,7 @@ export function CommentPreview({ reviewId, commentCount }: CommentPreviewProps) 
 
       {/* View All Link */}
       <Link
-        href={`/reviews/${reviewId}`}
+        href={`/reviews/${reviewUuid}`}
         className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
       >
 I        {commentCount === 1

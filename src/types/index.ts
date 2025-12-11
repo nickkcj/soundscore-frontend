@@ -74,6 +74,7 @@ export interface AlbumDetail {
 // Review types
 export interface Review {
   id: number;
+  uuid: string;
   rating: number;
   text: string | null;
   is_favorite: boolean;
@@ -157,6 +158,7 @@ export interface FollowResponse {
 // Group types
 export interface Group {
   id: number;
+  uuid: string;
   name: string;
   description: string | null;
   privacy: 'public' | 'private';
@@ -207,18 +209,59 @@ export interface GroupListResponse {
   has_prev: boolean;
 }
 
+// Group Invite types
+export interface GroupInvite {
+  id: number;
+  uuid: string;
+  group_id: number;
+  group_name: string;
+  group_uuid: string;
+  group_cover_image: string | null;
+  invitee_id: number;
+  invitee_username: string;
+  inviter_id: number;
+  inviter_username: string;
+  inviter_profile_picture: string | null;
+  status: 'pending' | 'accepted' | 'declined' | 'expired';
+  created_at: string;
+  expires_at: string;
+}
+
+export interface GroupInviteListResponse {
+  invites: GroupInvite[];
+  total: number;
+}
+
+export interface InviteActionResponse {
+  success: boolean;
+  message: string;
+  group_uuid?: string;
+}
+
+export interface GroupInviteResponse {
+  invite: GroupInvite;
+  message: string;
+}
+
 // Notification types
 export interface Notification {
   id: number;
-  notification_type: 'like' | 'comment' | 'follow' | 'reply';
+  notification_type: 'like' | 'comment' | 'follow' | 'reply' | 'group_invite';
   message: string;
   review_id: number | null;
+  review_uuid: string | null;
   comment_id: number | null;
   is_read: boolean;
   created_at: string;
   actor_id: number;
   actor_username: string;
   actor_profile_picture: string | null;
+  // Group invite specific fields
+  invite_uuid?: string;
+  group_uuid?: string;
+  group_name?: string;
+  group_cover_image?: string | null;
+  expires_at?: string;
 }
 
 export interface NotificationListResponse {
@@ -276,7 +319,7 @@ export interface MessageResponse {
 
 // WebSocket message types
 export interface WSMessage {
-  type: 'message' | 'user_joined' | 'user_left' | 'online_users' | 'typing';
+  type: 'message' | 'user_joined' | 'user_left' | 'online_users' | 'typing' | 'member_joined';
   content?: string;
   image_url?: string;
   user_id?: number;
@@ -285,6 +328,9 @@ export interface WSMessage {
   message_id?: number;
   timestamp?: string;
   online_users?: { user_id: number; username: string; profile_picture: string }[];
+  role?: 'admin' | 'moderator' | 'member';
+  joined_at?: string;
+  member_count?: number;
 }
 
 // Chatbot types
@@ -327,6 +373,7 @@ export interface TopAlbumsResponse {
 
 export interface RecentReview {
   id: number;
+  uuid: string;
   rating: number;
   text: string | null;
   created_at: string;

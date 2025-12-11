@@ -140,13 +140,13 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   };
 
   // Handle like for reviews
-  const handleLike = async (reviewId: number) => {
+  const handleLike = async (reviewUuid: string) => {
     if (!currentUser) {
       toast.error('Please log in to like reviews');
       return;
     }
 
-    const review = reviews.find((r) => r.id === reviewId);
+    const review = reviews.find((r) => r.uuid === reviewUuid);
     if (!review) return;
 
     const wasLiked = review.is_liked;
@@ -154,7 +154,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     // Optimistic update
     setReviews((prev) =>
       prev.map((r) =>
-        r.id === reviewId
+        r.uuid === reviewUuid
           ? {
               ...r,
               is_liked: !wasLiked,
@@ -165,10 +165,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     );
 
     try {
-      const response = await api.post<LikeResponse>(`/reviews/${reviewId}/like`);
+      const response = await api.post<LikeResponse>(`/reviews/${reviewUuid}/like`);
       setReviews((prev) =>
         prev.map((r) =>
-          r.id === reviewId
+          r.uuid === reviewUuid
             ? { ...r, is_liked: response.liked, like_count: response.like_count }
             : r
         )
@@ -177,7 +177,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
       // Revert on error
       setReviews((prev) =>
         prev.map((r) =>
-          r.id === reviewId
+          r.uuid === reviewUuid
             ? { ...r, is_liked: wasLiked, like_count: review.like_count }
             : r
         )
@@ -186,7 +186,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   };
 
   // Handle delete for reviews
-  const handleDelete = async (reviewId: number) => {
+  const handleDelete = async (reviewUuid: string) => {
     if (!confirm('Are you sure you want to delete this review?')) return;
 
     // Save current state for potential rollback
@@ -194,7 +194,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     const previousReviewCount = profile?.review_count ?? 0;
 
     // Optimistic delete - remove immediately
-    setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+    setReviews((prev) => prev.filter((r) => r.uuid !== reviewUuid));
     setProfile((prev) =>
       prev ? { ...prev, review_count: prev.review_count - 1 } : null
     );
@@ -202,7 +202,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
     // API call in background
     try {
-      await api.delete(`/reviews/${reviewId}`);
+      await api.delete(`/reviews/${reviewUuid}`);
     } catch {
       // Revert on error
       setReviews(previousReviews);
@@ -219,12 +219,12 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <div className="h-48 md:h-64 bg-gradient-to-r from-pink-400 to-purple-500" />
         <div className="container mx-auto max-w-3xl px-4 py-12">
-          <div className="text-center p-10 bg-white rounded-lg border border-dashed border-gray-300">
-            <div className="text-5xl text-gray-300 mb-3 inline-block">?</div>
-            <p className="text-gray-500 font-medium">User not found</p>
+          <div className="text-center p-10 bg-card rounded-lg border border-dashed border-border">
+            <div className="text-5xl text-muted-foreground/30 mb-3 inline-block">?</div>
+            <p className="text-muted-foreground font-medium">User not found</p>
           </div>
         </div>
       </div>
@@ -234,7 +234,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const avgRating = profile.avg_rating ? profile.avg_rating.toFixed(1) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Banner Section */}
       <div className="relative">
         {/* Banner Image */}
@@ -278,8 +278,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         {/* Profile Picture - Overlapping Banner */}
         <div className="container mx-auto max-w-3xl px-4">
           <div className="relative -mt-16 md:-mt-20 flex justify-between items-end">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white
-                          shadow-lg overflow-hidden bg-gray-100">
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-background
+                          shadow-lg overflow-hidden bg-muted">
               <Image
                 src={profile.profile_picture || '/images/default.jpg'}
                 alt={profile.username}
@@ -322,43 +322,43 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
       <main className="container mx-auto max-w-3xl px-4 pt-4 pb-8">
         {/* Username & Bio */}
         <div className="mb-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             {profile.username}
           </h1>
           {profile.bio && (
-            <p className="text-gray-600 mt-2 max-w-lg whitespace-pre-wrap">{profile.bio}</p>
+            <p className="text-muted-foreground mt-2 max-w-lg whitespace-pre-wrap">{profile.bio}</p>
           )}
-          <p className="text-sm text-gray-400 mt-2 flex items-center gap-1">
+          <p className="text-sm text-muted-foreground/70 mt-2 flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             Joined {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true })}
           </p>
         </div>
 
         {/* Stats Row */}
-        <div className="flex gap-6 pb-6 border-b border-gray-200">
+        <div className="flex gap-6 pb-6 border-b border-border">
           <div className="text-center">
-            <span className="block text-xl font-bold text-gray-900">{profile.review_count}</span>
-            <span className="text-sm text-gray-500">Reviews</span>
+            <span className="block text-xl font-bold text-foreground">{profile.review_count}</span>
+            <span className="text-sm text-muted-foreground">Reviews</span>
           </div>
           {avgRating && (
             <div className="text-center">
               <span className="block text-xl font-bold text-amber-500">{avgRating}</span>
-              <span className="text-sm text-gray-500">Avg Rating</span>
+              <span className="text-sm text-muted-foreground">Avg Rating</span>
             </div>
           )}
           <div className="text-center">
-            <span className="block text-xl font-bold text-gray-900">{profile.followers_count}</span>
-            <span className="text-sm text-gray-500">Followers</span>
+            <span className="block text-xl font-bold text-foreground">{profile.followers_count}</span>
+            <span className="text-sm text-muted-foreground">Followers</span>
           </div>
           <div className="text-center">
-            <span className="block text-xl font-bold text-gray-900">{profile.following_count}</span>
-            <span className="text-sm text-gray-500">Following</span>
+            <span className="block text-xl font-bold text-foreground">{profile.following_count}</span>
+            <span className="text-sm text-muted-foreground">Following</span>
           </div>
         </div>
 
         {/* Reviews Section */}
         <section className="py-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-6">Reviews</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-6">Reviews</h2>
 
           {reviewsLoading && reviews.length === 0 ? (
             <div className="space-y-4">
@@ -367,9 +367,9 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               ))}
             </div>
           ) : reviews.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
-              <div className="text-5xl text-gray-300 mb-3">🎧</div>
-              <p className="text-gray-500">No reviews yet.</p>
+            <div className="text-center py-12 bg-card rounded-xl border border-dashed border-border">
+              <div className="text-5xl text-muted-foreground/30 mb-3">🎧</div>
+              <p className="text-muted-foreground">No reviews yet.</p>
             </div>
           ) : (
             <InfiniteScroll
@@ -397,41 +397,41 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
 function ProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Banner Skeleton */}
-      <div className="h-48 md:h-64 bg-gray-200 animate-pulse" />
+      <div className="h-48 md:h-64 bg-muted animate-pulse" />
 
       {/* Profile Content */}
       <div className="container mx-auto max-w-3xl px-4">
         {/* Profile Picture Skeleton */}
         <div className="relative -mt-16 md:-mt-20 flex justify-between items-end">
-          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-300 border-4 border-white animate-pulse" />
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-muted border-4 border-background animate-pulse" />
           <div className="mb-4">
-            <div className="h-10 w-28 bg-gray-200 rounded-full animate-pulse" />
+            <div className="h-10 w-28 bg-muted rounded-full animate-pulse" />
           </div>
         </div>
 
         <div className="pt-4">
           {/* Name skeleton */}
-          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-2" />
+          <div className="h-8 w-48 bg-muted rounded animate-pulse mb-2" />
           {/* Bio skeleton */}
-          <div className="h-4 w-72 bg-gray-200 rounded animate-pulse mb-2" />
+          <div className="h-4 w-72 bg-muted rounded animate-pulse mb-2" />
           {/* Date skeleton */}
-          <div className="h-4 w-40 bg-gray-200 rounded animate-pulse mb-4" />
+          <div className="h-4 w-40 bg-muted rounded animate-pulse mb-4" />
 
           {/* Stats Skeleton */}
-          <div className="flex gap-6 py-6 border-b border-gray-200">
+          <div className="flex gap-6 py-6 border-b border-border">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="text-center">
-                <div className="h-6 w-12 bg-gray-200 rounded animate-pulse mx-auto mb-1" />
-                <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+                <div className="h-6 w-12 bg-muted rounded animate-pulse mx-auto mb-1" />
+                <div className="h-4 w-16 bg-muted rounded animate-pulse" />
               </div>
             ))}
           </div>
 
           {/* Reviews Skeleton */}
           <div className="py-6">
-            <div className="h-6 w-24 bg-gray-200 rounded animate-pulse mb-6" />
+            <div className="h-6 w-24 bg-muted rounded animate-pulse mb-6" />
             <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (
                 <ReviewCardSkeleton key={i} />

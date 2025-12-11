@@ -111,6 +111,7 @@ export function CreateReviewModal({
       // Create optimistic review object
       const optimisticReview: OptimisticReview = {
         id: -1,
+        uuid: optimisticId,
         _optimistic: true,
         _optimisticId: optimisticId,
         rating,
@@ -193,26 +194,26 @@ export function CreateReviewModal({
         showCloseButton={false}
       >
         {/* Header */}
-        <DialogHeader className="flex-shrink-0 border-b border-gray-200 pb-4">
+        <DialogHeader className="flex-shrink-0 border-b border-border pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {selectedAlbum && (
                 <button
                   onClick={handleBack}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1 hover:bg-muted rounded-full transition-colors"
                 >
-                  <ArrowLeft className="h-5 w-5 text-gray-500" />
+                  <ArrowLeft className="h-5 w-5 text-muted-foreground" />
                 </button>
               )}
-              <DialogTitle className="text-xl font-bold text-gray-800">
+              <DialogTitle className="text-xl font-bold text-foreground">
                 {selectedAlbum ? 'Write Your Review' : 'Create New Review'}
               </DialogTitle>
             </div>
             <button
               onClick={handleClose}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-1 hover:bg-muted rounded-full transition-colors"
             >
-              <X className="h-5 w-5 text-gray-500" />
+              <X className="h-5 w-5 text-muted-foreground" />
             </button>
           </div>
         </DialogHeader>
@@ -224,25 +225,25 @@ export function CreateReviewModal({
             <div className="space-y-4">
               {/* Search Input */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Search for an Album or Artist
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     type="text"
                     value={query}
                     onChange={handleSearchChange}
                     placeholder="Enter album or artist name..."
-                    className="pl-10 py-3 border-gray-300 focus:ring-pink-500 focus:border-pink-500"
+                    className="pl-10 py-3 border-input focus:ring-pink-500 focus:border-pink-500"
                     autoFocus
                   />
                   {query && (
                     <button
                       onClick={() => { setQuery(''); clearResults(); }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full"
                     >
-                      <X className="h-4 w-4 text-gray-400" />
+                      <X className="h-4 w-4 text-muted-foreground" />
                     </button>
                   )}
                 </div>
@@ -252,19 +253,19 @@ export function CreateReviewModal({
               {searchLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
-                  <span className="ml-3 text-gray-500">Searching...</span>
+                  <span className="ml-3 text-muted-foreground">Searching...</span>
                 </div>
               ) : results && results.length > 0 ? (
                 <div className="space-y-3">
-                  <p className="text-sm text-gray-500">{results.length} results found</p>
+                  <p className="text-sm text-muted-foreground">{results.length} results found</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto pr-2">
                     {results.map((album) => (
                       <button
                         key={album.spotify_id}
                         onClick={() => handleSelectAlbum(album)}
-                        className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-pink-300 hover:shadow-md transition-all text-left group"
+                        className="bg-card rounded-lg border border-border overflow-hidden hover:border-pink-300 dark:hover:border-pink-700 hover:shadow-md transition-all text-left group"
                       >
-                        <div className="aspect-square relative bg-gray-100">
+                        <div className="aspect-square relative bg-muted">
                           {album.cover_image ? (
                             <Image
                               src={album.cover_image}
@@ -274,17 +275,17 @@ export function CreateReviewModal({
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <Music className="h-12 w-12 text-gray-300" />
+                              <Music className="h-12 w-12 text-muted-foreground/30" />
                             </div>
                           )}
                         </div>
                         <div className="p-3">
-                          <h3 className="font-semibold text-gray-800 truncate text-sm" title={album.title}>
+                          <h3 className="font-semibold text-foreground truncate text-sm" title={album.title}>
                             {album.title}
                           </h3>
-                          <p className="text-xs text-gray-500 truncate">{album.artist}</p>
+                          <p className="text-xs text-muted-foreground truncate">{album.artist}</p>
                           {album.release_date && (
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-muted-foreground/70">
                               {new Date(album.release_date).getFullYear()}
                             </p>
                           )}
@@ -295,13 +296,13 @@ export function CreateReviewModal({
                 </div>
               ) : query && !searchLoading ? (
                 <div className="text-center py-12">
-                  <Music className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">No albums found for &quot;{query}&quot;</p>
+                  <Music className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+                  <p className="text-muted-foreground">No albums found for &quot;{query}&quot;</p>
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <Music className="h-16 w-16 text-gray-200 mx-auto mb-4" />
-                  <p className="text-gray-400">Start typing to search for an album</p>
+                  <Music className="h-16 w-16 text-muted-foreground/20 mx-auto mb-4" />
+                  <p className="text-muted-foreground/70">Start typing to search for an album</p>
                 </div>
               )}
             </div>
@@ -309,8 +310,8 @@ export function CreateReviewModal({
             /* Review Form Step */
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Selected Album */}
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+              <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-xl">
+                <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                   {selectedAlbum.cover_image ? (
                     <Image
                       src={selectedAlbum.cover_image}
@@ -321,15 +322,15 @@ export function CreateReviewModal({
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Music className="h-8 w-8 text-gray-400" />
+                      <Music className="h-8 w-8 text-muted-foreground" />
                     </div>
                   )}
                 </div>
                 <div className="flex-grow min-w-0">
-                  <h3 className="font-bold text-gray-800 truncate">{selectedAlbum.title}</h3>
-                  <p className="text-gray-600 text-sm">{selectedAlbum.artist}</p>
+                  <h3 className="font-bold text-foreground truncate">{selectedAlbum.title}</h3>
+                  <p className="text-muted-foreground text-sm">{selectedAlbum.artist}</p>
                   {selectedAlbum.release_date && (
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-muted-foreground/70 text-sm">
                       {new Date(selectedAlbum.release_date).getFullYear()}
                     </p>
                   )}
@@ -338,7 +339,7 @@ export function CreateReviewModal({
 
               {/* Rating */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-foreground mb-3">
                   Your Rating
                 </label>
                 <div className="flex items-center gap-4">
@@ -348,7 +349,7 @@ export function CreateReviewModal({
                     interactive
                     onChange={setRating}
                   />
-                  <span className="text-gray-500 text-sm">
+                  <span className="text-muted-foreground text-sm">
                     {rating > 0 ? `${rating}/5` : 'Click to rate'}
                   </span>
                 </div>
@@ -356,15 +357,15 @@ export function CreateReviewModal({
 
               {/* Review Text */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Review <span className="text-gray-400 font-normal">(optional)</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Your Review <span className="text-muted-foreground font-normal">(optional)</span>
                 </label>
                 <Textarea
                   placeholder="Share your thoughts about this album..."
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   rows={4}
-                  className="border-gray-300 focus:ring-pink-500 focus:border-pink-500"
+                  className="border-input focus:ring-pink-500 focus:border-pink-500"
                 />
               </div>
 
@@ -375,10 +376,10 @@ export function CreateReviewModal({
                   id="favorite"
                   checked={isFavorite}
                   onChange={(e) => setIsFavorite(e.target.checked)}
-                  className="h-4 w-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
+                  className="h-4 w-4 text-pink-600 border-input rounded focus:ring-pink-500"
                 />
-                <label htmlFor="favorite" className="flex items-center gap-2 text-gray-700 cursor-pointer text-sm">
-                  <Heart className={`h-4 w-4 ${isFavorite ? 'text-pink-500 fill-pink-500' : 'text-gray-400'}`} />
+                <label htmlFor="favorite" className="flex items-center gap-2 text-foreground cursor-pointer text-sm">
+                  <Heart className={`h-4 w-4 ${isFavorite ? 'text-pink-500 fill-pink-500' : 'text-muted-foreground'}`} />
                   Mark as favorite album
                 </label>
               </div>

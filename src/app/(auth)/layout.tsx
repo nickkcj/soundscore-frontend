@@ -14,7 +14,7 @@ export default function AuthLayout({
   // Mostra loading enquanto verifica auth OU quando já está autenticado (redirecionando)
   if (isLoading || isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-50 to-white">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-50 to-white dark:from-pink-950/20 dark:to-background">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-pulse">
             <Image
@@ -87,7 +87,7 @@ export default function AuthLayout({
       </div>
 
       {/* Right side - Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-8 bg-gray-50">
+      <div className="flex w-full lg:w-1/2 items-center justify-center p-8 bg-muted">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <Link href="/" className="flex items-center gap-2 mb-8 lg:hidden">

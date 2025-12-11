@@ -114,12 +114,11 @@ export function GroupInviteNotification({
       </div>
 
       {!isExpired && (
-        <div className="flex gap-2 ml-13 pl-13">
+        <div className="flex gap-2 pl-[52px] pr-4">
           <Button
             size="sm"
             onClick={handleAccept}
             disabled={isLoading}
-            className="flex-1"
           >
             <Check className="h-4 w-4 mr-1" />
             Accept
@@ -129,7 +128,6 @@ export function GroupInviteNotification({
             variant="outline"
             onClick={handleDecline}
             disabled={isLoading}
-            className="flex-1"
           >
             <X className="h-4 w-4 mr-1" />
             Ignore

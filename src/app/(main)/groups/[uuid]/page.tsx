@@ -318,7 +318,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
 
   if (!group) {
     return (
-      <div className="container px-4 py-8">
+      <div className="container max-w-2xl mx-auto px-4 py-8">
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">Group not found</p>

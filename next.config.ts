@@ -9,7 +9,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'wessmnaqfgfdyigckcni.supabase.co', // Supabase storage
+        hostname: 'wessmnaqfgfdyigckcni.supabase.co', // Supabase storage (old)
+      },
+      {
+        protocol: 'https',
+        hostname: 'cksowdtecwjbwirzjlnf.supabase.co', // Supabase storage (US-WEST)
       },
       {
         protocol: 'https',

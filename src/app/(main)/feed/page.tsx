@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Music, TrendingUp, Users, Plus, UsersRound, RefreshCw } from 'lucide-react';
@@ -9,11 +9,11 @@ import { Button } from '@/components/ui/button';
 import { ReviewCard, ReviewCardSkeleton } from '@/components/reviews/review-card';
 import { InfiniteScroll } from '@/components/common/infinite-scroll';
 import { useRequireAuth } from '@/hooks/use-auth';
-import { useFeed, useReview } from '@/hooks/use-reviews';
 import { StarRating } from '@/components/common/star-rating';
-import { homeApi, api } from '@/lib/api';
+import { useTrendingAlbums, useMyGroups, useSuggestedUsers } from '@/hooks/queries/use-sidebar-queries';
+import { useFeedQuery, useLikeMutation, useDeleteReviewMutation } from '@/hooks/queries/use-feed-query';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { TrendingAlbum, Group, GroupListResponse, UserListItem, PaginatedUsersResponse } from '@/types';
+import type { TrendingAlbum } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Dialog,
@@ -26,108 +26,46 @@ import {
 
 export default function FeedPage() {
   const { isLoading: authLoading } = useRequireAuth();
-  const {
-    reviews,
-    isLoading,
-    isLoadingMore,
-    hasMore,
-    error,
-    fetchFeed,
-    toggleLike,
-    removeReviewFromFeed,
-  } = useFeed();
-  const { deleteReview } = useReview();
 
-  const [trendingAlbums, setTrendingAlbums] = useState<TrendingAlbum[]>([]);
-  const [trendingAlbumsLoading, setTrendingAlbumsLoading] = useState(true);
-  const [myGroups, setMyGroups] = useState<Group[]>([]);
-  const [myGroupsLoading, setMyGroupsLoading] = useState(true);
-  const [suggestedUsers, setSuggestedUsers] = useState<UserListItem[]>([]);
-  const [suggestedUsersLoading, setSuggestedUsersLoading] = useState(true);
+  // State
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
-  const [isReloading, setIsReloading] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading) {
-      fetchFeed(true, sortOrder);
-      // Fetch trending albums
-      homeApi.getTrendingAlbums(3)
-        .then((response) => {
-          setTrendingAlbums(response.albums);
-        })
-        .catch((error) => {
-          console.error('Failed to fetch trending albums:', error);
-        })
-        .finally(() => {
-          setTrendingAlbumsLoading(false);
-        });
-      // Fetch my groups
-      api.get<GroupListResponse>('/groups/my-groups')
-        .then((response) => {
-          setMyGroups(response.groups);
-        })
-        .catch((error) => {
-          console.error('Failed to fetch my groups:', error);
-        })
-        .finally(() => {
-          setMyGroupsLoading(false);
-        });
-      // Fetch suggested users
-      api.get<PaginatedUsersResponse>('/users/suggested?limit=5')
-        .then((response) => {
-          setSuggestedUsers(response.users);
-        })
-        .catch((error) => {
-          console.error('Failed to fetch suggested users:', error);
-        })
-        .finally(() => {
-          setSuggestedUsersLoading(false);
-        });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading]);
+  // React Query hooks for sidebar data (cached & deduped)
+  const { data: trendingData, isLoading: trendingAlbumsLoading } = useTrendingAlbums(3);
+  const { data: groupsData, isLoading: myGroupsLoading } = useMyGroups();
+  const { data: suggestedData, isLoading: suggestedUsersLoading } = useSuggestedUsers(5);
 
+  // React Query infinite scroll for feed
+  const {
+    data: feedData,
+    isLoading: feedLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+    isRefetching,
+    error: feedError,
+  } = useFeedQuery(sortOrder);
+
+  // Mutations
+  const likeMutation = useLikeMutation();
+  const deleteMutation = useDeleteReviewMutation();
+
+  // Derived data
+  const trendingAlbums = trendingData?.albums ?? [];
+  const myGroups = groupsData?.groups ?? [];
+  const suggestedUsers = suggestedData?.users ?? [];
+
+  // Flatten paginated reviews into single array
+  const reviews = useMemo(() => {
+    return feedData?.pages.flatMap((page) => page.reviews) ?? [];
+  }, [feedData]);
+
+  // Handlers
   const handleSortChange = (newSort: 'desc' | 'asc') => {
     setSortOrder(newSort);
-    fetchFeed(true, newSort);
-  };
-
-  const handleDelete = async () => {
-    if (!reviewToDelete) return;
-
-    // Close dialog immediately for responsiveness
-    const reviewUuid = reviewToDelete;
-    setDeleteDialogOpen(false);
-    setReviewToDelete(null);
-
-    // Find the review to get its id for UI removal
-    const reviewToRemove = reviews.find(r => r.uuid === reviewUuid);
-    if (reviewToRemove) {
-      // Optimistic removal - remove from UI immediately
-      removeReviewFromFeed(reviewToRemove.id);
-    }
-    toast.success('Review deleted');
-
-    // API call in background
-    try {
-      const success = await deleteReview(reviewUuid);
-      if (!success) {
-        // If API returns false, restore feed
-        fetchFeed(true, sortOrder);
-        toast.error('Failed to delete review. Restoring...');
-      }
-    } catch {
-      // Revert on error - refetch feed
-      fetchFeed(true, sortOrder);
-      toast.error('Failed to delete review. Restoring...');
-    }
-  };
-
-  const openDeleteDialog = (reviewUuid: string) => {
-    setReviewToDelete(reviewUuid);
-    setDeleteDialogOpen(true);
   };
 
   const toggleSort = () => {
@@ -135,15 +73,49 @@ export default function FeedPage() {
     handleSortChange(newSort);
   };
 
-  const handleReload = async () => {
-    setIsReloading(true);
-    await fetchFeed(true, sortOrder);
-    setIsReloading(false);
+  const handleReload = () => {
+    refetch();
+  };
+
+  const handleLike = (reviewUuid: string) => {
+    likeMutation.mutate(reviewUuid);
+  };
+
+  const openDeleteDialog = (reviewUuid: string) => {
+    setReviewToDelete(reviewUuid);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!reviewToDelete) return;
+
+    const reviewUuid = reviewToDelete;
+    setDeleteDialogOpen(false);
+    setReviewToDelete(null);
+
+    toast.success('Review deleted');
+    deleteMutation.mutate(reviewUuid, {
+      onError: () => {
+        toast.error('Failed to delete review');
+        refetch();
+      },
+    });
+  };
+
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
   };
 
   if (authLoading) {
     return <FeedSkeleton />;
   }
+
+  const isLoading = feedLoading;
+  const isLoadingMore = isFetchingNextPage;
+  const hasMore = hasNextPage ?? false;
+  const error = feedError ? (feedError as Error).message : null;
 
   return (
     <div className="bg-background min-h-screen relative">
@@ -249,11 +221,11 @@ export default function FeedPage() {
                 {/* Reload Button */}
                 <button
                   onClick={handleReload}
-                  disabled={isReloading}
+                  disabled={isRefetching}
                   className="text-sm text-pink-600 dark:text-pink-300 font-medium flex items-center px-3 py-1.5 bg-pink-50 dark:bg-pink-950 rounded-full shadow-sm hover:bg-pink-100 dark:hover:bg-pink-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Reload feed"
                 >
-                  <RefreshCw className={`w-4 h-4 ${isReloading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
                 </button>
                 {/* Sort Toggle Button */}
                 <button
@@ -278,7 +250,7 @@ export default function FeedPage() {
             {error && (
               <div className="bg-red-50 dark:bg-red-950 text-red-600 p-4 rounded-xl mb-8 shadow-sm border border-red-100 dark:border-red-900">
                 {error}
-                <Button variant="link" className="ml-2" onClick={() => fetchFeed(true)}>
+                <Button variant="link" className="ml-2" onClick={() => refetch()}>
                   Try again
                 </Button>
               </div>
@@ -302,15 +274,15 @@ export default function FeedPage() {
               <InfiniteScroll
                 hasMore={hasMore}
                 isLoading={isLoadingMore}
-                onLoadMore={() => fetchFeed(false)}
+                onLoadMore={handleLoadMore}
                 loader={<ReviewCardSkeleton />}
               >
                 <div className="space-y-10">
                   {reviews.map((review) => (
                     <ReviewCard
-                      key={review.id}
+                      key={review.uuid}
                       review={review}
-                      onLike={toggleLike}
+                      onLike={handleLike}
                       onDelete={openDeleteDialog}
                     />
                   ))}
@@ -322,7 +294,7 @@ export default function FeedPage() {
             {hasMore && !isLoadingMore && reviews.length > 0 && (
               <div className="mt-12 text-center">
                 <button
-                  onClick={() => fetchFeed(false)}
+                  onClick={handleLoadMore}
                   className="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-full text-sm font-medium transition-all hover:shadow-md hover:from-pink-600 hover:to-pink-700 flex items-center mx-auto"
                 >
                   <span>Load more</span>

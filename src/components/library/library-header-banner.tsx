@@ -24,21 +24,21 @@ export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryH
 
   return (
     <div className="relative h-36 lg:h-48 rounded-xl overflow-hidden">
-      {/* Blurred Background */}
+      {/* Background Image */}
       {bannerImage ? (
         <Image
           src={bannerImage}
           alt="Banner"
           fill
-          className="object-cover blur-xl scale-110"
+          className="object-cover"
           priority
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/5" />
       )}
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-background/30" />
+      {/* Gradient Overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
 
       {/* Content */}
       <div className="relative h-full flex items-center justify-between px-4 lg:px-6">

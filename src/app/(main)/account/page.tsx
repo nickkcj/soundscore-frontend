@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, User, Lock, Trash2, Settings, Camera, AlertTriangle } from 'lucide-react';
+import { Loader2, User, Lock, Trash2, Settings, Camera, AlertTriangle, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
 import { useRequireAuth } from '@/hooks/use-auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { api } from '@/lib/api';
@@ -58,7 +59,9 @@ export default function AccountPage() {
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [activeSection, setActiveSection] = useState<'profile' | 'password' | 'danger'>('profile');
+  const [activeSection, setActiveSection] = useState<'profile' | 'password' | 'privacy' | 'danger'>('profile');
+  const [libraryPublic, setLibraryPublic] = useState(user?.library_public ?? true);
+  const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const profileForm = useForm<ProfileForm>({
@@ -189,6 +192,32 @@ export default function AccountPage() {
     }
   };
 
+  const handlePrivacyToggle = async (checked: boolean) => {
+    if (!user) return;
+
+    const previousValue = libraryPublic;
+
+    // Optimistic update
+    setLibraryPublic(checked);
+    toast.success(checked ? 'Library is now public' : 'Library is now private');
+
+    setIsUpdatingPrivacy(true);
+    try {
+      const updatedUser = await api.patch<UserType>('/users/profile', {
+        library_public: checked,
+      });
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+    } catch (err) {
+      // Revert on error
+      setLibraryPublic(previousValue);
+      toast.error(err instanceof Error ? err.message : 'Failed to update privacy settings');
+    } finally {
+      setIsUpdatingPrivacy(false);
+    }
+  };
+
   if (authLoading || !user) {
     return <AccountSkeleton />;
   }
@@ -256,6 +285,17 @@ export default function AccountPage() {
                 >
                   <Lock className="w-5 h-5" />
                   <span className="font-medium">Password</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('privacy')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeSection === 'privacy'
+                      ? 'bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400'
+                      : 'text-foreground hover:bg-muted'
+                  }`}
+                >
+                  <Eye className="w-5 h-5" />
+                  <span className="font-medium">Privacy</span>
                 </button>
                 <button
                   onClick={() => setActiveSection('danger')}
@@ -443,6 +483,42 @@ export default function AccountPage() {
                     </Button>
                   </div>
                 </form>
+              </section>
+            )}
+
+            {/* Privacy Section */}
+            {activeSection === 'privacy' && (
+              <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20">
+                  <h2 className="text-xl font-bold text-foreground flex items-center">
+                    <Eye className="w-5 h-5 mr-2 text-pink-500" />
+                    Privacy Settings
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">Control what others can see on your profile</p>
+                </div>
+                <div className="p-6 space-y-6">
+                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                    <div className="space-y-1">
+                      <Label htmlFor="library-public" className="text-foreground font-medium">
+                        Public Library
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        Show your library stats, top artists and tracks on your public profile
+                      </p>
+                    </div>
+                    <Switch
+                      id="library-public"
+                      checked={libraryPublic}
+                      onCheckedChange={handlePrivacyToggle}
+                      disabled={isUpdatingPrivacy}
+                      className="data-[state=checked]:bg-pink-500"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    When enabled, visitors to your profile will see a summary of your listening activity,
+                    including your top artists and most played tracks. When disabled, only you can see your library.
+                  </p>
+                </div>
               </section>
             )}
 

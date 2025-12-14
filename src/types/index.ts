@@ -6,6 +6,7 @@ export interface User {
   profile_picture: string | null;
   banner_image: string | null;
   bio: string | null;
+  library_public: boolean;
   created_at: string;
 }
 
@@ -445,6 +446,13 @@ export interface TopTrack {
   scrobble_count: number;
 }
 
+export interface TopAlbum {
+  name: string;
+  artist: string;
+  image: string | null;
+  scrobble_count: number;
+}
+
 export interface ScrobblesByDay {
   date: string;
   count: number;
@@ -452,6 +460,7 @@ export interface ScrobblesByDay {
 
 export interface LibraryStats {
   total_scrobbles: number;
+  unique_artists_count: number;
   top_artist: { name: string; count: number } | null;
   top_track: { name: string; artist: string; image: string | null; count: number } | null;
   scrobbles_by_day: ScrobblesByDay[];

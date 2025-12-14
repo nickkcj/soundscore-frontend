@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun } from 'lucide-react';
+import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun, Music } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -131,6 +131,12 @@ export function Header() {
                           <Link href={`/profile/${user?.username}`} className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-pink-50 hover:text-pink-600">
                             <User className="h-4 w-4" />
                             <span>My Profile</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/library" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-pink-50 hover:text-pink-600">
+                            <Music className="h-4 w-4" />
+                            <span>Library</span>
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
@@ -280,6 +286,15 @@ export function Header() {
                   }`}
                 >
                   My Profile
+                </Link>
+                <Link
+                  href="/library"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
+                    isActive('/library') ? 'bg-pink-50 text-pink-600 dark:bg-pink-950' : 'text-foreground hover:bg-muted'
+                  }`}
+                >
+                  Library
                 </Link>
                 <Link
                   href="/my-reviews"

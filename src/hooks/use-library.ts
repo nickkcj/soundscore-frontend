@@ -8,6 +8,7 @@ import type {
   LibraryStats,
   TopArtist,
   TopTrack,
+  TopAlbum,
   SpotifyConnectionStatus,
   SyncResponse,
 } from '@/types';
@@ -123,15 +124,16 @@ export function useLibraryStats(username: string, days = 30) {
   return { stats, isLoading, refetch: fetchStats };
 }
 
-export function useTopArtists(username: string, days = 30, limit = 10) {
+export function useTopArtists(username: string, timeRange = 'medium_term', limit = 10) {
   const [artists, setArtists] = useState<TopArtist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchArtists = async () => {
+      setIsLoading(true);
       try {
         const data = await api.get<TopArtist[]>(
-          `/library/top/artists/${username}?days=${days}&limit=${limit}`
+          `/library/top/artists/${username}?time_range=${timeRange}&limit=${limit}`
         );
         setArtists(data);
       } catch {
@@ -142,7 +144,7 @@ export function useTopArtists(username: string, days = 30, limit = 10) {
     };
 
     fetchArtists();
-  }, [username, days, limit]);
+  }, [username, timeRange, limit]);
 
   return { artists, isLoading };
 }
@@ -153,6 +155,7 @@ export function useTopTracks(username: string, days = 30, limit = 10) {
 
   useEffect(() => {
     const fetchTracks = async () => {
+      setIsLoading(true);
       try {
         const data = await api.get<TopTrack[]>(
           `/library/top/tracks/${username}?days=${days}&limit=${limit}`
@@ -169,6 +172,31 @@ export function useTopTracks(username: string, days = 30, limit = 10) {
   }, [username, days, limit]);
 
   return { tracks, isLoading };
+}
+
+export function useTopAlbums(username: string, days = 30, limit = 10) {
+  const [albums, setAlbums] = useState<TopAlbum[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAlbums = async () => {
+      setIsLoading(true);
+      try {
+        const data = await api.get<TopAlbum[]>(
+          `/library/top/albums/${username}?days=${days}&limit=${limit}`
+        );
+        setAlbums(data);
+      } catch {
+        setAlbums([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAlbums();
+  }, [username, days, limit]);
+
+  return { albums, isLoading };
 }
 
 export function useSyncScrobbles() {

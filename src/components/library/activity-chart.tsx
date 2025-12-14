@@ -1,72 +1,123 @@
 'use client';
 
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, eachDayOfInterval, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { ScrobblesByDay } from '@/types';
+import { cn } from '@/lib/utils';
 
 interface ActivityChartProps {
   data: ScrobblesByDay[];
   isLoading?: boolean;
+  days?: number;
 }
 
-export function ActivityChart({ data, isLoading }: ActivityChartProps) {
+export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps) {
   if (isLoading) {
     return (
-      <div className="space-y-2">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 animate-pulse">
-            <div className="w-16 h-4 bg-muted rounded" />
-            <div className="flex-1 h-4 bg-muted rounded" style={{ width: `${Math.random() * 60 + 20}%` }} />
-          </div>
-        ))}
+      <div className="space-y-3">
+        <div className="flex justify-between items-center">
+          <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+          <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+        </div>
+        <div className="space-y-1">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 animate-pulse">
+              <div className="w-14 h-4 bg-muted rounded" />
+              <div className="flex-1 h-5 bg-muted rounded" />
+              <div className="w-8 h-4 bg-muted rounded" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <p>No activity data yet</p>
+      <div className="text-center py-8 text-muted-foreground text-sm">
+        <p>Sem dados de atividade</p>
       </div>
     );
   }
 
-  // Find max count for scaling bars
-  const maxCount = Math.max(...data.map(d => d.count));
+  // Create a map for quick lookup
+  const dataMap = new Map(data.map(d => [d.date, d.count]));
+
+  // Generate all days in range
+  const today = new Date();
+  const startDate = subDays(today, days - 1);
+  const allDays = eachDayOfInterval({ start: startDate, end: today });
 
   // Sort by date descending (most recent first)
-  const sortedData = [...data].sort((a, b) =>
-    new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sortedDays = [...allDays].reverse();
+
+  // Find max for intensity calculation
+  const maxCount = Math.max(...data.map(d => d.count), 1);
+
+  const getBarWidth = (count: number) => {
+    if (count === 0) return 0;
+    return Math.max((count / maxCount) * 100, 5);
+  };
+
+  const getIntensityClass = (count: number) => {
+    if (count === 0) return 'bg-muted/30';
+    const ratio = count / maxCount;
+    if (ratio > 0.75) return 'bg-primary';
+    if (ratio > 0.5) return 'bg-primary/70';
+    if (ratio > 0.25) return 'bg-primary/40';
+    return 'bg-primary/20';
+  };
+
+  // Show only first 15 days for compact view
+  const displayDays = sortedDays.slice(0, 15);
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-muted-foreground">Activity</h3>
-        <span className="text-xs text-muted-foreground">Last 30 days</span>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium text-muted-foreground">Atividade</h3>
+        <span className="text-xs text-muted-foreground">
+          Últimos {days} dias
+        </span>
       </div>
 
-      {sortedData.map((item) => {
-        const barWidth = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-        const date = parseISO(item.date);
+      {/* Horizontal bar chart */}
+      <div className="space-y-1">
+        {displayDays.map((day) => {
+          const dateStr = format(day, 'yyyy-MM-dd');
+          const count = dataMap.get(dateStr) || 0;
 
-        return (
-          <div key={item.date} className="flex items-center gap-3 group">
-            <span className="w-16 text-xs text-muted-foreground shrink-0">
-              {format(date, 'd MMM', { locale: ptBR })}
-            </span>
-            <div className="flex-1 h-5 bg-muted/30 rounded overflow-hidden">
-              <div
-                className="h-full bg-primary/20 rounded transition-all duration-300 group-hover:bg-primary/30"
-                style={{ width: `${barWidth}%` }}
-              />
+          return (
+            <div key={dateStr} className="flex items-center gap-3 group">
+              <span className="w-14 text-xs text-muted-foreground shrink-0">
+                {format(day, 'd MMM', { locale: ptBR })}
+              </span>
+              <div className="flex-1 h-5 bg-muted/30 rounded overflow-hidden">
+                <div
+                  className={cn(
+                    'h-full rounded transition-all duration-300 group-hover:opacity-80',
+                    getIntensityClass(count)
+                  )}
+                  style={{ width: `${getBarWidth(count)}%` }}
+                />
+              </div>
+              <span className="w-8 text-xs text-muted-foreground text-right">
+                {count}
+              </span>
             </div>
-            <span className="w-8 text-xs text-muted-foreground text-right">
-              {item.count}
-            </span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center justify-end gap-1 text-xs text-muted-foreground pt-2">
+        <span>Menos</span>
+        <div className="w-3 h-3 rounded-sm bg-muted/30" />
+        <div className="w-3 h-3 rounded-sm bg-primary/20" />
+        <div className="w-3 h-3 rounded-sm bg-primary/40" />
+        <div className="w-3 h-3 rounded-sm bg-primary/70" />
+        <div className="w-3 h-3 rounded-sm bg-primary" />
+        <span>Mais</span>
+      </div>
     </div>
   );
 }

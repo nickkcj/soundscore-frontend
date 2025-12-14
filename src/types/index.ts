@@ -407,3 +407,61 @@ export interface TrendingAlbumsResponse {
   week_start: string;
   week_end: string;
 }
+
+// Library / Scrobble types
+export interface NowPlaying {
+  track_id: string;
+  track_name: string;
+  artist_name: string;
+  album_name: string;
+  album_image_url: string | null;
+  duration_ms: number;
+  progress_ms: number;
+  is_playing: boolean;
+}
+
+export interface Scrobble {
+  id: number;
+  track_id: string;
+  track_name: string;
+  artist_name: string;
+  album_name: string | null;
+  album_image_url: string | null;
+  duration_ms: number | null;
+  played_at: string;
+}
+
+export interface TopArtist {
+  name: string;
+  scrobble_count: number;
+}
+
+export interface TopTrack {
+  name: string;
+  artist: string;
+  album: string | null;
+  image: string | null;
+  scrobble_count: number;
+}
+
+export interface ScrobblesByDay {
+  date: string;
+  count: number;
+}
+
+export interface LibraryStats {
+  total_scrobbles: number;
+  top_artist: { name: string; count: number } | null;
+  top_track: { name: string; artist: string; image: string | null; count: number } | null;
+  scrobbles_by_day: ScrobblesByDay[];
+}
+
+export interface SpotifyConnectionStatus {
+  connected: boolean;
+  username: string | null;
+}
+
+export interface SyncResponse {
+  synced_count: number;
+  message: string;
+}

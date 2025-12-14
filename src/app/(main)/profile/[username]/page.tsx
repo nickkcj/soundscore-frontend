@@ -9,10 +9,13 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ReviewCard, ReviewCardSkeleton } from '@/components/reviews/review-card';
 import { InfiniteScroll } from '@/components/common/infinite-scroll';
+import { LibraryTab } from '@/components/library/library-tab';
 import { useAuth } from '@/hooks/use-auth';
 import { useUserReviews } from '@/hooks/use-reviews';
 import { api } from '@/lib/api';
 import type { UserProfile, FollowResponse, LikeResponse } from '@/types';
+
+type ProfileTab = 'reviews' | 'library';
 
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = use(params);
@@ -24,6 +27,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const [activeTab, setActiveTab] = useState<ProfileTab>('reviews');
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
   const isOwnProfile = currentUser?.username === username;
@@ -356,38 +360,68 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
           </div>
         </div>
 
-        {/* Reviews Section */}
-        <section className="py-6">
-          <h2 className="text-lg font-semibold text-foreground mb-6">Reviews</h2>
+        {/* Tab Navigation */}
+        <div className="flex gap-2 border-b border-border mt-6">
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === 'reviews'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Reviews
+          </button>
+          <button
+            onClick={() => setActiveTab('library')}
+            className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === 'library'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Library
+          </button>
+        </div>
 
-          {reviewsLoading && reviews.length === 0 ? (
-            <div className="space-y-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <ReviewCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : reviews.length === 0 ? (
-            <div className="text-center py-12 bg-card rounded-xl border border-dashed border-border">
-              <div className="text-5xl text-muted-foreground/30 mb-3">🎧</div>
-              <p className="text-muted-foreground">No reviews yet.</p>
-            </div>
-          ) : (
-            <InfiniteScroll
-              hasMore={hasMore}
-              isLoading={reviewsLoading}
-              onLoadMore={() => fetchReviews(false)}
-            >
-              <div className="space-y-4">
-                {reviews.map((review) => (
-                  <ReviewCard
-                    key={review.id}
-                    review={review}
-                    onLike={handleLike}
-                    onDelete={isOwnProfile ? handleDelete : undefined}
-                  />
-                ))}
-              </div>
-            </InfiniteScroll>
+        {/* Tab Content */}
+        <section className="py-6">
+          {activeTab === 'reviews' && (
+            <>
+              {reviewsLoading && reviews.length === 0 ? (
+                <div className="space-y-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <ReviewCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="text-center py-12 bg-card rounded-xl border border-dashed border-border">
+                  <div className="text-5xl text-muted-foreground/30 mb-3">🎧</div>
+                  <p className="text-muted-foreground">No reviews yet.</p>
+                </div>
+              ) : (
+                <InfiniteScroll
+                  hasMore={hasMore}
+                  isLoading={reviewsLoading}
+                  onLoadMore={() => fetchReviews(false)}
+                >
+                  <div className="space-y-4">
+                    {reviews.map((review) => (
+                      <ReviewCard
+                        key={review.id}
+                        review={review}
+                        onLike={handleLike}
+                        onDelete={isOwnProfile ? handleDelete : undefined}
+                      />
+                    ))}
+                  </div>
+                </InfiniteScroll>
+              )}
+            </>
+          )}
+
+          {activeTab === 'library' && (
+            <LibraryTab username={username} />
           )}
         </section>
       </main>

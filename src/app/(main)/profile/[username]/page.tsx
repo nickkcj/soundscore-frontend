@@ -10,8 +10,10 @@ import { Button } from '@/components/ui/button';
 import { ReviewCard, ReviewCardSkeleton } from '@/components/reviews/review-card';
 import { InfiniteScroll } from '@/components/common/infinite-scroll';
 import { LibraryTab } from '@/components/library/library-tab';
+import { NowPlayingCard } from '@/components/library/now-playing-card';
 import { useAuth } from '@/hooks/use-auth';
 import { useUserReviews } from '@/hooks/use-reviews';
+import { useNowPlaying } from '@/hooks/use-library';
 import { api } from '@/lib/api';
 import type { UserProfile, FollowResponse, LikeResponse } from '@/types';
 
@@ -21,6 +23,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const { username } = use(params);
   const { user: currentUser } = useAuth();
   const { reviews, isLoading: reviewsLoading, hasMore, fetchReviews, setReviews } = useUserReviews(username);
+  const { nowPlaying } = useNowPlaying(username);
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -336,6 +339,11 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             <Calendar className="h-4 w-4" />
             Joined {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true })}
           </p>
+          {nowPlaying?.is_playing && (
+            <div className="mt-3">
+              <NowPlayingCard nowPlaying={nowPlaying} compact />
+            </div>
+          )}
         </div>
 
         {/* Stats Row */}

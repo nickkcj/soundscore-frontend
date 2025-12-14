@@ -4,12 +4,11 @@ import { useState, useEffect } from 'react';
 import { RefreshCw, Music, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { NowPlayingCard } from './now-playing-card';
 import { ScrobbleList } from './scrobble-list';
 import { TopArtists } from './top-artists';
 import { TopTracks } from './top-tracks';
+import { ActivityChart } from './activity-chart';
 import {
-  useNowPlaying,
   useSpotifyStatus,
   useScrobbles,
   useLibraryStats,
@@ -30,7 +29,6 @@ export function LibraryTab({ username }: LibraryTabProps) {
   const isOwnProfile = currentUser?.username === username;
 
   const { status, isLoading: statusLoading } = useSpotifyStatus(username);
-  const { nowPlaying, isLoading: nowPlayingLoading } = useNowPlaying(username);
   const { stats, isLoading: statsLoading, refetch: refetchStats } = useLibraryStats(username);
   const { scrobbles, isLoading: scrobblesLoading, refetch: refetchScrobbles } = useScrobbles(username);
   const { artists, isLoading: artistsLoading } = useTopArtists(username);
@@ -94,9 +92,6 @@ export function LibraryTab({ username }: LibraryTabProps) {
 
   return (
     <div className="space-y-6">
-      {/* Now Playing */}
-      <NowPlayingCard nowPlaying={nowPlaying} isLoading={nowPlayingLoading} />
-
       {/* Stats Header */}
       {!statsLoading && stats && (
         <div className="grid grid-cols-3 gap-4 p-4 bg-card rounded-lg border">
@@ -118,6 +113,13 @@ export function LibraryTab({ username }: LibraryTabProps) {
             </span>
             <span className="text-sm text-muted-foreground">Top Track</span>
           </div>
+        </div>
+      )}
+
+      {/* Activity Chart */}
+      {stats?.scrobbles_by_day && stats.scrobbles_by_day.length > 0 && (
+        <div className="p-4 bg-card rounded-lg border">
+          <ActivityChart data={stats.scrobbles_by_day} isLoading={statsLoading} />
         </div>
       )}
 

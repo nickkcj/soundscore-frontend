@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { User } from 'lucide-react';
 import type { TopArtist } from '@/types';
 
@@ -15,8 +16,8 @@ export function TopArtists({ artists, isLoading }: TopArtistsProps) {
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex items-center gap-3 p-2 animate-pulse">
             <div className="w-6 text-center text-muted-foreground">{i + 1}</div>
+            <div className="w-10 h-10 bg-muted rounded-full" />
             <div className="h-4 flex-1 bg-muted rounded" />
-            <div className="h-4 w-12 bg-muted rounded" />
           </div>
         ))}
       </div>
@@ -42,12 +43,32 @@ export function TopArtists({ artists, isLoading }: TopArtistsProps) {
           <div className="w-6 text-center text-muted-foreground font-medium">
             {index + 1}
           </div>
+
+          {/* Artist Image */}
+          <div className="relative w-10 h-10 rounded-full overflow-hidden bg-muted flex-shrink-0">
+            {artist.image ? (
+              <Image
+                src={artist.image}
+                alt={artist.name}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <User className="w-5 h-5 text-muted-foreground" />
+              </div>
+            )}
+          </div>
+
           <div className="flex-1 min-w-0">
             <p className="font-medium text-sm truncate">{artist.name}</p>
           </div>
-          <div className="text-xs text-muted-foreground">
-            {artist.scrobble_count} plays
-          </div>
+
+          {artist.scrobble_count && (
+            <div className="text-xs text-muted-foreground">
+              {artist.scrobble_count} plays
+            </div>
+          )}
         </div>
       ))}
     </div>

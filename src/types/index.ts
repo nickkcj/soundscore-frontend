@@ -433,7 +433,8 @@ export interface Scrobble {
 
 export interface TopArtist {
   name: string;
-  scrobble_count: number;
+  image?: string | null;
+  scrobble_count?: number;
 }
 
 export interface TopTrack {

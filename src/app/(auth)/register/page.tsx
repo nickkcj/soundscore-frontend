@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/stores/auth-store';
+import { OAuthButtons } from '@/components/auth/oauth-buttons';
 
 const registerSchema = z.object({
   username: z
@@ -126,6 +127,8 @@ export default function RegisterPage() {
           Create account
         </Button>
       </form>
+
+      <OAuthButtons disabled={isLoading} />
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{' '}

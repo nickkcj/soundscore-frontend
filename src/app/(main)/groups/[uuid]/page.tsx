@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, use, useCallback } from 'react';
 import Image from 'next/image';
-import { ArrowLeft, Send, Users, Music, Loader2, ImageIcon, X } from 'lucide-react';
+import { ArrowLeft, Send, Users, Music, Loader2, ImageIcon, X, Settings } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { UserAvatar } from '@/components/common/user-avatar';
 import { InviteMemberModal } from '@/components/groups/invite-member-modal';
+import { GroupSettingsModal } from '@/components/groups/group-settings-modal';
 import { useRequireAuth } from '@/hooks/use-auth';
 import { useGroupWebSocket } from '@/hooks/use-websocket';
 import { api } from '@/lib/api';
@@ -34,7 +36,9 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
+  const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -312,6 +316,17 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
     }
   };
 
+  const handleGroupUpdate = (updatedGroup: Group) => {
+    setGroup(prev => prev ? { ...prev, ...updatedGroup } : null);
+  };
+
+  const handleGroupDelete = () => {
+    router.push('/groups');
+  };
+
+  const isAdmin = group?.role === 'admin';
+  const isCreator = user?.id === group?.created_by_id;
+
   if (authLoading || isLoading) {
     return <GroupChatSkeleton />;
   }
@@ -442,11 +457,37 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
                     </p>
                   </div>
                 </div>
-                <Badge variant={isConnected ? 'default' : 'secondary'} className="text-xs">
-                  {isConnected ? 'Connected' : 'Connecting...'}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  {isAdmin && (
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="h-8 w-8 bg-background/80 hover:bg-background"
+                      onClick={() => setShowSettings(true)}
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Badge variant={isConnected ? 'default' : 'secondary'} className="text-xs">
+                    {isConnected ? 'Connected' : 'Connecting...'}
+                  </Badge>
+                </div>
               </div>
             </div>
+
+            {/* Settings Modal */}
+            {showSettings && user && (
+              <GroupSettingsModal
+                group={group}
+                members={members}
+                isOpen={showSettings}
+                onClose={() => setShowSettings(false)}
+                onUpdate={handleGroupUpdate}
+                onDelete={handleGroupDelete}
+                isCreator={isCreator}
+                currentUserId={user.id}
+              />
+            )}
 
             {/* Messages */}
             <div

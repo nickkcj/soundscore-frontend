@@ -17,11 +17,11 @@ interface DateRangeSelectorProps {
 }
 
 const DATE_RANGE_OPTIONS = [
-  { value: '7', label: 'Últimos 7 dias' },
-  { value: '30', label: 'Últimos 30 dias' },
-  { value: '90', label: 'Últimos 90 dias' },
-  { value: '180', label: 'Últimos 6 meses' },
-  { value: '365', label: 'Último ano' },
+  { value: '7', label: 'Last 7 days' },
+  { value: '30', label: 'Last 30 days' },
+  { value: '90', label: 'Last 90 days' },
+  { value: '180', label: 'Last 6 months' },
+  { value: '365', label: 'Last year' },
 ] as const;
 
 export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {

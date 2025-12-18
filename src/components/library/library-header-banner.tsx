@@ -44,10 +44,10 @@ export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryH
       <div className="relative h-full flex items-center justify-between px-4 lg:px-6">
         {/* Left: Title */}
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Biblioteca</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold">Library</h1>
           {topArtist && (
             <p className="text-sm text-muted-foreground mt-1">
-              Artista favorito: <span className="text-foreground font-medium">{topArtist.name}</span>
+              Favorite artist: <span className="text-foreground font-medium">{topArtist.name}</span>
             </p>
           )}
         </div>
@@ -71,7 +71,7 @@ export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryH
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                Faixa Principal
+                Top Track
               </p>
               <p className="font-medium text-sm truncate">{topTrack.name}</p>
               <p className="text-xs text-muted-foreground truncate">{topTrack.artist}</p>

@@ -64,7 +64,7 @@ export function LibraryContent({ username }: LibraryContentProps) {
       refetchScrobbles();
       refetchStats();
     } else {
-      toast.error('Erro ao sincronizar. Verifique se o Spotify está conectado.');
+      toast.error('Sync failed. Make sure Spotify is connected.');
     }
   };
 
@@ -80,11 +80,11 @@ export function LibraryContent({ username }: LibraryContentProps) {
     return (
       <div className="text-center py-12">
         <Music className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
-        <h3 className="text-lg font-medium mb-2">Spotify Não Conectado</h3>
+        <h3 className="text-lg font-medium mb-2">Spotify Not Connected</h3>
         <p className="text-muted-foreground mb-4">
           {isOwnProfile
-            ? 'Conecte sua conta do Spotify para acompanhar seu histórico de músicas.'
-            : 'Este usuário não conectou sua conta do Spotify.'}
+            ? 'Connect your Spotify account to track your listening history.'
+            : 'This user hasn\'t connected their Spotify account.'}
         </p>
         {isOwnProfile && (
           <Button
@@ -93,7 +93,7 @@ export function LibraryContent({ username }: LibraryContentProps) {
             }}
             className="bg-green-500 hover:bg-green-600"
           >
-            Conectar Spotify
+            Connect Spotify
           </Button>
         )}
       </div>

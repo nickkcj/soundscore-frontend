@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Plus, Search, Users, Lock, Globe, TrendingUp, Music, Loader2 } from 'lucide-react';
+import { Plus, Search, Users, Lock, Globe, TrendingUp, Music, Loader2, MoreVertical, Settings, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,9 +18,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { GroupSettingsModal } from '@/components/groups/group-settings-modal';
 import { useRequireAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/use-auth';
 import { api } from '@/lib/api';
-import type { Group, GroupListResponse } from '@/types';
+import type { Group, GroupListResponse, GroupMember } from '@/types';
 
 const CATEGORIES = [
   { value: 'all', label: 'All Categories' },
@@ -35,6 +44,7 @@ const CATEGORIES = [
 
 export default function GroupsPage() {
   const { isLoading: authLoading } = useRequireAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [groups, setGroups] = useState<Group[]>([]);
   const [trendingGroups, setTrendingGroups] = useState<Group[]>([]);
@@ -59,6 +69,22 @@ export default function GroupsPage() {
     toast.success('Joined group!');
     router.push(`/groups/${groupUuid}`);
   }, [router]);
+
+  // Handle group update
+  const handleGroupUpdate = useCallback((updatedGroup: Group) => {
+    setGroups(prev => prev.map(g =>
+      g.uuid === updatedGroup.uuid ? { ...g, ...updatedGroup } : g
+    ));
+    setTrendingGroups(prev => prev.map(g =>
+      g.uuid === updatedGroup.uuid ? { ...g, ...updatedGroup } : g
+    ));
+  }, []);
+
+  // Handle group delete
+  const handleGroupDelete = useCallback((groupUuid: string) => {
+    setGroups(prev => prev.filter(g => g.uuid !== groupUuid));
+    setTrendingGroups(prev => prev.filter(g => g.uuid !== groupUuid));
+  }, []);
 
   // Debounce search input
   useEffect(() => {
@@ -146,7 +172,14 @@ export default function GroupsPage() {
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {trendingGroups.map((group) => (
-              <GroupCard key={group.id} group={group} onJoinSuccess={handleJoinSuccess} />
+              <GroupCard
+                key={group.id}
+                group={group}
+                onJoinSuccess={handleJoinSuccess}
+                onUpdate={handleGroupUpdate}
+                onDelete={handleGroupDelete}
+                currentUserId={user?.id}
+              />
             ))}
           </div>
         </div>
@@ -198,7 +231,14 @@ export default function GroupsPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {groups.map((group) => (
-            <GroupCard key={group.id} group={group} onJoinSuccess={handleJoinSuccess} />
+            <GroupCard
+              key={group.id}
+              group={group}
+              onJoinSuccess={handleJoinSuccess}
+              onUpdate={handleGroupUpdate}
+              onDelete={handleGroupDelete}
+              currentUserId={user?.id}
+            />
           ))}
         </div>
       )}
@@ -206,9 +246,22 @@ export default function GroupsPage() {
   );
 }
 
-function GroupCard({ group, onJoinSuccess }: { group: Group; onJoinSuccess?: (groupUuid: string) => void }) {
+interface GroupCardProps {
+  group: Group;
+  onJoinSuccess?: (groupUuid: string) => void;
+  onUpdate?: (updatedGroup: Group) => void;
+  onDelete?: (groupUuid: string) => void;
+  currentUserId?: number;
+}
+
+function GroupCard({ group, onJoinSuccess, onUpdate, onDelete, currentUserId }: GroupCardProps) {
   const [isJoining, setIsJoining] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [members, setMembers] = useState<GroupMember[]>([]);
   const router = useRouter();
+
+  const isAdmin = group.role === 'admin';
+  const isCreator = currentUserId === group.created_by_id;
 
   const handleJoin = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -233,83 +286,143 @@ function GroupCard({ group, onJoinSuccess }: { group: Group; onJoinSuccess?: (gr
     router.push(`/groups/${group.uuid}`);
   };
 
+  const handleOpenSettings = async () => {
+    // Fetch members when opening settings
+    try {
+      const response = await api.get<{ members: GroupMember[] }>(`/groups/${group.uuid}/members`);
+      setMembers(response.members);
+    } catch {
+      setMembers([]);
+    }
+    setShowSettings(true);
+  };
+
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow h-full p-0">
-      {/* Cover Image - fills to top with rounded corners */}
-      <div className="relative h-28 bg-gradient-to-br from-primary/20 to-accent/20">
-        {group.cover_image ? (
-          <Image
-            src={group.cover_image}
-            alt={group.name}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Music className="h-10 w-10 text-muted-foreground/30" />
-          </div>
-        )}
-        <div className="absolute top-2 right-2">
-          {group.privacy === 'private' ? (
-            <Badge variant="secondary" className="gap-1 text-xs">
-              <Lock className="h-3 w-3" />
-              Private
-            </Badge>
+    <>
+      <Card className="overflow-hidden hover:shadow-md transition-shadow h-full p-0">
+        {/* Cover Image - fills to top with rounded corners */}
+        <div className="relative h-28 bg-gradient-to-br from-primary/20 to-accent/20">
+          {group.cover_image ? (
+            <Image
+              src={group.cover_image}
+              alt={group.name}
+              fill
+              className="object-cover"
+            />
           ) : (
-            <Badge variant="outline" className="gap-1 bg-background/80 text-xs">
-              <Globe className="h-3 w-3" />
-              Public
-            </Badge>
+            <div className="w-full h-full flex items-center justify-center">
+              <Music className="h-10 w-10 text-muted-foreground/30" />
+            </div>
           )}
-        </div>
-      </div>
-      <div className="p-4 flex flex-col h-[calc(100%-7rem)]">
-        <div className="flex-1 min-h-0">
-          <h3 className="font-semibold truncate">{group.name}</h3>
-          {group.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-              {group.description}
-            </p>
-          )}
-        </div>
-        <div className="flex items-center justify-between mt-3 pt-2">
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Users className="h-4 w-4" />
-              {group.member_count} members
-            </span>
-            {group.category && (
-              <Badge variant="secondary" className="text-xs">
-                {group.category}
+          <div className="absolute top-2 right-2 flex items-center gap-2">
+            {group.privacy === 'private' ? (
+              <Badge variant="secondary" className="gap-1 text-xs">
+                <Lock className="h-3 w-3" />
+                Private
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="gap-1 bg-background/80 text-xs">
+                <Globe className="h-3 w-3" />
+                Public
               </Badge>
             )}
+            {/* Admin Menu */}
+            {isAdmin && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="h-7 w-7 bg-background/80 hover:bg-background"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleOpenSettings}>
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </DropdownMenuItem>
+                  {isCreator && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onClick={handleOpenSettings}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Group
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
-          {group.is_member ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleOpen}
-              className="ml-2 cursor-pointer"
-            >
-              Open
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              onClick={handleJoin}
-              disabled={isJoining}
-              className="ml-2 cursor-pointer"
-            >
-              {isJoining ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                'Join'
-              )}
-            </Button>
-          )}
         </div>
-      </div>
-    </Card>
+        <div className="p-4 flex flex-col h-[calc(100%-7rem)]">
+          <div className="flex-1 min-h-0">
+            <h3 className="font-semibold truncate">{group.name}</h3>
+            {group.description && (
+              <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                {group.description}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center justify-between mt-3 pt-2">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                {group.member_count} members
+              </span>
+              {group.category && (
+                <Badge variant="secondary" className="text-xs">
+                  {group.category}
+                </Badge>
+              )}
+            </div>
+            {group.is_member ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleOpen}
+                className="ml-2 cursor-pointer"
+              >
+                Open
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                onClick={handleJoin}
+                disabled={isJoining}
+                className="ml-2 cursor-pointer"
+              >
+                {isJoining ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  'Join'
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      {/* Settings Modal */}
+      {showSettings && currentUserId && (
+        <GroupSettingsModal
+          group={group}
+          members={members}
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+          onUpdate={onUpdate}
+          onDelete={() => onDelete?.(group.uuid)}
+          isCreator={isCreator}
+          currentUserId={currentUserId}
+        />
+      )}
+    </>
   );
 }
 

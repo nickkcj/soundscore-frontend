@@ -1,7 +1,6 @@
 'use client';
 
-import { format, parseISO, eachDayOfInterval, subDays } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { format, eachDayOfInterval, subDays } from 'date-fns';
 import type { ScrobblesByDay } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -35,7 +34,7 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
   if (!data || data.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground text-sm">
-        <p>Sem dados de atividade</p>
+        <p>No activity data</p>
       </div>
     );
   }
@@ -74,9 +73,9 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-muted-foreground">Atividade</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">Activity</h3>
         <span className="text-xs text-muted-foreground">
-          Últimos {days} dias
+          Last {days} days
         </span>
       </div>
 
@@ -89,7 +88,7 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
           return (
             <div key={dateStr} className="flex items-center gap-3 group">
               <span className="w-14 text-xs text-muted-foreground shrink-0">
-                {format(day, 'd MMM', { locale: ptBR })}
+                {format(day, 'd MMM')}
               </span>
               <div className="flex-1 h-5 bg-muted/30 rounded overflow-hidden">
                 <div
@@ -110,13 +109,13 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
 
       {/* Legend */}
       <div className="flex items-center justify-end gap-1 text-xs text-muted-foreground pt-2">
-        <span>Menos</span>
+        <span>Less</span>
         <div className="w-3 h-3 rounded-sm bg-muted/30" />
         <div className="w-3 h-3 rounded-sm bg-primary/20" />
         <div className="w-3 h-3 rounded-sm bg-primary/40" />
         <div className="w-3 h-3 rounded-sm bg-primary/70" />
         <div className="w-3 h-3 rounded-sm bg-primary" />
-        <span>Mais</span>
+        <span>More</span>
       </div>
     </div>
   );

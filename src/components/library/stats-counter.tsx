@@ -20,16 +20,16 @@ export function StatsCounter({ totalScrobbles, uniqueArtists, isLoading }: Stats
     <div className="flex items-center gap-6 text-sm flex-wrap">
       <div className="flex items-center gap-2">
         <span className="text-2xl font-bold text-foreground">
-          {totalScrobbles.toLocaleString('pt-BR')}
+          {totalScrobbles.toLocaleString()}
         </span>
         <span className="text-muted-foreground">scrobbles</span>
       </div>
       <div className="flex items-center gap-2">
         <span className="text-lg font-semibold text-foreground">
-          {uniqueArtists.toLocaleString('pt-BR')}
+          {uniqueArtists.toLocaleString()}
         </span>
         <span className="text-muted-foreground text-xs uppercase tracking-wider">
-          artistas incluídos
+          unique artists
         </span>
       </div>
     </div>

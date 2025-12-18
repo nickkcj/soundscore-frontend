@@ -12,9 +12,9 @@ interface LibraryTabsProps {
 
 const TABS = [
   { id: 'scrobbles', label: 'Scrobbles', icon: History },
-  { id: 'artists', label: 'Artistas', icon: Star },
-  { id: 'albums', label: 'Álbuns', icon: Disc },
-  { id: 'tracks', label: 'Faixas', icon: Music },
+  { id: 'artists', label: 'Artists', icon: Star },
+  { id: 'albums', label: 'Albums', icon: Disc },
+  { id: 'tracks', label: 'Tracks', icon: Music },
 ] as const;
 
 export function LibraryTabs({ activeTab, onTabChange }: LibraryTabsProps) {

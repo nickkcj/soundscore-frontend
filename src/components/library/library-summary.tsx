@@ -44,12 +44,12 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
     return (
       <div className="py-6 border-t border-border">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Biblioteca</h2>
+          <h2 className="text-lg font-semibold">Library</h2>
         </div>
         <div className="text-center py-6 bg-muted/30 rounded-lg">
           <Music className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
           <p className="text-sm text-muted-foreground mb-3">
-            Conecte seu Spotify para mostrar sua biblioteca
+            Connect your Spotify to show your library
           </p>
           <Button
             size="sm"
@@ -58,7 +58,7 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
             }}
             className="bg-green-500 hover:bg-green-600"
           >
-            Conectar Spotify
+            Connect Spotify
           </Button>
         </div>
       </div>
@@ -72,17 +72,17 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
     return (
       <div className="py-6 border-t border-border">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Biblioteca</h2>
+          <h2 className="text-lg font-semibold">Library</h2>
           <Link href="/library">
             <Button variant="ghost" size="sm" className="text-primary">
-              Ver completa
+              View full
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           </Link>
         </div>
         <div className="text-center py-6 bg-muted/30 rounded-lg">
           <p className="text-sm text-muted-foreground">
-            Sincronize seu histórico para ver seus top artistas
+            Sync your history to see your top artists
           </p>
         </div>
       </div>
@@ -94,15 +94,15 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold">Biblioteca</h2>
+          <h2 className="text-lg font-semibold">Library</h2>
           <span className="text-sm text-muted-foreground">
-            {stats.total_scrobbles.toLocaleString('pt-BR')} scrobbles
+            {stats.total_scrobbles.toLocaleString()} scrobbles
           </span>
         </div>
         {isOwnProfile && (
           <Link href="/library">
             <Button variant="ghost" size="sm" className="text-primary">
-              Ver completa
+              View full
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           </Link>
@@ -112,7 +112,7 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
       {/* Top Artists */}
       {artists.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground mb-3">Top Artistas</h3>
+          <h3 className="text-sm font-medium text-muted-foreground mb-3">Top Artists</h3>
           <div className="flex gap-4">
             {artists.slice(0, 3).map((artist, index) => (
               <div key={artist.name} className="flex items-center gap-3 flex-1 min-w-0">
@@ -157,7 +157,7 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Mais ouvida</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Most played</p>
               <p className="font-medium text-sm truncate">{stats.top_track.name}</p>
               <p className="text-xs text-muted-foreground truncate">{stats.top_track.artist}</p>
             </div>

@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { ReviewCard, ReviewCardSkeleton } from '@/components/reviews/review-card';
 import { InfiniteScroll } from '@/components/common/infinite-scroll';
 import { NowPlayingCard } from '@/components/library/now-playing-card';
-import { LibrarySummary } from '@/components/library/library-summary';
 import { useAuth } from '@/hooks/use-auth';
 import { useUserReviews } from '@/hooks/use-reviews';
 import { useNowPlaying } from '@/hooks/use-library';
@@ -364,13 +363,6 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             <span className="text-sm text-muted-foreground">Following</span>
           </div>
         </div>
-
-        {/* Library Summary Section */}
-        <LibrarySummary
-          username={username}
-          isOwnProfile={isOwnProfile}
-          isPublic={profile.library_public}
-        />
 
         {/* Reviews Section */}
         <section className="py-6 border-t border-border">

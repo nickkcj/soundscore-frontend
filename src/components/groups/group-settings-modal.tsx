@@ -60,7 +60,7 @@ interface GroupSettingsModalProps {
 }
 
 const CATEGORIES = [
-  { value: '', label: 'No Category' },
+  { value: 'none', label: 'No Category' },
   { value: 'rock', label: 'Rock' },
   { value: 'pop', label: 'Pop' },
   { value: 'hip-hop', label: 'Hip-Hop' },
@@ -92,7 +92,7 @@ export function GroupSettingsModal({
       name: group.name,
       description: group.description || '',
       privacy: group.privacy,
-      category: group.category || '',
+      category: group.category || 'none',
     },
   });
 
@@ -103,7 +103,7 @@ export function GroupSettingsModal({
         name: data.name,
         description: data.description || null,
         privacy: data.privacy,
-        category: data.category || null,
+        category: data.category === 'none' ? null : data.category || null,
       });
       toast.success('Group updated!');
       onUpdate?.(updatedGroup);
@@ -226,7 +226,7 @@ export function GroupSettingsModal({
                 <div className="space-y-2">
                   <Label>Category</Label>
                   <Select
-                    value={form.watch('category') || ''}
+                    value={form.watch('category') || 'none'}
                     onValueChange={(value) => form.setValue('category', value)}
                   >
                     <SelectTrigger>

@@ -73,10 +73,10 @@ export default function GroupsPage() {
   // Handle group update
   const handleGroupUpdate = useCallback((updatedGroup: Group) => {
     setGroups(prev => prev.map(g =>
-      g.uuid === updatedGroup.uuid ? { ...g, ...updatedGroup } : g
+      g.uuid === updatedGroup.uuid ? { ...g, ...updatedGroup, is_member: g.is_member, role: g.role } : g
     ));
     setTrendingGroups(prev => prev.map(g =>
-      g.uuid === updatedGroup.uuid ? { ...g, ...updatedGroup } : g
+      g.uuid === updatedGroup.uuid ? { ...g, ...updatedGroup, is_member: g.is_member, role: g.role } : g
     ));
   }, []);
 

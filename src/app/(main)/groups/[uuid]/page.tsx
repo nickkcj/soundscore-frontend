@@ -317,7 +317,13 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
   };
 
   const handleGroupUpdate = (updatedGroup: Group) => {
-    setGroup(prev => prev ? { ...prev, ...updatedGroup } : null);
+    setGroup(prev => prev ? {
+      ...prev,
+      ...updatedGroup,
+      // Preserve membership fields that aren't returned by PATCH
+      is_member: prev.is_member,
+      role: prev.role,
+    } : null);
   };
 
   const handleGroupDelete = () => {

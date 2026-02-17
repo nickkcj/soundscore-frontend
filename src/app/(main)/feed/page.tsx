@@ -128,7 +128,7 @@ export default function FeedPage() {
               {/* Header */}
               <div className="px-5 py-4 border-b border-border">
                 <h3 className="font-semibold text-foreground flex items-center">
-                  <UsersRound className="h-4 w-4 text-pink-500 mr-2" />
+                  <UsersRound className="h-4 w-4 text-wine-500 mr-2" />
                   My Groups
                 </h3>
               </div>
@@ -162,7 +162,7 @@ export default function FeedPage() {
                         href={`/groups/${group.uuid}`}
                         className="flex items-center gap-3 p-2.5 hover:bg-muted rounded-lg transition-colors"
                       >
-                        <div className="w-14 h-9 rounded-md bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <div className="w-14 h-9 rounded-md bg-wine-100 dark:bg-wine-900/30 flex items-center justify-center overflow-hidden flex-shrink-0">
                           {group.cover_image ? (
                             <Image
                               src={group.cover_image}
@@ -173,7 +173,7 @@ export default function FeedPage() {
                               quality={90}
                             />
                           ) : (
-                            <span className="text-pink-600 font-bold text-xs">
+                            <span className="text-wine-600 font-bold text-xs">
                               {group.name.substring(0, 2).toUpperCase()}
                             </span>
                           )}
@@ -194,7 +194,7 @@ export default function FeedPage() {
                 <div className="space-y-2">
                   <Link
                     href="/groups/create"
-                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium bg-pink-100 dark:bg-pink-900/30 text-pink-600 rounded-xl hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium bg-wine-100 dark:bg-wine-900/30 text-wine-600 rounded-xl hover:bg-wine-200 dark:hover:bg-wine-900/50 transition-colors"
                   >
                     <Plus className="h-4 w-4" />
                     Create Group
@@ -214,7 +214,7 @@ export default function FeedPage() {
           <div className="lg:flex-1 mt-3">
             <div className="flex items-center justify-between mb-10">
               <h1 className="text-2xl font-bold text-foreground flex items-center">
-                <Music className="h-7 w-7 mr-2 text-pink-500" />
+                <Music className="h-7 w-7 mr-2 text-wine-500" />
                 Latest Reviews
               </h1>
               <div className="flex items-center gap-2">
@@ -222,7 +222,7 @@ export default function FeedPage() {
                 <button
                   onClick={handleReload}
                   disabled={isRefetching}
-                  className="text-sm text-pink-600 dark:text-pink-300 font-medium flex items-center px-3 py-1.5 bg-pink-50 dark:bg-pink-950 rounded-full shadow-sm hover:bg-pink-100 dark:hover:bg-pink-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="text-sm text-wine-600 dark:text-wine-300 font-medium flex items-center px-3 py-1.5 bg-wine-50 dark:bg-wine-950 rounded-full shadow-sm hover:bg-wine-100 dark:hover:bg-wine-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Reload feed"
                 >
                   <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
@@ -230,7 +230,7 @@ export default function FeedPage() {
                 {/* Sort Toggle Button */}
                 <button
                   onClick={toggleSort}
-                  className="text-sm text-pink-600 dark:text-pink-300 font-medium flex items-center px-3 py-1.5 bg-pink-50 dark:bg-pink-950 rounded-full shadow-sm hover:bg-pink-100 dark:hover:bg-pink-900 transition-colors"
+                  className="text-sm text-wine-600 dark:text-wine-300 font-medium flex items-center px-3 py-1.5 bg-wine-50 dark:bg-wine-950 rounded-full shadow-sm hover:bg-wine-100 dark:hover:bg-wine-900 transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -264,7 +264,7 @@ export default function FeedPage() {
               </div>
             ) : reviews.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 bg-card rounded-xl shadow-sm border border-border">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16 text-pink-200 dark:text-pink-800 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16 text-wine-200 dark:text-wine-800 mb-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
                 </svg>
                 <p className="text-muted-foreground font-medium">No recent reviews yet.</p>
@@ -295,7 +295,7 @@ export default function FeedPage() {
               <div className="mt-12 text-center">
                 <button
                   onClick={handleLoadMore}
-                  className="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-full text-sm font-medium transition-all hover:shadow-md hover:from-pink-600 hover:to-pink-700 flex items-center mx-auto"
+                  className="px-6 py-2.5 bg-wine-600 hover:bg-wine-700 text-white rounded-full text-sm font-medium transition-all hover:shadow-md flex items-center mx-auto"
                 >
                   <span>Load more</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -312,7 +312,7 @@ export default function FeedPage() {
               {/* Trending Albums Section */}
               <div className="px-5 py-4 border-b border-border">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center">
-                  <TrendingUp className="h-4 w-4 text-pink-500 mr-2" />
+                  <TrendingUp className="h-4 w-4 text-wine-500 mr-2" />
                   Trending Albums
                 </h3>
                 <div className="space-y-4">
@@ -335,7 +335,7 @@ export default function FeedPage() {
               {/* Suggested Users Section */}
               <div className="px-5 py-4">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center">
-                  <Users className="h-4 w-4 text-pink-500 mr-2" />
+                  <Users className="h-4 w-4 text-wine-500 mr-2" />
                   Suggested Users
                 </h3>
                 <div className="space-y-3.5">
@@ -376,7 +376,7 @@ export default function FeedPage() {
                             {user.followers_count || 0} followers
                           </p>
                         </div>
-                        <span className="text-xs font-medium px-2 py-1 bg-pink-100 dark:bg-pink-900/30 text-pink-600 rounded hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors">
+                        <span className="text-xs font-medium px-2 py-1 bg-wine-100 dark:bg-wine-900/30 text-wine-600 rounded hover:bg-wine-200 dark:hover:bg-wine-900/50 transition-colors">
                           Follow
                         </span>
                       </Link>
@@ -387,7 +387,7 @@ export default function FeedPage() {
                 {/* See More Link */}
                 {suggestedUsers.length > 0 && (
                   <div className="mt-5 text-center">
-                    <Link href="/discover?type=users" className="text-xs text-pink-600 hover:underline">
+                    <Link href="/discover?type=users" className="text-xs text-wine-600 hover:underline">
                       See more suggestions
                     </Link>
                   </div>
@@ -447,7 +447,7 @@ function TrendingAlbumItem({ album }: { album: TrendingAlbum }) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-pink-200 to-purple-200 dark:from-pink-800 dark:to-purple-800" />
+          <div className="w-full h-full bg-gradient-to-br from-wine-200 to-wine-300 dark:from-wine-800 dark:to-wine-900" />
         )}
       </div>
       <div>

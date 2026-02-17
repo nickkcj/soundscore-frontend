@@ -82,7 +82,7 @@ export default function MyReviewsPage() {
       <main className="container mx-auto max-w-7xl px-4 py-12 md:py-20">
         {/* User Profile Section */}
         <section className="mb-16 md:mb-20">
-          <div className="relative overflow-hidden rounded-2xl shadow-lg bg-gradient-to-br from-pink-500 to-purple-600 text-white">
+          <div className="relative overflow-hidden rounded-2xl shadow-lg bg-wine-600 text-white">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-15">
               <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
@@ -131,7 +131,7 @@ export default function MyReviewsPage() {
               <div className="md:ml-auto">
                 <button
                   onClick={() => setCreateReviewOpen(true)}
-                  className="inline-flex items-center px-6 py-3 bg-background text-pink-600 dark:text-pink-400 font-medium rounded-full hover:bg-muted transition duration-300 shadow-md"
+                  className="inline-flex items-center px-6 py-3 bg-background text-wine-600 dark:text-wine-400 font-medium rounded-full hover:bg-muted transition duration-300 shadow-md"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Create New Review
@@ -144,7 +144,7 @@ export default function MyReviewsPage() {
         {/* Favorite Albums Section */}
         <section className="mb-16 md:mb-20">
           <h2 className="text-3xl font-bold text-foreground mb-6 border-b border-border pb-3 flex items-center">
-            <Heart className="w-8 h-8 mr-2 text-pink-500 fill-pink-500" />
+            <Heart className="w-8 h-8 mr-2 text-wine-500 fill-wine-500" />
             Favorite Albums
           </h2>
           {favoriteAlbums.length > 0 ? (
@@ -187,7 +187,7 @@ export default function MyReviewsPage() {
         {/* All Reviews Section */}
         <section>
           <h2 className="text-3xl font-bold text-foreground mb-6 border-b border-border pb-3 flex items-center">
-            <ClipboardList className="w-8 h-8 mr-2 text-pink-500" />
+            <ClipboardList className="w-8 h-8 mr-2 text-wine-500" />
             All Reviews
           </h2>
           {isLoading && reviews.length === 0 ? (
@@ -198,8 +198,8 @@ export default function MyReviewsPage() {
             </div>
           ) : reviews.length === 0 ? (
             <div className="text-center py-16 bg-card rounded-xl shadow-sm border border-border">
-              <div className="bg-pink-50 dark:bg-pink-950/30 w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6">
-                <ClipboardList className="w-12 h-12 text-pink-400" />
+              <div className="bg-wine-50 dark:bg-wine-950/30 w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6">
+                <ClipboardList className="w-12 h-12 text-wine-400" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">No Reviews Yet</h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
@@ -207,7 +207,7 @@ export default function MyReviewsPage() {
               </p>
               <button
                 onClick={() => setCreateReviewOpen(true)}
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-full hover:from-pink-600 hover:to-purple-700 transition duration-300 shadow-md"
+                className="inline-flex items-center px-6 py-3 bg-wine-600 hover:bg-wine-700 text-white font-medium rounded-full transition duration-300 shadow-md"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Write Your First Review
@@ -261,7 +261,7 @@ export default function MyReviewsPage() {
                     <div className="absolute top-2 right-2 flex flex-col gap-2">
                       <button
                         onClick={(e) => { e.stopPropagation(); openDeleteDialog(review); }}
-                        className="p-1.5 bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-100 dark:hover:bg-pink-950/50 transition-colors duration-200"
+                        className="p-1.5 bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400 rounded-full hover:bg-wine-100 dark:hover:bg-wine-950/50 transition-colors duration-200"
                         title="Delete Review"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -270,7 +270,7 @@ export default function MyReviewsPage() {
                         href={`/reviews/${review.id}/edit`}
                         onClick={(e) => e.stopPropagation()}
                         title="Edit Review"
-                        className="p-1.5 bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-100 dark:hover:bg-pink-950/50 transition-colors duration-200"
+                        className="p-1.5 bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400 rounded-full hover:bg-wine-100 dark:hover:bg-wine-950/50 transition-colors duration-200"
                       >
                         <Pencil className="w-4 h-4" />
                       </Link>
@@ -333,7 +333,7 @@ export default function MyReviewsPage() {
                 <div className="flex gap-2">
                   <Link
                     href={`/reviews/${viewReview.id}/edit`}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-950/50 transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400 rounded-lg hover:bg-wine-100 dark:hover:bg-wine-950/50 transition-colors"
                   >
                     <Pencil className="w-4 h-4" />
                     Edit
@@ -409,7 +409,7 @@ function MyReviewsSkeleton() {
       <main className="container mx-auto max-w-7xl px-4 py-12 md:py-20">
         {/* Profile Header Skeleton */}
         <section className="mb-16 md:mb-20">
-          <div className="rounded-2xl shadow-lg bg-gradient-to-br from-pink-400 to-purple-500 p-8 md:p-10">
+          <div className="rounded-2xl shadow-lg bg-wine-600 p-8 md:p-10">
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-white/20 animate-pulse" />
               <div className="space-y-4 text-center md:text-left">

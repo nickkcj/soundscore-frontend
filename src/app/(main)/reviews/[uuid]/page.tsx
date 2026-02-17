@@ -262,8 +262,8 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ uuid: s
               className={cn(
                 "flex-1 h-10 rounded-full gap-2 transition-colors",
                 review.is_liked
-                  ? "text-pink-500 hover:bg-pink-500/10"
-                  : "hover:bg-pink-500/10 hover:text-pink-500"
+                  ? "text-wine-500 hover:bg-wine-500/10"
+                  : "hover:bg-wine-500/10 hover:text-wine-500"
               )}
               onClick={handleLike}
               disabled={isLiking}

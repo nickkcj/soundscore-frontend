@@ -14,11 +14,11 @@ export default function AuthLayout({
   // Mostra loading enquanto verifica auth OU quando já está autenticado (redirecionando)
   if (isLoading || isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-50 to-white dark:from-pink-950/20 dark:to-background">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-wine-50 to-white dark:from-wine-950/20 dark:to-background">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-pulse">
             <Image
-              src="/images/music.png"
+              src="/images/logo_soundscore.png"
               alt="SoundScore Logo"
               width={56}
               height={56}
@@ -39,35 +39,34 @@ export default function AuthLayout({
     <div className="min-h-screen flex">
       {/* Left side */}
       <div
-        className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-8"
+        className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-8 pb-24"
         style={{
           background: `linear-gradient(to bottom,
-            rgba(201,24,74,0.85) 0%,
-            rgba(201,24,74,0.75) 50%,
-            rgba(0,0,0,0.9) 100%)`,
+            #722F37 0%,
+            #5e2530 60%,
+            #2d1218 100%)`,
         }}
       >
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 mb-10">
+        <Link href="/" className="mb-0">
           <Image
-            src="/images/music.png"
-            alt="SoundScore Logo"
-            width={56}
-            height={56}
-            className="rounded-full bg-white p-1"
+            src="/images/logo_soundscore.png"
+            alt="SoundScore"
+            width={500}
+            height={130}
+            className="h-40 w-auto object-contain brightness-0 invert"
           />
-          <span className="font-bold text-3xl text-white">SoundScore</span>
         </Link>
 
         {/* Floating illustration */}
         <img
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/27032dba77e68e55a80db39bdfcbc3e2ccb4b98f"
-          className="w-[380px] h-[380px] object-contain animate-[float_6s_ease-in-out_infinite]"
+          className="w-[380px] h-[380px] object-contain animate-[float_6s_ease-in-out_infinite] brightness-0 invert opacity-80"
           alt="Music illustration"
         />
 
         {/* Text below */}
-        <div className="text-center mt-10">
+        <div className="text-center mt-0">
           <h1 className="text-4xl font-bold text-white mb-3">
             Rank your taste in music
           </h1>
@@ -92,13 +91,13 @@ export default function AuthLayout({
           {/* Mobile Logo */}
           <Link href="/" className="flex items-center gap-2 mb-8 lg:hidden">
             <Image
-              src="/images/music.png"
+              src="/images/logo_soundscore.png"
               alt="SoundScore Logo"
               width={40}
               height={40}
               className="rounded-full"
             />
-            <span className="font-bold text-xl text-[#C9184A]">
+            <span className="font-bold text-xl text-wine-700">
               SoundScore
             </span>
           </Link>

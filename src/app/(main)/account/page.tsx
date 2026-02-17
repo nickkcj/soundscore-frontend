@@ -223,18 +223,12 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background relative overflow-hidden">
-      {/* Decorative Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-pink-100 dark:bg-pink-950/30 rounded-full filter blur-3xl opacity-20 translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-100 dark:bg-purple-950/30 rounded-full filter blur-3xl opacity-20 -translate-x-1/2 translate-y-1/2" />
-      </div>
-
-      <main className="container mx-auto max-w-4xl px-4 py-12 md:py-20 relative z-10">
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto max-w-4xl px-4 py-12 md:py-20">
         {/* Page Header */}
         <header className="mb-10">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 flex items-center">
-            <Settings className="w-8 h-8 mr-3 text-pink-500" />
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground flex items-center">
+            <Settings className="w-8 h-8 mr-3 text-wine-500" />
             Account Settings
           </h1>
           <p className="text-muted-foreground mt-2">Manage your profile and security settings</p>
@@ -247,7 +241,7 @@ export default function AccountPage() {
               <div className="p-4 border-b border-border">
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-pink-200">
+                    <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-wine-200">
                       <Image
                         src={user.profile_picture || '/images/default.jpg'}
                         alt={user.username}
@@ -268,7 +262,7 @@ export default function AccountPage() {
                   onClick={() => setActiveSection('profile')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeSection === 'profile'
-                      ? 'bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400'
+                      ? 'bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400'
                       : 'text-foreground hover:bg-muted'
                   }`}
                 >
@@ -279,7 +273,7 @@ export default function AccountPage() {
                   onClick={() => setActiveSection('password')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeSection === 'password'
-                      ? 'bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400'
+                      ? 'bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400'
                       : 'text-foreground hover:bg-muted'
                   }`}
                 >
@@ -290,7 +284,7 @@ export default function AccountPage() {
                   onClick={() => setActiveSection('privacy')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeSection === 'privacy'
-                      ? 'bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400'
+                      ? 'bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400'
                       : 'text-foreground hover:bg-muted'
                   }`}
                 >
@@ -317,9 +311,9 @@ export default function AccountPage() {
             {/* Profile Section */}
             {activeSection === 'profile' && (
               <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20">
+                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-wine-50 to-wine-100 dark:from-wine-950/20 dark:to-wine-950/20">
                   <h2 className="text-xl font-bold text-foreground flex items-center">
-                    <User className="w-5 h-5 mr-2 text-pink-500" />
+                    <User className="w-5 h-5 mr-2 text-wine-500" />
                     Profile Information
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">Update your public profile information</p>
@@ -328,7 +322,7 @@ export default function AccountPage() {
                   {/* Profile Picture */}
                   <div className="flex items-center gap-6">
                     <div className="relative">
-                      <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-pink-100 shadow-lg">
+                      <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-wine-100 shadow-lg">
                         <Image
                           src={user.profile_picture || '/images/default.jpg'}
                           alt={user.username}
@@ -351,7 +345,7 @@ export default function AccountPage() {
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isUploadingPhoto}
-                        className="absolute bottom-0 right-0 p-2 bg-pink-500 text-white rounded-full shadow-md hover:bg-pink-600 transition-colors disabled:opacity-50"
+                        className="absolute bottom-0 right-0 p-2 bg-wine-500 text-white rounded-full shadow-md hover:bg-wine-600 transition-colors disabled:opacity-50"
                         title="Change profile picture"
                       >
                         {isUploadingPhoto ? (
@@ -375,7 +369,7 @@ export default function AccountPage() {
                       id="username"
                       {...profileForm.register('username')}
                       defaultValue={user.username}
-                      className="border-input focus:border-pink-400 focus:ring-pink-400"
+                      className="border-input focus:border-wine-400 focus:ring-wine-400"
                     />
                     {profileForm.formState.errors.username && (
                       <p className="text-sm text-red-500">
@@ -393,7 +387,7 @@ export default function AccountPage() {
                       {...profileForm.register('bio')}
                       defaultValue={user.bio || ''}
                       rows={4}
-                      className="border-input focus:border-pink-400 focus:ring-pink-400 resize-none"
+                      className="border-input focus:border-wine-400 focus:ring-wine-400 resize-none"
                     />
                     {profileForm.formState.errors.bio && (
                       <p className="text-sm text-red-500">
@@ -406,7 +400,7 @@ export default function AccountPage() {
                     <Button
                       type="submit"
                       disabled={isUpdating}
-                      className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-6"
+                      className="bg-wine-600 hover:bg-wine-700 text-white px-6"
                     >
                       {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Save Changes
@@ -419,9 +413,9 @@ export default function AccountPage() {
             {/* Password Section */}
             {activeSection === 'password' && (
               <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20">
+                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-wine-50 to-wine-100 dark:from-wine-950/20 dark:to-wine-950/20">
                   <h2 className="text-xl font-bold text-foreground flex items-center">
-                    <Lock className="w-5 h-5 mr-2 text-pink-500" />
+                    <Lock className="w-5 h-5 mr-2 text-wine-500" />
                     Change Password
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">Keep your account secure with a strong password</p>
@@ -433,7 +427,7 @@ export default function AccountPage() {
                       id="currentPassword"
                       type="password"
                       {...passwordForm.register('currentPassword')}
-                      className="border-input focus:border-pink-400 focus:ring-pink-400"
+                      className="border-input focus:border-wine-400 focus:ring-wine-400"
                     />
                     {passwordForm.formState.errors.currentPassword && (
                       <p className="text-sm text-red-500">
@@ -448,7 +442,7 @@ export default function AccountPage() {
                       id="newPassword"
                       type="password"
                       {...passwordForm.register('newPassword')}
-                      className="border-input focus:border-pink-400 focus:ring-pink-400"
+                      className="border-input focus:border-wine-400 focus:ring-wine-400"
                     />
                     {passwordForm.formState.errors.newPassword && (
                       <p className="text-sm text-red-500">
@@ -463,7 +457,7 @@ export default function AccountPage() {
                       id="confirmPassword"
                       type="password"
                       {...passwordForm.register('confirmPassword')}
-                      className="border-input focus:border-pink-400 focus:ring-pink-400"
+                      className="border-input focus:border-wine-400 focus:ring-wine-400"
                     />
                     {passwordForm.formState.errors.confirmPassword && (
                       <p className="text-sm text-red-500">
@@ -476,7 +470,7 @@ export default function AccountPage() {
                     <Button
                       type="submit"
                       disabled={isChangingPassword}
-                      className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-6"
+                      className="bg-wine-600 hover:bg-wine-700 text-white px-6"
                     >
                       {isChangingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Change Password
@@ -489,9 +483,9 @@ export default function AccountPage() {
             {/* Privacy Section */}
             {activeSection === 'privacy' && (
               <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20">
+                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-wine-50 to-wine-100 dark:from-wine-950/20 dark:to-wine-950/20">
                   <h2 className="text-xl font-bold text-foreground flex items-center">
-                    <Eye className="w-5 h-5 mr-2 text-pink-500" />
+                    <Eye className="w-5 h-5 mr-2 text-wine-500" />
                     Privacy Settings
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">Control what others can see on your profile</p>
@@ -511,7 +505,7 @@ export default function AccountPage() {
                       checked={libraryPublic}
                       onCheckedChange={handlePrivacyToggle}
                       disabled={isUpdatingPrivacy}
-                      className="data-[state=checked]:bg-pink-500"
+                      className="data-[state=checked]:bg-wine-500"
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">

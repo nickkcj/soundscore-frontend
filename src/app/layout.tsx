@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     'Rate albums, discover new music, and connect with fellow music lovers. Share your music taste with the world.',
   keywords: ['music', 'reviews', 'albums', 'ratings', 'social', 'discover'],
   icons: {
-    icon: '/images/music.png',
-    apple: '/images/music.png',
+    icon: '/images/logo_only_soundscore.png',
+    apple: '/images/logo_only_soundscore.png',
   },
 };
 
@@ -32,7 +32,7 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="light"
+            forcedTheme="light"
             enableSystem={false}
             disableTransitionOnChange
           >

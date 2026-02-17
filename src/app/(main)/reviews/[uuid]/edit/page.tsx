@@ -126,7 +126,7 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground">Review not found</p>
               <Link href="/my-reviews">
-                <Button className="mt-4 bg-pink-600 hover:bg-pink-700">Back to My Reviews</Button>
+                <Button className="mt-4 bg-wine-600 hover:bg-wine-700">Back to My Reviews</Button>
               </Link>
             </CardContent>
           </Card>
@@ -138,7 +138,7 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-12">
       <div className="container max-w-2xl mx-auto px-4">
-        <Link href="/my-reviews" className="inline-flex items-center gap-2 text-muted-foreground hover:text-pink-600 dark:hover:text-pink-400 transition-colors mb-6">
+        <Link href="/my-reviews" className="inline-flex items-center gap-2 text-muted-foreground hover:text-wine-600 dark:hover:text-wine-400 transition-colors mb-6">
           <ArrowLeft className="h-4 w-4" />
           Back to My Reviews
         </Link>

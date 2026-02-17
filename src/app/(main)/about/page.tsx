@@ -6,10 +6,9 @@ export default function AboutPage() {
       className="min-h-[calc(100vh-140px)] flex items-center"
       style={{
         background: `linear-gradient(to bottom right,
-          rgba(201,24,74,0.9) 0%,
-          rgba(201,24,74,0.8) 30%,
-          rgba(156,39,176,0.7) 60%,
-          rgba(103,58,183,0.8) 100%)`,
+          #722F37 0%,
+          #5e2530 60%,
+          #3a1820 100%)`,
       }}
     >
       <div className="container mx-auto max-w-6xl px-8 py-16 md:py-24">

@@ -235,7 +235,7 @@ export function CreateReviewModal({
                     value={query}
                     onChange={handleSearchChange}
                     placeholder="Enter album or artist name..."
-                    className="pl-10 py-3 border-input focus:ring-pink-500 focus:border-pink-500"
+                    className="pl-10 py-3 border-input focus:ring-wine-500 focus:border-wine-500"
                     autoFocus
                   />
                   {query && (
@@ -252,7 +252,7 @@ export function CreateReviewModal({
               {/* Search Results */}
               {searchLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-wine-500" />
                   <span className="ml-3 text-muted-foreground">Searching...</span>
                 </div>
               ) : results && results.length > 0 ? (
@@ -263,7 +263,7 @@ export function CreateReviewModal({
                       <button
                         key={album.spotify_id}
                         onClick={() => handleSelectAlbum(album)}
-                        className="bg-card rounded-lg border border-border overflow-hidden hover:border-pink-300 dark:hover:border-pink-700 hover:shadow-md transition-all text-left group"
+                        className="bg-card rounded-lg border border-border overflow-hidden hover:border-wine-300 dark:hover:border-wine-700 hover:shadow-md transition-all text-left group"
                       >
                         <div className="aspect-square relative bg-muted">
                           {album.cover_image ? (
@@ -365,7 +365,7 @@ export function CreateReviewModal({
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   rows={4}
-                  className="border-input focus:ring-pink-500 focus:border-pink-500"
+                  className="border-input focus:ring-wine-500 focus:border-wine-500"
                 />
               </div>
 
@@ -376,10 +376,10 @@ export function CreateReviewModal({
                   id="favorite"
                   checked={isFavorite}
                   onChange={(e) => setIsFavorite(e.target.checked)}
-                  className="h-4 w-4 text-pink-600 border-input rounded focus:ring-pink-500"
+                  className="h-4 w-4 text-wine-600 border-input rounded focus:ring-wine-500"
                 />
                 <label htmlFor="favorite" className="flex items-center gap-2 text-foreground cursor-pointer text-sm">
-                  <Heart className={`h-4 w-4 ${isFavorite ? 'text-pink-500 fill-pink-500' : 'text-muted-foreground'}`} />
+                  <Heart className={`h-4 w-4 ${isFavorite ? 'text-wine-500 fill-wine-500' : 'text-muted-foreground'}`} />
                   Mark as favorite album
                 </label>
               </div>
@@ -394,7 +394,7 @@ export function CreateReviewModal({
                 <Button
                   type="submit"
                   disabled={isLoading || rating === 0}
-                  className="flex-1 bg-pink-600 hover:bg-pink-700 text-white font-medium py-3"
+                  className="flex-1 bg-wine-600 hover:bg-wine-700 text-white font-medium py-3"
                 >
                   {isLoading ? (
                     <>

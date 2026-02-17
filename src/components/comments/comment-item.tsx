@@ -133,8 +133,8 @@ export function CommentItem({
               className={cn(
                 "h-8 px-3 rounded-full gap-2 transition-colors",
                 comment.is_liked
-                  ? "text-pink-500 hover:text-pink-600 hover:bg-pink-500/10"
-                  : "text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10"
+                  ? "text-wine-500 hover:text-wine-600 hover:bg-wine-500/10"
+                  : "text-muted-foreground hover:text-wine-500 hover:bg-wine-500/10"
               )}
               onClick={() => onToggleLike(comment.id)}
               disabled={comment.id === -1}

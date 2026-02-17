@@ -85,7 +85,7 @@ export function GroupInviteNotification({
               {notification.actor_username.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="absolute -bottom-1 -right-1 rounded-full p-1 bg-purple-500">
+          <div className="absolute -bottom-1 -right-1 rounded-full p-1 bg-wine-700">
             <Users className="h-3 w-3 text-white" />
           </div>
         </div>

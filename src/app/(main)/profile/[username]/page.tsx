@@ -223,7 +223,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   if (!profile) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="h-48 md:h-64 bg-gradient-to-r from-pink-400 to-purple-500" />
+        <div className="h-48 md:h-64 bg-wine-600" />
         <div className="container mx-auto max-w-3xl px-4 py-12">
           <div className="text-center p-10 bg-card rounded-lg border border-dashed border-border">
             <div className="text-5xl text-muted-foreground/30 mb-3 inline-block">?</div>
@@ -241,7 +241,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
       {/* Banner Section */}
       <div className="relative">
         {/* Banner Image */}
-        <div className="h-48 md:h-64 bg-gradient-to-r from-pink-400 to-purple-500 relative overflow-hidden">
+        <div className="h-48 md:h-64 bg-wine-600 relative overflow-hidden">
           {profile.banner_image && (
             <Image
               src={profile.banner_image}
@@ -306,14 +306,14 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                   onClick={handleFollow}
                   disabled={followLoading}
                   variant={isFollowing ? "outline" : "default"}
-                  className={`rounded-full ${isFollowing ? "" : "bg-pink-500 hover:bg-pink-600"}`}
+                  className={`rounded-full ${isFollowing ? "" : "bg-wine-500 hover:bg-wine-600"}`}
                 >
                   {followLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {isFollowing ? 'Unfollow' : 'Follow'}
                 </Button>
               ) : (
                 <Link href="/login">
-                  <Button className="rounded-full bg-pink-500 hover:bg-pink-600">Follow</Button>
+                  <Button className="rounded-full bg-wine-500 hover:bg-wine-600">Follow</Button>
                 </Link>
               )}
             </div>

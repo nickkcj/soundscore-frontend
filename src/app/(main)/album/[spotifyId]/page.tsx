@@ -175,7 +175,7 @@ export default function AlbumPage({ params }: PageProps) {
                   priority
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-500/20 to-purple-500/20">
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-wine-500/20 to-wine-800/20">
                   <Music className="h-24 w-24 text-muted-foreground/50" />
                 </div>
               )}
@@ -212,7 +212,7 @@ export default function AlbumPage({ params }: PageProps) {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-              <Button asChild className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white">
+              <Button asChild className="bg-wine-600 hover:bg-wine-700 text-white">
                 <a href={album.spotify_url} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   Open in Spotify
@@ -233,7 +233,7 @@ export default function AlbumPage({ params }: PageProps) {
           <Card className="mb-10">
             <CardContent className="pt-6">
               <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Music className="h-5 w-5 text-pink-500" />
+                <Music className="h-5 w-5 text-wine-500" />
                 About this Album
               </h2>
               <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
@@ -247,7 +247,7 @@ export default function AlbumPage({ params }: PageProps) {
         <Card className="mb-10">
           <CardContent className="pt-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Disc3 className="h-5 w-5 text-pink-500" />
+              <Disc3 className="h-5 w-5 text-wine-500" />
               Tracklist
             </h2>
             <div className="divide-y">
@@ -282,7 +282,7 @@ export default function AlbumPage({ params }: PageProps) {
                     rel="noopener noreferrer"
                     className="opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-pink-500 hover:text-pink-600">
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-wine-500 hover:text-wine-600">
                       <Play className="h-4 w-4 fill-current" />
                     </Button>
                   </a>
@@ -295,7 +295,7 @@ export default function AlbumPage({ params }: PageProps) {
         {/* Reviews Section */}
         <div className="mb-10">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Star className="h-5 w-5 text-pink-500" />
+            <Star className="h-5 w-5 text-wine-500" />
             Reviews ({totalReviews})
           </h2>
 

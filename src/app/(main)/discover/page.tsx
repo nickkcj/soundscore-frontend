@@ -59,17 +59,11 @@ export default function DiscoverPage() {
   const hasResults = results.albums.length > 0 || results.users.length > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-pink-100 dark:bg-pink-950/30 rounded-full filter blur-3xl opacity-30 -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-100 dark:bg-purple-950/30 rounded-full filter blur-3xl opacity-30 translate-x-1/2 translate-y-1/2" />
-      </div>
-
-      <main className="container mx-auto max-w-6xl px-4 py-12 md:py-16 relative z-10">
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto max-w-6xl px-4 py-12 md:py-16">
         {/* Header Section */}
         <header className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-4 animate-fade-in">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 animate-fade-in">
             Discover New Music
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -82,13 +76,13 @@ export default function DiscoverPage() {
           <div className="max-w-3xl mx-auto">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-6 w-6 text-pink-400" />
+                <Search className="h-6 w-6 text-wine-400" />
               </div>
               <Input
                 placeholder="Search albums, artists, or users..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 text-lg border-2 border-border rounded-full focus:border-pink-400 focus:ring-pink-400 transition-all bg-background shadow-sm"
+                className="w-full pl-12 pr-4 py-4 text-lg border-2 border-border rounded-full focus:border-wine-400 focus:ring-wine-400 transition-all bg-background shadow-sm"
               />
             </div>
           </div>
@@ -100,14 +94,14 @@ export default function DiscoverPage() {
             <TabsList className="bg-card shadow-sm border border-border rounded-full p-1.5">
               <TabsTrigger
                 value="albums"
-                className="rounded-full px-6 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all"
+                className="rounded-full px-6 py-2.5 data-[state=active]:bg-wine-600 data-[state=active]:text-white transition-all"
               >
                 <Disc3 className="h-4 w-4 mr-2" />
                 Albums
               </TabsTrigger>
               <TabsTrigger
                 value="users"
-                className="rounded-full px-6 py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all"
+                className="rounded-full px-6 py-2.5 data-[state=active]:bg-wine-600 data-[state=active]:text-white transition-all"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Users
@@ -119,8 +113,8 @@ export default function DiscoverPage() {
         {/* Results */}
         {!query.trim() ? (
           <div className="text-center py-20 bg-card/50 backdrop-blur-sm rounded-2xl border border-border shadow-sm">
-            <div className="bg-pink-50 dark:bg-pink-950/30 w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6">
-              <Search className="h-12 w-12 text-pink-400" />
+            <div className="bg-wine-50 dark:bg-wine-950/30 w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6">
+              <Search className="h-12 w-12 text-wine-400" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">Ready to Explore?</h3>
             <p className="text-muted-foreground max-w-md mx-auto">
@@ -160,7 +154,7 @@ export default function DiscoverPage() {
             {tab === 'albums' && results.albums.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center">
-                  <Disc3 className="h-7 w-7 text-pink-500 mr-3" />
+                  <Disc3 className="h-7 w-7 text-wine-500 mr-3" />
                   Albums
                   <span className="ml-3 text-sm font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full">
                     {results.albums.length} results
@@ -188,7 +182,7 @@ export default function DiscoverPage() {
             {tab === 'users' && results.users.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center">
-                  <Users className="h-7 w-7 text-pink-500 mr-3" />
+                  <Users className="h-7 w-7 text-wine-500 mr-3" />
                   Users
                   <span className="ml-3 text-sm font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full">
                     {results.users.length} results
@@ -214,7 +208,7 @@ function UserCard({ user }: { user: UserListItem }) {
       <div className="bg-card rounded-xl shadow-sm border border-border p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-pink-100">
+            <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-wine-100">
               <Image
                 src={user.profile_picture || '/images/default.jpg'}
                 alt={user.username}
@@ -230,7 +224,7 @@ function UserCard({ user }: { user: UserListItem }) {
               <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{user.bio}</p>
             )}
           </div>
-          <button className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium rounded-full hover:from-pink-600 hover:to-purple-600 transition-all shadow-sm">
+          <button className="px-4 py-2 bg-wine-600 hover:bg-wine-700 text-white text-sm font-medium rounded-full transition-all shadow-sm">
             View
           </button>
         </div>

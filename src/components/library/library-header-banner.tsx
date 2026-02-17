@@ -24,13 +24,13 @@ export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryH
 
   return (
     <div className="relative h-36 lg:h-48 rounded-xl overflow-hidden">
-      {/* Background Image */}
+      {/* Background Image - blurred for ambient effect */}
       {bannerImage ? (
         <Image
           src={bannerImage}
           alt="Banner"
           fill
-          className="object-cover"
+          className="object-cover scale-110 blur-md"
           priority
         />
       ) : (

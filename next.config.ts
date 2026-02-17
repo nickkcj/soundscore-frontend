@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'soundscore-2.s3.us-east-2.amazonaws.com', // AWS S3 storage
+        hostname: 'soundscore-2.s3.amazonaws.com', // AWS S3 storage
       },
     ],
   },

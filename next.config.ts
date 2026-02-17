@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com', // Fallback images
       },
+      {
+        protocol: 'https',
+        hostname: 'soundscore-2.s3.us-east-2.amazonaws.com', // AWS S3 storage
+      },
     ],
   },
 };

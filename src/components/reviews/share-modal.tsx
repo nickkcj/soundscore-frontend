@@ -161,7 +161,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
         </div>
 
         {/* Users & Groups List */}
-        <div className="max-h-[300px] overflow-y-auto">
+        <div className="max-h-[300px] overflow-y-auto overflow-x-hidden">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin" />
@@ -185,7 +185,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
                     return (
                       <div
                         key={u.id}
-                        className="flex items-center justify-between p-2 rounded-lg hover:bg-muted"
+                        className="flex items-center justify-between p-2 rounded-lg hover:bg-muted w-full"
                       >
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           <Avatar className="h-10 w-10 flex-shrink-0">
@@ -230,7 +230,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
                     return (
                       <div
                         key={g.id}
-                        className="flex items-center justify-between p-2 rounded-lg hover:bg-muted"
+                        className="flex items-center justify-between p-2 rounded-lg hover:bg-muted w-full"
                       >
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0 overflow-hidden">

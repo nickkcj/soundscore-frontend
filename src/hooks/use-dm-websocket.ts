@@ -49,7 +49,7 @@ export function useDMWebSocket({
   }, [onMessage, onTyping, onRead]);
 
   const connect = useCallback(() => {
-    if (isConnectingRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
+    if (!conversationId || isConnectingRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
       return;
     }
 
@@ -178,6 +178,7 @@ export function useDMWebSocket({
   }, []);
 
   useEffect(() => {
+    if (!conversationId) return;
     connect();
     return () => disconnect();
   }, [conversationId]);

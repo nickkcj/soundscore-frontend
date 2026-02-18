@@ -54,7 +54,7 @@ export function ReviewShareCard({ data }: { data: ReviewShareData }) {
           )}
         </div>
         {/* Info */}
-        <div className="flex-1 p-2.5 min-w-0">
+        <div className="flex-1 p-2.5 min-w-0 text-left">
           <p className="text-xs text-muted-foreground">
             Review by <span className="font-medium text-foreground">@{data.username}</span>
           </p>

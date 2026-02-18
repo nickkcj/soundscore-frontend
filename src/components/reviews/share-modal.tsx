@@ -124,30 +124,27 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[520px] w-[calc(100vw-2rem)]">
+      <DialogContent className="p-5 gap-3 [&>*]:min-w-0">
         <DialogHeader>
           <DialogTitle>Share Review</DialogTitle>
         </DialogHeader>
 
         {/* Copy Link Section */}
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border">
+        <button
+          type="button"
+          onClick={handleCopyLink}
+          className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border hover:bg-muted transition-colors text-left w-full"
+        >
           <Link2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="text-sm truncate flex-1 text-muted-foreground">
-            {reviewUrl}
+          <span className="text-sm text-muted-foreground flex-1 truncate">
+            soundscore.com.br/reviews/{reviewUuid.slice(0, 8)}...
           </span>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleCopyLink}
-            className="flex-shrink-0"
-          >
-            {copied ? (
-              <Check className="h-4 w-4 text-green-500" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
+          {copied ? (
+            <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+          ) : (
+            <Copy className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          )}
+        </button>
 
         {/* Search */}
         <div className="relative">

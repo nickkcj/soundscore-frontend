@@ -10,6 +10,7 @@ import { UserAvatar } from '@/components/common/user-avatar';
 import { useRequireAuth } from '@/hooks/use-auth';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { tryParseReviewShare } from '@/components/reviews/review-share-card';
 import type { ConversationType, ConversationListResponse } from '@/types';
 
 export default function MessagesPage() {
@@ -104,6 +105,15 @@ export default function MessagesPage() {
   );
 }
 
+function getMessagePreview(content: string | undefined): string {
+  if (!content) return 'No messages yet';
+  const reviewShare = tryParseReviewShare(content);
+  if (reviewShare) {
+    return `🎵 Shared a review: ${reviewShare.album_title}`;
+  }
+  return content;
+}
+
 function ConversationItem({ conversation }: { conversation: ConversationType }) {
   const { other_user, last_message, unread_count, updated_at } = conversation;
 
@@ -133,7 +143,7 @@ function ConversationItem({ conversation }: { conversation: ConversationType }) 
               unread_count > 0 ? 'text-foreground font-medium' : 'text-muted-foreground'
             )}
           >
-            {last_message?.content || 'No messages yet'}
+            {getMessagePreview(last_message?.content)}
           </p>
           {unread_count > 0 && (
             <span className="flex-shrink-0 ml-2 h-5 min-w-[20px] px-1.5 rounded-full bg-wine-600 text-white text-xs font-medium flex items-center justify-center">

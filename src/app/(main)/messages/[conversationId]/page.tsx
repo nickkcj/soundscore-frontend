@@ -15,6 +15,7 @@ import { useRequireAuth } from '@/hooks/use-auth';
 import { useDMWebSocket } from '@/hooks/use-dm-websocket';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { ReviewShareCard, tryParseReviewShare } from '@/components/reviews/review-share-card';
 import type { DirectMessageType, DMMessageListResponse, ConversationType, ConversationListResponse } from '@/types';
 
 interface OtherUser {
@@ -367,6 +368,7 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
 
 function MessageItem({ message, isOwn }: { message: DirectMessageType; isOwn: boolean }) {
   const [isImageLoading, setIsImageLoading] = useState(true);
+  const reviewShare = message.content ? tryParseReviewShare(message.content) : null;
 
   useEffect(() => {
     if (message.image_url) {
@@ -393,38 +395,42 @@ function MessageItem({ message, isOwn }: { message: DirectMessageType; isOwn: bo
             {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
           </span>
         </div>
-        <div
-          className={cn(
-            'rounded-lg inline-block overflow-hidden',
-            message.content ? 'px-3 py-2' : 'p-1',
-            isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'
-          )}
-        >
-          {message.image_url && (
-            <div className="relative mb-2 last:mb-0">
-              {isImageLoading && (
-                <div className="w-[250px] h-[200px] bg-muted-foreground/20 animate-pulse rounded-lg flex items-center justify-center">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                </div>
-              )}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={message.image_url}
-                alt="Message image"
-                className={cn(
-                  'max-w-[250px] max-h-[300px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity',
-                  isImageLoading && 'hidden'
+        {reviewShare ? (
+          <ReviewShareCard data={reviewShare} />
+        ) : (
+          <div
+            className={cn(
+              'rounded-lg inline-block overflow-hidden',
+              message.content ? 'px-3 py-2' : 'p-1',
+              isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'
+            )}
+          >
+            {message.image_url && (
+              <div className="relative mb-2 last:mb-0">
+                {isImageLoading && (
+                  <div className="w-[250px] h-[200px] bg-muted-foreground/20 animate-pulse rounded-lg flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
                 )}
-                onLoad={() => setIsImageLoading(false)}
-                onError={() => setIsImageLoading(false)}
-                onClick={() => window.open(message.image_url!, '_blank')}
-              />
-            </div>
-          )}
-          {message.content && (
-            <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-          )}
-        </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={message.image_url}
+                  alt="Message image"
+                  className={cn(
+                    'max-w-[250px] max-h-[300px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity',
+                    isImageLoading && 'hidden'
+                  )}
+                  onLoad={() => setIsImageLoading(false)}
+                  onError={() => setIsImageLoading(false)}
+                  onClick={() => window.open(message.image_url!, '_blank')}
+                />
+              </div>
+            )}
+            {message.content && (
+              <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

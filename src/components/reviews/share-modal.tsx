@@ -125,7 +125,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg w-[calc(100vw-2rem)]">
         <DialogHeader>
           <DialogTitle>Share Review</DialogTitle>
         </DialogHeader>

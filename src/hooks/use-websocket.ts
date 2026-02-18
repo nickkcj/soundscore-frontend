@@ -60,8 +60,7 @@ export function useGroupWebSocket({
   }, [onMessage, onUserJoined, onUserLeft, onOnlineUsers, onTyping, onMemberJoined]);
 
   const connect = useCallback(() => {
-    // Prevent multiple simultaneous connection attempts
-    if (isConnectingRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
+    if (!groupUuid || isConnectingRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
       return;
     }
 
@@ -211,9 +210,10 @@ export function useGroupWebSocket({
   }, []);
 
   useEffect(() => {
+    if (!groupUuid) return;
     connect();
     return () => disconnect();
-  }, [groupUuid]); // Only reconnect when groupUuid changes
+  }, [groupUuid]);
 
   return {
     isConnected,

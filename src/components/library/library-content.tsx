@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Music, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { LibraryHeaderBanner } from './library-header-banner';
 import { LibraryTabs, type LibrarySubTab } from './library-tabs';
 import { DateRangeSelector, type DateRangeValue } from './date-range-selector';

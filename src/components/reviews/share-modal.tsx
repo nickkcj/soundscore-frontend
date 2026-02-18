@@ -125,7 +125,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-lg w-[calc(100vw-2rem)]">
+      <DialogContent className="sm:max-w-[520px] w-[calc(100vw-2rem)]">
         <DialogHeader>
           <DialogTitle>Share Review</DialogTitle>
         </DialogHeader>
@@ -172,7 +172,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
               {search ? 'No results found' : 'Follow users to share with them'}
             </div>
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-1 pr-3">
               {/* Users */}
               {filteredUsers.length > 0 && (
                 <>

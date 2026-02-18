@@ -34,12 +34,12 @@ export function ReviewShareCard({ data }: { data: ReviewShareData }) {
   return (
     <Link
       href={`/reviews/${data.review_uuid}`}
-      className="block rounded-xl border border-border overflow-hidden hover:bg-muted/50 transition-colors bg-background/80 max-w-[320px]"
+      className="block rounded-xl border border-border overflow-hidden hover:bg-muted/50 transition-colors bg-background/80 w-[380px] max-w-full"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex">
         {/* Album Cover */}
-        <div className="relative w-20 h-20 flex-shrink-0 bg-muted">
+        <div className="relative w-24 h-24 flex-shrink-0 bg-muted overflow-hidden">
           {data.album_cover ? (
             <Image
               src={data.album_cover}

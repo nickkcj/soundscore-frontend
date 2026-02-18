@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { RefreshCw, Music, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { Music, Loader2 } from 'lucide-react';
 import { LibraryHeaderBanner } from './library-header-banner';
 import { LibraryTabs, type LibrarySubTab } from './library-tabs';
 import { DateRangeSelector, type DateRangeValue } from './date-range-selector';
@@ -20,7 +18,6 @@ import {
   useTopArtists,
   useTopAlbums,
   useTopTracks,
-  useSyncScrobbles,
 } from '@/hooks/use-library';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -36,37 +33,18 @@ export function LibraryContent({ username }: LibraryContentProps) {
   const [dateRange, setDateRange] = useState<DateRangeValue>('30');
   const days = parseInt(dateRange);
 
+  // Map days to Spotify time_range
+  const timeRange = days <= 30 ? 'short_term' : days <= 90 ? 'medium_term' : 'long_term';
+
   // Data hooks with date range
   const { status, isLoading: statusLoading } = useSpotifyStatus(username);
-  const { stats, isLoading: statsLoading, refetch: refetchStats } = useLibraryStats(username, days);
-  const { scrobbles, isLoading: scrobblesLoading, refetch: refetchScrobbles } = useScrobbles(username);
-  const { artists, isLoading: artistsLoading } = useTopArtists(username, 'medium_term');
+  const { stats, isLoading: statsLoading } = useLibraryStats(username, days);
+  const { scrobbles, isLoading: scrobblesLoading } = useScrobbles(username);
+  const { artists, isLoading: artistsLoading } = useTopArtists(username, timeRange);
   const { albums, isLoading: albumsLoading } = useTopAlbums(username, days);
   const { tracks, isLoading: tracksLoading } = useTopTracks(username, days);
-  const { sync, isSyncing } = useSyncScrobbles();
 
   const [activeSubTab, setActiveSubTab] = useState<LibrarySubTab>('scrobbles');
-  const [hasSynced, setHasSynced] = useState(false);
-
-  // Auto-sync on load for own profile
-  useEffect(() => {
-    if (isOwnProfile && status?.connected && !hasSynced) {
-      handleSync();
-      setHasSynced(true);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOwnProfile, status?.connected]);
-
-  const handleSync = async () => {
-    const result = await sync();
-    if (result) {
-      toast.success(result.message);
-      refetchScrobbles();
-      refetchStats();
-    } else {
-      toast.error('Sync failed. Make sure Spotify is connected.');
-    }
-  };
 
   if (statusLoading) {
     return (
@@ -91,7 +69,7 @@ export function LibraryContent({ username }: LibraryContentProps) {
             onClick={() => {
               window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth/spotify/login`;
             }}
-            className="bg-green-500 hover:bg-green-600"
+            className="bg-wine-600 hover:bg-wine-700"
           >
             Connect Spotify
           </Button>
@@ -117,25 +95,7 @@ export function LibraryContent({ username }: LibraryContentProps) {
           isLoading={statsLoading}
         />
 
-        <div className="flex items-center gap-3">
-          <DateRangeSelector value={dateRange} onChange={setDateRange} />
-
-          {isOwnProfile && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSync}
-              disabled={isSyncing}
-            >
-              {isSyncing ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <RefreshCw className="w-4 h-4 mr-2" />
-              )}
-              Sync
-            </Button>
-          )}
-        </div>
+        <DateRangeSelector value={dateRange} onChange={setDateRange} />
       </div>
 
       {/* Tabs */}

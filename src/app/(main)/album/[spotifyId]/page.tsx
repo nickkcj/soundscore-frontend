@@ -185,7 +185,16 @@ export default function AlbumPage({ params }: PageProps) {
           {/* Album Info */}
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">{album.title}</h1>
-            <p className="text-xl text-muted-foreground mb-4">{album.artist}</p>
+            {album.artist_spotify_id ? (
+              <Link
+                href={`/artist/${album.artist_spotify_id}`}
+                className="text-xl text-muted-foreground mb-4 block hover:text-foreground transition-colors hover:underline"
+              >
+                {album.artist}
+              </Link>
+            ) : (
+              <p className="text-xl text-muted-foreground mb-4">{album.artist}</p>
+            )}
 
             {/* Meta Info */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-muted-foreground mb-4">

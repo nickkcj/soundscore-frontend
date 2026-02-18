@@ -436,8 +436,8 @@ export default function FeedPage() {
 
 function TrendingAlbumItem({ album }: { album: TrendingAlbum }) {
   return (
-    <Link href={`/album/${album.spotify_id}`} className="flex items-center gap-3 hover:bg-muted p-2 rounded-lg transition-colors">
-      <div className="w-14 h-14 rounded-md overflow-hidden shadow-sm">
+    <Link href={`/album/${album.spotify_id}`} className="flex items-start gap-3 hover:bg-muted p-2 rounded-lg transition-colors">
+      <div className="w-14 h-14 flex-shrink-0 rounded-md overflow-hidden shadow-sm">
         {album.cover_image ? (
           <Image
             src={album.cover_image}
@@ -450,7 +450,7 @@ function TrendingAlbumItem({ album }: { album: TrendingAlbum }) {
           <div className="w-full h-full bg-gradient-to-br from-wine-200 to-wine-300 dark:from-wine-800 dark:to-wine-900" />
         )}
       </div>
-      <div>
+      <div className="min-w-0 flex-1">
         <h4 className="font-medium text-sm text-foreground line-clamp-1">{album.title}</h4>
         <p className="text-xs text-muted-foreground line-clamp-1">{album.artist}</p>
         <div className="flex items-center mt-1">

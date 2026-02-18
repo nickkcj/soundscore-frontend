@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun, Music } from 'lucide-react';
+import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun, Music, MessageSquare } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,8 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { NotificationDropdown } from './notification-dropdown';
+import { api } from '@/lib/api';
 
 const NAV_ITEMS = [
   { label: 'About', href: '/about' },
@@ -72,8 +74,8 @@ function NavPill({ isActive }: { isActive: (path: string) => boolean }) {
             activeIndex === i
               ? 'text-white'
               : isActive(item.href)
-                ? 'text-wine-600'
-                : 'text-foreground/80 hover:text-wine-600'
+                ? 'text-wine-600 dark:text-wine-300'
+                : 'text-foreground/80 hover:text-wine-600 dark:hover:text-wine-300'
           }`}
           onMouseEnter={() => setHoveredIndex(i)}
         >
@@ -90,10 +92,29 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [unreadDMs, setUnreadDMs] = useState(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Poll unread DM count
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const fetchUnread = async () => {
+      try {
+        const data = await api.get<{ unread_count: number }>('/dm/unread-count');
+        setUnreadDMs(data.unread_count);
+      } catch {
+        // Silent
+      }
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   const isActive = (path: string) => pathname === path || pathname.startsWith(path + '/');
 
@@ -121,7 +142,7 @@ export function Header() {
                   <Link
                     href="/feed"
                     className={`group relative py-1.5 px-4 text-base font-medium transition-all duration-200 hover:bg-background/70 rounded-full ${
-                      isActive('/feed') ? 'text-wine-600' : 'text-foreground/80 hover:text-wine-600'
+                      isActive('/feed') ? 'text-wine-600 dark:text-wine-300' : 'text-foreground/80 hover:text-wine-600 dark:hover:text-wine-300'
                     }`}
                   >
                     <span>Feed</span>
@@ -132,7 +153,7 @@ export function Header() {
                   <Link
                     href="/discover"
                     className={`group relative py-1.5 px-4 text-base font-medium transition-all duration-200 hover:bg-background/70 rounded-full ${
-                      isActive('/discover') ? 'text-wine-600' : 'text-foreground/80 hover:text-wine-600'
+                      isActive('/discover') ? 'text-wine-600 dark:text-wine-300' : 'text-foreground/80 hover:text-wine-600 dark:hover:text-wine-300'
                     }`}
                   >
                     <span>Discover</span>
@@ -143,7 +164,7 @@ export function Header() {
                   <Link
                     href="/groups"
                     className={`group relative py-1.5 px-4 text-base font-medium transition-all duration-200 hover:bg-background/70 rounded-full ${
-                      isActive('/groups') ? 'text-wine-600' : 'text-foreground/80 hover:text-wine-600'
+                      isActive('/groups') ? 'text-wine-600 dark:text-wine-300' : 'text-foreground/80 hover:text-wine-600 dark:hover:text-wine-300'
                     }`}
                   >
                     <span>Groups</span>
@@ -155,6 +176,16 @@ export function Header() {
 
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-3">
+                  {/* Messages */}
+                  <Link href="/messages" className="relative p-2 hover:bg-muted rounded-full transition-colors">
+                    <MessageSquare className={cn('h-5 w-5', isActive('/messages') ? 'text-wine-600 dark:text-wine-300' : 'text-foreground/70')} />
+                    {unreadDMs > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-wine-600 text-white text-[10px] font-bold flex items-center justify-center">
+                        {unreadDMs > 99 ? '99+' : unreadDMs}
+                      </span>
+                    )}
+                  </Link>
+
                   {/* Notifications */}
                   <NotificationDropdown />
 
@@ -162,7 +193,7 @@ export function Header() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="relative focus:outline-none">
-                        <Avatar className="h-10 w-10 ring-2 ring-wine-200 hover:ring-wine-400 transition-all cursor-pointer">
+                        <Avatar className="h-10 w-10 ring-2 ring-wine-200 hover:ring-wine-400 dark:ring-wine-800 dark:hover:ring-wine-600 transition-all cursor-pointer">
                           <AvatarImage src={user?.profile_picture || undefined} alt={user?.username} />
                           <AvatarFallback className="bg-wine-600 text-white font-semibold">
                             {user?.username?.charAt(0).toUpperCase()}
@@ -188,25 +219,25 @@ export function Header() {
                       {/* Menu Items */}
                       <div className="py-1">
                         <DropdownMenuItem asChild>
-                          <Link href={`/profile/${user?.username}`} className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600">
+                          <Link href={`/profile/${user?.username}`} className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
                             <User className="h-4 w-4" />
                             <span>My Profile</span>
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/library" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600">
+                          <Link href="/library" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
                             <Music className="h-4 w-4" />
                             <span>Library</span>
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/my-reviews" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600">
+                          <Link href="/my-reviews" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
                             <ClipboardList className="h-4 w-4" />
                             <span>My Reviews</span>
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/account" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600">
+                          <Link href="/account" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
                             <Settings className="h-4 w-4" />
                             <span>Settings</span>
                           </Link>
@@ -219,7 +250,7 @@ export function Header() {
                       <div className="py-1">
                         <DropdownMenuItem
                           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                          className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600"
+                          className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300"
                         >
                           {mounted && theme === 'dark' ? (
                             <Sun className="h-4 w-4" />
@@ -286,7 +317,7 @@ export function Header() {
                   href="/feed"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/feed') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950' : 'text-foreground hover:bg-muted'
+                    isActive('/feed') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   Feed
@@ -295,7 +326,7 @@ export function Header() {
                   href="/discover"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/discover') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950' : 'text-foreground hover:bg-muted'
+                    isActive('/discover') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   Discover
@@ -304,16 +335,30 @@ export function Header() {
                   href="/groups"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/groups') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950' : 'text-foreground hover:bg-muted'
+                    isActive('/groups') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   Groups
                 </Link>
                 <Link
+                  href="/messages"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors flex items-center justify-between ${
+                    isActive('/messages') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
+                  }`}
+                >
+                  <span>Messages</span>
+                  {unreadDMs > 0 && (
+                    <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-wine-600 text-white text-xs font-medium flex items-center justify-center">
+                      {unreadDMs}
+                    </span>
+                  )}
+                </Link>
+                <Link
                   href={`/profile/${user?.username}`}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive(`/profile/${user?.username}`) ? 'bg-wine-50 text-wine-600 dark:bg-wine-950' : 'text-foreground hover:bg-muted'
+                    isActive(`/profile/${user?.username}`) ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   My Profile
@@ -322,7 +367,7 @@ export function Header() {
                   href="/library"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/library') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950' : 'text-foreground hover:bg-muted'
+                    isActive('/library') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   Library
@@ -331,7 +376,7 @@ export function Header() {
                   href="/my-reviews"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/my-reviews') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950' : 'text-foreground hover:bg-muted'
+                    isActive('/my-reviews') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   My Reviews
@@ -340,7 +385,7 @@ export function Header() {
                   href="/account"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/account') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950' : 'text-foreground hover:bg-muted'
+                    isActive('/account') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   Settings
@@ -374,7 +419,7 @@ export function Header() {
                   href="/about"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/about') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950' : 'text-foreground hover:bg-muted'
+                    isActive('/about') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   About
@@ -383,7 +428,7 @@ export function Header() {
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/login') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950' : 'text-foreground hover:bg-muted'
+                    isActive('/login') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   Login

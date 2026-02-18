@@ -7,7 +7,7 @@ export function Footer() {
         <div className="flex items-center justify-between max-md:flex-col max-md:gap-4">
           {/* Brand & Copyright */}
           <div className="flex items-center gap-2 max-md:flex-col max-md:gap-1">
-            <span className="text-wine-700 text-lg font-bold">
+            <span className="text-wine-700 dark:text-wine-400 text-lg font-bold">
               SoundScore
             </span>
             <span className="text-sm text-muted-foreground">
@@ -18,14 +18,14 @@ export function Footer() {
           {/* Social Icons */}
           <div className="flex gap-3">
             {/* Twitter/X */}
-            <a href="#" aria-label="Twitter" className="text-muted-foreground hover:text-wine-600">
+            <a href="#" aria-label="Twitter" className="text-muted-foreground hover:text-wine-600 dark:hover:text-wine-400">
               <span className="sr-only">Twitter</span>
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
             </a>
             {/* Facebook */}
-            <a href="#" aria-label="Facebook" className="text-muted-foreground hover:text-wine-600">
+            <a href="#" aria-label="Facebook" className="text-muted-foreground hover:text-wine-600 dark:hover:text-wine-400">
               <span className="sr-only">Facebook</span>
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -36,7 +36,7 @@ export function Footer() {
               </svg>
             </a>
             {/* Instagram */}
-            <a href="#" aria-label="Instagram" className="text-muted-foreground hover:text-wine-600">
+            <a href="#" aria-label="Instagram" className="text-muted-foreground hover:text-wine-600 dark:hover:text-wine-400">
               <span className="sr-only">Instagram</span>
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm5.25.75a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
@@ -46,7 +46,7 @@ export function Footer() {
             <a
               href="https://www.linkedin.com/in/nicholas-jasper-6388902b9/"
               aria-label="LinkedIn"
-              className="text-muted-foreground hover:text-wine-600"
+              className="text-muted-foreground hover:text-wine-600 dark:hover:text-wine-400"
             >
               <span className="sr-only">LinkedIn</span>
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

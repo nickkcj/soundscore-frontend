@@ -26,7 +26,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="flex items-center gap-2 w-full px-3 py-2 text-sm cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 transition-colors"
+      className="flex items-center gap-2 w-full px-3 py-2 text-sm cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300 transition-colors"
     >
       {isDark ? (
         <Sun className="h-4 w-4" />

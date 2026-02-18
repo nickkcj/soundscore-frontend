@@ -47,9 +47,6 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
   const startDate = subDays(today, days - 1);
   const allDays = eachDayOfInterval({ start: startDate, end: today });
 
-  // Sort by date descending (most recent first)
-  const sortedDays = [...allDays].reverse();
-
   // Find max for intensity calculation
   const maxCount = Math.max(...data.map(d => d.count), 1);
 
@@ -67,8 +64,8 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
     return 'bg-primary/20';
   };
 
-  // Show only first 15 days for compact view
-  const displayDays = sortedDays.slice(0, 15);
+  // Show most recent 15 days (oldest at top, newest at bottom)
+  const displayDays = allDays.slice(-15);
 
   return (
     <div className="space-y-3">

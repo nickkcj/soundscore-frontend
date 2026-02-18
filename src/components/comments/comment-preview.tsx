@@ -85,17 +85,15 @@ export function CommentPreview({ reviewUuid, commentCount }: CommentPreviewProps
         </div>
       ))}
 
-      {/* View All Link */}
-      <Link
-        href={`/reviews/${reviewUuid}`}
-        className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
-      >
-I        {commentCount === 1
-          ? 'View 1 comment'
-          : commentCount <= 3
-          ? `View all ${commentCount} comments`
-          : `View all ${commentCount} comments`}
-      </Link>
+      {/* View More Link - only show when there are more comments than previewed */}
+      {commentCount > 3 && (
+        <Link
+          href={`/reviews/${reviewUuid}`}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          View {commentCount - 3} more {commentCount - 3 === 1 ? 'comment' : 'comments'}
+        </Link>
+      )}
     </div>
   );
 }

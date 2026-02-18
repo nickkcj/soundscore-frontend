@@ -7,7 +7,7 @@ import type { TopArtist } from '@/types';
 
 interface LibraryHeaderBannerProps {
   topArtist: TopArtist | null;
-  topTrack: { name: string; artist: string; image: string | null; count: number } | null;
+  topTrack: { name: string; artist: string; image: string | null; count: number; track_id?: string | null } | null;
   isLoading?: boolean;
 }
 
@@ -76,9 +76,16 @@ export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryH
               <p className="font-medium text-sm truncate">{topTrack.name}</p>
               <p className="text-xs text-muted-foreground truncate">{topTrack.artist}</p>
             </div>
-            <Button size="icon" variant="ghost" className="rounded-full flex-shrink-0">
-              <Play className="w-4 h-4" />
-            </Button>
+            {topTrack.track_id && (
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full flex-shrink-0"
+                onClick={() => window.open(`https://open.spotify.com/track/${topTrack.track_id}`, '_blank')}
+              >
+                <Play className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         )}
       </div>

@@ -81,7 +81,7 @@ export function LibraryTab({ username }: LibraryTabProps) {
             onClick={() => {
               window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth/spotify/login`;
             }}
-            className="bg-green-500 hover:bg-green-600"
+            className="bg-wine-600 hover:bg-wine-700"
           >
             Connect Spotify
           </Button>

@@ -97,7 +97,7 @@ export default function AuthLayout({
               height={40}
               className="rounded-full"
             />
-            <span className="font-bold text-xl text-wine-700">
+            <span className="font-bold text-xl text-wine-700 dark:text-wine-400">
               SoundScore
             </span>
           </Link>

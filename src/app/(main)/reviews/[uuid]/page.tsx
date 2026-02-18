@@ -4,8 +4,10 @@ import { useState, useEffect, use, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowLeft, Heart, MessageCircle, MoreHorizontal, Pencil, Trash2, Music, Bookmark, Share, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, MoreHorizontal, Pencil, Trash2, Music, Share2 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { CommentThread } from '@/components/comments';
+import { ShareModal } from '@/components/reviews/share-modal';
 import { useRequireAuth } from '@/hooks/use-auth';
 import { useReview } from '@/hooks/use-reviews';
 import { useAuthStore } from '@/stores/auth-store';
@@ -28,6 +30,7 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ uuid: s
   const { getReview } = useReview();
   const { user } = useAuthStore();
 
+  const queryClient = useQueryClient();
   const [review, setReview] = useState<Review | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLiking, setIsLiking] = useState(false);
@@ -85,7 +88,26 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ uuid: s
     setReview((prev) =>
       prev ? { ...prev, comment_count: prev.comment_count + delta } : prev
     );
-  }, []);
+
+    // Update feed cache so count is correct when user navigates back
+    queryClient.setQueriesData(
+      { queryKey: ['feed'] },
+      (old: { pages: { reviews: Review[] }[]; pageParams: number[] } | undefined) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            reviews: page.reviews.map((r) =>
+              r.uuid === uuid
+                ? { ...r, comment_count: r.comment_count + delta }
+                : r
+            ),
+          })),
+        };
+      }
+    );
+  }, [queryClient, uuid]);
 
   if (authLoading || isLoading) {
     return <ReviewDetailSkeleton />;
@@ -185,7 +207,7 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ uuid: s
 
           {/* Album Card - Modern Style */}
           <Link
-            href={`/albums/${review.album.spotify_id}`}
+            href={`/album/${review.album.spotify_id}`}
             className="mt-4 rounded-2xl border border-border overflow-hidden hover:bg-muted/50 transition-colors block cursor-pointer"
           >
             <div className="flex">
@@ -228,39 +250,13 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ uuid: s
             </span>
           </div>
 
-          {/* Stats Row */}
-          <div className="flex gap-5 py-4 border-b border-border">
-            <button className="flex items-center gap-1 hover:underline">
-              <span className="font-bold">{review.like_count}</span>
-              <span className="text-muted-foreground">Likes</span>
-            </button>
-            <button className="flex items-center gap-1 hover:underline">
-              <span className="font-bold">{review.comment_count}</span>
-              <span className="text-muted-foreground">Comments</span>
-            </button>
-          </div>
-
-          {/* Action Buttons - Twitter Style */}
-          <div className="flex items-center justify-around py-2 border-b border-border">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex-1 h-10 rounded-full hover:bg-primary/10 hover:text-primary gap-2"
-            >
-              <MessageCircle className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex-1 h-10 rounded-full hover:bg-green-500/10 hover:text-green-500 gap-2"
-            >
-              <BarChart3 className="h-5 w-5" />
-            </Button>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-6 py-2 border-b border-border">
             <Button
               variant="ghost"
               size="sm"
               className={cn(
-                "flex-1 h-10 rounded-full gap-2 transition-colors",
+                "h-10 rounded-full gap-2 transition-colors",
                 review.is_liked
                   ? "text-wine-500 hover:bg-wine-500/10"
                   : "hover:bg-wine-500/10 hover:text-wine-500"
@@ -269,21 +265,26 @@ export default function ReviewDetailPage({ params }: { params: Promise<{ uuid: s
               disabled={isLiking}
             >
               <Heart className={cn("h-5 w-5", review.is_liked && "fill-current")} />
+              <span>{review.like_count}</span>
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="flex-1 h-10 rounded-full hover:bg-primary/10 hover:text-primary gap-2"
+              className="h-10 rounded-full hover:bg-primary/10 hover:text-primary gap-2"
+              onClick={() => document.getElementById('comment-input')?.focus()}
             >
-              <Bookmark className="h-5 w-5" />
+              <MessageCircle className="h-5 w-5" />
+              <span>{review.comment_count}</span>
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex-1 h-10 rounded-full hover:bg-primary/10 hover:text-primary gap-2"
-            >
-              <Share className="h-5 w-5" />
-            </Button>
+            <ShareModal reviewUuid={review.uuid}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-10 rounded-full hover:bg-primary/10 hover:text-primary gap-2"
+              >
+                <Share2 className="h-5 w-5" />
+              </Button>
+            </ShareModal>
           </div>
         </article>
 

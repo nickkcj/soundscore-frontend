@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, MoreHorizontal, Pencil, Trash2, Music } from 'lucide-react';
+import { Heart, MessageCircle, MoreHorizontal, Pencil, Trash2, Music, Share2 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,6 +17,7 @@ import {
 import { UserAvatar } from '@/components/common/user-avatar';
 import { StarRating } from '@/components/common/star-rating';
 import { CommentPreview } from '@/components/comments';
+import { ShareModal } from '@/components/reviews/share-modal';
 import { useAuthStore } from '@/stores/auth-store';
 import { cn } from '@/lib/utils';
 import type { Review } from '@/types';
@@ -173,7 +174,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
       <CardContent className="pb-3">
         {/* Album Info */}
         <div className="flex gap-4 mb-4">
-          <div className="relative h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+          <Link href={`/album/${review.album.spotify_id}`} className="relative h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
             {review.album.cover_image ? (
               <Image
                 src={review.album.cover_image}
@@ -186,9 +187,11 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
                 <Music className="h-8 w-8 text-muted-foreground/50" />
               </div>
             )}
-          </div>
+          </Link>
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold truncate">{review.album.title}</h3>
+            <Link href={`/album/${review.album.spotify_id}`} className="font-semibold truncate block hover:underline">
+              {review.album.title}
+            </Link>
             <p className="text-sm text-muted-foreground truncate">{review.album.artist}</p>
             <div className="mt-2">
               <StarRating rating={review.rating} size="sm" />
@@ -240,6 +243,12 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
               </Button>
             </Link>
           )}
+
+          <ShareModal reviewUuid={review.uuid}>
+            <Button variant="ghost" size="sm" className="gap-2 h-8">
+              <Share2 className="h-4 w-4" />
+            </Button>
+          </ShareModal>
         </div>
 
         {/* Comment Preview */}

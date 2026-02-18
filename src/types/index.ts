@@ -59,6 +59,7 @@ export interface AlbumDetail {
   spotify_id: string;
   title: string;
   artist: string;
+  artist_spotify_id: string | null;
   cover_image: string | null;
   release_date: string | null;
   label: string | null;
@@ -474,4 +475,66 @@ export interface SpotifyConnectionStatus {
 export interface SyncResponse {
   synced_count: number;
   message: string;
+}
+
+// Direct Message types
+export interface DMOtherUser {
+  id: number;
+  username: string;
+  profile_picture: string | null;
+}
+
+export interface DirectMessageType {
+  id: number;
+  conversation_id: number;
+  sender_id: number;
+  sender_username: string;
+  sender_profile_picture: string | null;
+  content: string;
+  image_url: string | null;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface ConversationType {
+  id: number;
+  other_user: DMOtherUser;
+  last_message: DirectMessageType | null;
+  unread_count: number;
+  updated_at: string;
+}
+
+export interface ConversationListResponse {
+  conversations: ConversationType[];
+  total: number;
+}
+
+export interface DMMessageListResponse {
+  messages: DirectMessageType[];
+  total: number;
+  page: number;
+  per_page: number;
+  has_more: boolean;
+}
+
+// Artist types
+export interface ArtistAlbum {
+  spotify_id: string;
+  title: string;
+  cover_image: string | null;
+  release_date: string | null;
+  avg_rating: number | null;
+  review_count: number;
+}
+
+export interface ArtistDetail {
+  spotify_id: string;
+  name: string;
+  image_url: string | null;
+  genres: string[];
+  popularity: number;
+  followers: number;
+  spotify_url: string;
+  summary: string | null;
+  albums: ArtistAlbum[];
 }

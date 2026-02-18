@@ -77,6 +77,7 @@ export function CommentForm({
       />
       <div className="flex-1 min-w-0">
         <textarea
+          id="comment-input"
           ref={textareaRef}
           value={text}
           onChange={(e) => setText(e.target.value)}

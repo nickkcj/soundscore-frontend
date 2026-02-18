@@ -16,7 +16,7 @@ import { useDMWebSocket } from '@/hooks/use-dm-websocket';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { ReviewShareCard, tryParseReviewShare } from '@/components/reviews/review-share-card';
-import type { DirectMessageType, DMMessageListResponse, ConversationType, ConversationListResponse } from '@/types';
+import type { DirectMessageType, DMMessageListResponse, ConversationType } from '@/types';
 
 interface OtherUser {
   id: number;
@@ -24,11 +24,19 @@ interface OtherUser {
   profile_picture: string | null;
 }
 
-export default function DMChatPage({ params }: { params: Promise<{ conversationId: string }> }) {
-  const { conversationId: conversationIdStr } = use(params);
-  const conversationId = parseInt(conversationIdStr, 10);
+interface ConversationStartResponse {
+  id: number;
+  other_user: OtherUser;
+  last_message: null;
+  unread_count: number;
+  updated_at: string;
+}
+
+export default function DMChatPage({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = use(params);
   const { user, isLoading: authLoading } = useRequireAuth();
 
+  const [conversationId, setConversationId] = useState<number | null>(null);
   const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
   const [messages, setMessages] = useState<DirectMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,26 +63,26 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
     userScrolledUp.current = scrollHeight - scrollTop - clientHeight > 150;
   }, []);
 
-  // Fetch conversation data
+  // Start/get conversation by username, then fetch messages
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch conversations to find the other user info
-        const convData = await api.get<ConversationListResponse>('/dm/conversations');
-        const thisConv = convData.conversations.find((c) => c.id === conversationId);
-        if (thisConv) {
-          setOtherUser(thisConv.other_user);
-        }
+        // Get or create conversation by username
+        const conv = await api.post<ConversationStartResponse>(
+          `/dm/conversations/${username}`
+        );
+        setConversationId(conv.id);
+        setOtherUser(conv.other_user);
 
         // Fetch messages
         const msgData = await api.get<DMMessageListResponse>(
-          `/dm/conversations/${conversationId}/messages?per_page=100`
+          `/dm/conversations/${conv.id}/messages?per_page=100`
         );
         setMessages(msgData.messages);
 
         // Mark as read
-        await api.put(`/dm/conversations/${conversationId}/read`);
+        await api.put(`/dm/conversations/${conv.id}/read`);
       } catch {
         toast.error('Failed to load conversation');
       } finally {
@@ -85,14 +93,13 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
     if (!authLoading) {
       fetchData();
     }
-  }, [conversationId, authLoading]);
+  }, [username, authLoading]);
 
-  // WebSocket
+  // WebSocket - only connect once we have the conversation ID
   const { isConnected, sendMessage, sendTyping, sendRead } = useDMWebSocket({
-    conversationId,
+    conversationId: conversationId || 0,
     onMessage: (message) => {
       setMessages((prev) => {
-        // Avoid duplicates
         const existingIndex = prev.findIndex(
           (m) => m.id === message.id ||
           (m.id < 0 && m.sender_id === message.sender_id && m.content === message.content)
@@ -111,21 +118,17 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
         setTimeout(scrollToBottom, 50);
       }
 
-      // Clear typing when message received
       setTypingUser(null);
 
-      // Mark as read if message from other user
       if (message.sender_id !== user?.id) {
         sendRead();
       }
     },
-    onTyping: (_userId, username) => {
-      setTypingUser(username);
-      // Clear after 3 seconds
+    onTyping: (_userId, uname) => {
+      setTypingUser(uname);
       setTimeout(() => setTypingUser(null), 3000);
     },
     onRead: () => {
-      // Mark all our sent messages as read
       setMessages((prev) =>
         prev.map((m) => (m.sender_id === user?.id ? { ...m, is_read: true } : m))
       );
@@ -173,13 +176,12 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!messageInput.trim() && !selectedImage) || !isConnected || !user) return;
+    if ((!messageInput.trim() && !selectedImage) || !isConnected || !user || !conversationId) return;
 
     const content = messageInput.trim();
     let imagePath: string | undefined;
     let imageUrl: string | undefined;
 
-    // Upload image if selected
     if (selectedImage) {
       setIsUploading(true);
       try {
@@ -200,7 +202,6 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
       setIsUploading(false);
     }
 
-    // Optimistic update
     const optimisticMessage: DirectMessageType = {
       id: -Date.now(),
       conversation_id: conversationId,
@@ -227,10 +228,10 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto border-x border-border min-h-screen flex flex-col">
+    <div className="h-[calc(100vh-73px)] bg-background">
+      <div className="max-w-2xl mx-auto border-x border-border h-full flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="bg-background/80 backdrop-blur-md border-b border-border flex-shrink-0">
           <div className="flex items-center gap-3 px-4 h-14">
             <Link
               href="/messages"
@@ -264,7 +265,7 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
         {/* Messages */}
         <div
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto"
+          className="flex-1 overflow-y-auto min-h-0"
           onScroll={handleMessagesScroll}
         >
           <div className="space-y-4 px-4 py-4">
@@ -286,7 +287,7 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
 
         {/* Typing Indicator */}
         {typingUser && (
-          <div className="px-4 py-0.5 text-xs text-muted-foreground/70 flex items-center gap-0.5">
+          <div className="px-4 py-0.5 text-xs text-muted-foreground/70 flex items-center gap-0.5 flex-shrink-0">
             <span>{typingUser} is typing</span>
             <span className="flex">
               <span className="animate-bounce [animation-delay:0ms]">.</span>
@@ -298,7 +299,7 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
 
         {/* Image Preview */}
         {imagePreview && (
-          <div className="px-4 py-2 border-t bg-muted/30">
+          <div className="px-4 py-2 border-t bg-muted/30 flex-shrink-0">
             <div className="relative inline-block">
               <Image
                 src={imagePreview}
@@ -319,7 +320,7 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
         )}
 
         {/* Input */}
-        <form onSubmit={handleSendMessage} className="flex gap-2 p-3 border-t bg-muted/30">
+        <form onSubmit={handleSendMessage} className="flex gap-2 p-3 border-t bg-muted/30 flex-shrink-0">
           <input
             ref={fileInputRef}
             type="file"
@@ -339,7 +340,6 @@ export default function DMChatPage({ params }: { params: Promise<{ conversationI
           </Button>
           <Input
             ref={inputRef}
-            id="comment-input"
             placeholder="Type a message..."
             value={messageInput}
             onChange={(e) => {
@@ -438,16 +438,16 @@ function MessageItem({ message, isOwn }: { message: DirectMessageType; isOwn: bo
 
 function DMChatSkeleton() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto border-x border-border min-h-screen flex flex-col">
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
+    <div className="h-[calc(100vh-73px)] bg-background">
+      <div className="max-w-2xl mx-auto border-x border-border h-full flex flex-col">
+        <div className="bg-background/80 backdrop-blur-md border-b border-border flex-shrink-0">
           <div className="flex items-center gap-3 px-4 h-14">
             <Skeleton className="h-9 w-9 rounded-full" />
             <Skeleton className="h-8 w-8 rounded-full" />
             <Skeleton className="h-5 w-24" />
           </div>
         </div>
-        <div className="flex-1 py-4 px-4 space-y-4">
+        <div className="flex-1 py-4 px-4 space-y-4 min-h-0 overflow-hidden">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className={cn('flex gap-3', i % 2 === 0 && 'flex-row-reverse')}>
               <Skeleton className="h-8 w-8 rounded-full flex-shrink-0" />

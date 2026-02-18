@@ -69,8 +69,8 @@ export function ReviewShareCard({ data }: { data: ReviewShareData }) {
         </div>
       </div>
       {data.text && (
-        <div className="px-2.5 pb-2.5">
-          <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed">
+        <div className="px-2.5 pb-2 -mt-1">
+          <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-snug italic">
             &ldquo;{data.text}&rdquo;
           </p>
         </div>

@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
@@ -162,7 +161,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
         </div>
 
         {/* Users & Groups List */}
-        <ScrollArea className="h-[300px]">
+        <div className="max-h-[300px] overflow-y-auto">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin" />
@@ -172,7 +171,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
               {search ? 'No results found' : 'Follow users to share with them'}
             </div>
           ) : (
-            <div className="space-y-1 pr-3">
+            <div className="space-y-1">
               {/* Users */}
               {filteredUsers.length > 0 && (
                 <>
@@ -188,7 +187,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
                         key={u.id}
                         className="flex items-center justify-between p-2 rounded-lg hover:bg-muted"
                       >
-                        <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
                           <Avatar className="h-10 w-10 flex-shrink-0">
                             <AvatarImage src={u.profile_picture || undefined} />
                             <AvatarFallback>
@@ -202,7 +201,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
                           onClick={() => handleShareToUser(u.username)}
                           disabled={sendingTo === key || sentTo.has(key)}
                           variant={sentTo.has(key) ? 'secondary' : 'default'}
-                          className="flex-shrink-0"
+                          className="flex-shrink-0 ml-2"
                         >
                           {sendingTo === key ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -233,7 +232,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
                         key={g.id}
                         className="flex items-center justify-between p-2 rounded-lg hover:bg-muted"
                       >
-                        <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
                           <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0 overflow-hidden">
                             {g.cover_image ? (
                               <img
@@ -257,7 +256,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
                           onClick={() => handleShareToGroup(g.uuid, g.name)}
                           disabled={sendingTo === key || sentTo.has(key)}
                           variant={sentTo.has(key) ? 'secondary' : 'default'}
-                          className="flex-shrink-0"
+                          className="flex-shrink-0 ml-2"
                         >
                           {sendingTo === key ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -274,7 +273,7 @@ export function ShareModal({ reviewUuid, children }: ShareModalProps) {
               )}
             </div>
           )}
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

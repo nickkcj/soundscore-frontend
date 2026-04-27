@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/nickkcj/soundscore-web/main/public/images/logo_soundscore.png" alt="SoundScore Logo" width="200" />
+  <img src="https://raw.githubusercontent.com/nickkcj/soundscore-frontend/main/public/images/logo_soundscore.png" alt="SoundScore Logo" width="200" />
 
   # SoundScore Web
 

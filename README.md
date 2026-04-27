@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <img src="https://raw.githubusercontent.com/nickkcj/soundscore-web/main/public/images/logo_soundscore.png" alt="SoundScore Logo" width="200" />
 
-## Getting Started
+  # SoundScore Web
 
-First, run the development server:
+  **The high-performance, modern frontend for the SoundScore social network.**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+  [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+  [Live Site](https://soundscore.com.br) • [API Repository](https://github.com/nickkcj/soundscore-api)
+</div>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Overview
+SoundScore Web is a high-performance Single Page Application (SPA) built with **Next.js**. It provides a seamless interface for music enthusiasts to document their listening journey, synchronize Spotify data, and engage with a community of reviewers.
 
-## Learn More
+## Key Features
+- **Real-time Social Feed:** Instant updates on friend activity and album reviews.
+- **Spotify Integration:** Secure OAuth flow and real-time visualization of listening history.
+- **AI Chat Interface:** A sleek, conversational UI to interact with the Gemini-powered backend assistant.
+- **Dynamic Scoring:** Visual data representation of album ratings and community trends.
+- **Responsive Design:** Mobile-first approach ensuring a perfect experience across all devices.
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
+- **Framework:** Next.js 14+ (App Router)
+- **Language:** TypeScript for full-stack type safety.
+- **Styling:** Tailwind CSS for utility-first, responsive design.
+- **State & Data:** React Hooks & Context API for client-side state.
+- **Icons:** Lucide React & FontAwesome.
+- **Deployment:** Vercel (Optimized for Next.js environments).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture
+The frontend is architected to leverage the best of **Next.js**:
+- **Server Components:** Used for SEO-critical pages and fast initial loads.
+- **Client Components:** Implemented for highly interactive sections like the AI Chat, WebSockets, and real-time Spotify syncing.
+- **API Integration:** Strictly typed communication with the FastAPI backend.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Setup & Installation
 
-## Deploy on Vercel
+### Prerequisites
+- Node.js 18+
+- Backend API running (see [SoundScore API](https://github.com/nickkcj/soundscore-api))
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Local Development
+1. **Clone and Install:**
+    ```bash
+    git clone [https://github.com/nickkcj/soundscore-web.git](https://github.com/nickkcj/soundscore-web.git)
+    cd soundscore-web
+    npm install
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. **Environment Variables:**
+    Create a `.env.local` file in the root directory:
+    ```env
+    NEXT_PUBLIC_API_URL=http://localhost:8000
+    ```
+
+3. **Run the Development Server:**
+    ```bash
+    npm run dev
+    ```
+    Open [http://localhost:3000](http://localhost:3000) to see the application.
+
+---
+<p align="center">Developed by <a href="https://linkedin.com/in/nicholasjasperdev">Nicholas Jasper</a></p>

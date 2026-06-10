@@ -91,12 +91,13 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
     }
   }, [groupUuid, authLoading]);
 
-  // WebSocket connection
+  // Realtime connection (Supabase)
   const { isConnected, sendMessage, sendTyping } = useGroupWebSocket({
     groupUuid,
+    groupId: group?.id ?? 0,
     onMessage: (message) => {
       setMessages((prev) => {
-        // Evita duplicação - se já existe uma mensagem com mesmo id ou
+        // Evita duplicação — se já existe mensagem com mesmo id ou
         // uma mensagem optimistic do mesmo usuário com mesmo conteúdo, substitui
         const existingIndex = prev.findIndex(
           (m) => m.id === message.id ||
@@ -104,10 +105,29 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
         );
 
         if (existingIndex !== -1) {
-          // Substitui a mensagem optimistic pela real do servidor
+          // Substitui a mensagem optimistic pela real do servidor.
+          // Preserva username/profile_picture da mensagem optimistic se o
+          // evento do Realtime não trouxer (INSERT não inclui joins).
+          const existing = prev[existingIndex];
           const newMessages = [...prev];
-          newMessages[existingIndex] = message;
+          newMessages[existingIndex] = {
+            ...message,
+            username: message.username || existing.username,
+            profile_picture: message.profile_picture ?? existing.profile_picture,
+          };
           return newMessages;
+        }
+
+        // Mensagem de outro membro: enriquece com dados da lista de membros
+        if (message.user_id !== user?.id) {
+          const member = members.find((m) => m.user_id === message.user_id);
+          if (member) {
+            return [...prev, {
+              ...message,
+              username: member.username,
+              profile_picture: member.profile_picture,
+            }];
+          }
         }
 
         return [...prev, message];
@@ -240,9 +260,9 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
 
     const content = messageInput.trim();
     let imagePath: string | undefined;
-    let imageUrl: string | undefined;
+    let imagePreviewUrl: string | undefined;
 
-    // Upload image if selected
+    // Upload da imagem se houver
     if (selectedImage) {
       setIsUploading(true);
       try {
@@ -254,7 +274,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
           formData
         );
         imagePath = response.image_path;
-        imageUrl = response.image_url;
+        imagePreviewUrl = response.image_url;
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Falha ao enviar imagem');
         setIsUploading(false);
@@ -263,28 +283,42 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
       setIsUploading(false);
     }
 
-    // Optimistic update - adiciona mensagem imediatamente com id negativo temporário
+    // Optimistic update — id negativo temporário
+    const optimisticId = -Date.now();
     const optimisticMessage: GroupMessage = {
-      id: -Date.now(), // ID negativo para identificar como optimistic
+      id: optimisticId,
       group_id: group?.id || 0,
       user_id: user.id,
       content,
-      image_url: imageUrl || null,
+      image_url: imagePreviewUrl || null,
       created_at: new Date().toISOString(),
       username: user.username,
       profile_picture: user.profile_picture || null,
     };
 
     setMessages((prev) => [...prev, optimisticMessage]);
-
-    // Envia via WebSocket
-    sendMessage(content, imagePath);
     setMessageInput('');
     clearSelectedImage();
     inputRef.current?.focus();
-    // Força scroll quando o próprio usuário envia
     userScrolledUp.current = false;
     setTimeout(scrollToBottom, 50);
+
+    try {
+      // POST REST — retorna a mensagem completa com id definitivo e URL assinada
+      const serverMessage = await sendMessage(content, imagePath);
+      if (serverMessage) {
+        // Substitui o optimistic pela resposta real do servidor
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === optimisticId ? { ...serverMessage } : m
+          )
+        );
+      }
+    } catch (err) {
+      // Reverte o optimistic em caso de falha
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+      toast.error(err instanceof Error ? err.message : 'Falha ao enviar mensagem');
+    }
   };
 
   const handleJoinGroup = async () => {

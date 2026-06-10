@@ -95,7 +95,7 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
     }
   }, [username, authLoading]);
 
-  // WebSocket - only connect once we have the conversation ID
+  // Realtime connection (Supabase) — só conecta quando tiver o conversationId
   const { isConnected, sendMessage, sendTyping, sendRead } = useDMWebSocket({
     conversationId: conversationId || 0,
     onMessage: (message) => {
@@ -106,9 +106,24 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
         );
 
         if (existingIndex !== -1) {
+          // Preserva dados de exibição do optimistic caso o INSERT não traga
+          const existing = prev[existingIndex];
           const newMessages = [...prev];
-          newMessages[existingIndex] = message;
+          newMessages[existingIndex] = {
+            ...message,
+            sender_username: message.sender_username || existing.sender_username,
+            sender_profile_picture: message.sender_profile_picture ?? existing.sender_profile_picture,
+          };
           return newMessages;
+        }
+
+        // Enriquece mensagem de outro usuário com os dados do otherUser carregado
+        if (message.sender_id !== user?.id && otherUser) {
+          return [...prev, {
+            ...message,
+            sender_username: otherUser.username,
+            sender_profile_picture: otherUser.profile_picture,
+          }];
         }
 
         return [...prev, message];
@@ -180,7 +195,7 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
 
     const content = messageInput.trim();
     let imagePath: string | undefined;
-    let imageUrl: string | undefined;
+    let imagePreviewUrl: string | undefined;
 
     if (selectedImage) {
       setIsUploading(true);
@@ -193,7 +208,7 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
           formData
         );
         imagePath = response.image_path;
-        imageUrl = response.image_url;
+        imagePreviewUrl = response.image_url;
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Failed to upload image');
         setIsUploading(false);
@@ -202,25 +217,38 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
       setIsUploading(false);
     }
 
+    const optimisticId = -Date.now();
     const optimisticMessage: DirectMessageType = {
-      id: -Date.now(),
+      id: optimisticId,
       conversation_id: conversationId,
       sender_id: user.id,
       sender_username: user.username,
       sender_profile_picture: user.profile_picture,
       content,
-      image_url: imageUrl || null,
+      image_url: imagePreviewUrl || null,
       is_read: false,
       created_at: new Date().toISOString(),
     };
 
     setMessages((prev) => [...prev, optimisticMessage]);
-    sendMessage(content, imagePath);
     setMessageInput('');
     clearSelectedImage();
     inputRef.current?.focus();
     userScrolledUp.current = false;
     setTimeout(scrollToBottom, 50);
+
+    try {
+      // POST REST — retorna a mensagem completa com id definitivo
+      const serverMessage = await sendMessage(content, imagePath);
+      if (serverMessage) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === optimisticId ? { ...serverMessage } : m))
+        );
+      }
+    } catch (err) {
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+      toast.error(err instanceof Error ? err.message : 'Failed to send message');
+    }
   };
 
   if (authLoading || isLoading) {

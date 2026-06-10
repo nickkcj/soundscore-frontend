@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User } from '@/types';
 import { authApi, clearTokens, getAccessToken } from '@/lib/api';
+import { destroySupabaseClient } from '@/lib/supabase';
 
 interface AuthState {
   user: User | null;
@@ -54,6 +55,8 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         authApi.logout();
+        // Drop the Realtime client so the next user doesn't reuse this token
+        destroySupabaseClient();
         set({ user: null, isAuthenticated: false, error: null });
       },
 

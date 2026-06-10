@@ -1,22 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { getAccessToken } from '@/lib/api';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+import { getSupabaseClient } from '@/lib/supabase';
+import { api } from '@/lib/api';
+import { useAuthStore } from '@/stores/auth-store';
 import type { DirectMessageType } from '@/types';
 
-const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
-
-interface DMWSMessage {
-  type: 'message' | 'typing' | 'read' | 'pong';
-  content?: string;
-  image_url?: string | null;
-  sender_id?: number;
-  username?: string;
-  profile_picture?: string | null;
-  message_id?: number;
-  timestamp?: string;
-  user_id?: number;
-}
+// ---------------------------------------------------------------------------
+// Tipos
+// ---------------------------------------------------------------------------
 
 interface UseDMWebSocketOptions {
   conversationId: number;
@@ -25,18 +18,32 @@ interface UseDMWebSocketOptions {
   onRead?: (userId: number) => void;
 }
 
+// Payload cru do postgres_changes INSERT em direct_messages
+interface RawDirectMessageInsert {
+  id: number;
+  conversation_id: number;
+  sender_id: number;
+  content: string;
+  image_url: string | null;
+  is_read: boolean;
+  created_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Hook
+// ---------------------------------------------------------------------------
+
 export function useDMWebSocket({
   conversationId,
   onMessage,
   onTyping,
   onRead,
 }: UseDMWebSocketOptions) {
-  const wsRef = useRef<WebSocket | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const reconnectAttempts = useRef(0);
-  const isConnectingRef = useRef(false);
+
+  const { user } = useAuthStore();
 
   const onMessageRef = useRef(onMessage);
   const onTypingRef = useRef(onTyping);
@@ -48,140 +55,168 @@ export function useDMWebSocket({
     onReadRef.current = onRead;
   }, [onMessage, onTyping, onRead]);
 
-  const connect = useCallback(() => {
-    if (!conversationId || isConnectingRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
-      return;
-    }
+  const currentUserRef = useRef(user);
+  useEffect(() => {
+    currentUserRef.current = user;
+  }, [user]);
 
-    const token = getAccessToken();
-    if (!token) {
-      setError('Not authenticated');
-      return;
-    }
+  // IDs já processados para deduplicar com o optimistic update da página
+  const seenMessageIdsRef = useRef<Set<number>>(new Set());
 
-    isConnectingRef.current = true;
+  const connect = useCallback(async () => {
+    if (!conversationId) return;
 
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
+    try {
+      const supabase = await getSupabaseClient();
 
-    const url = `${WS_BASE_URL}/ws/dm/${conversationId}?token=${token}`;
-    const ws = new WebSocket(url);
+      if (channelRef.current) {
+        await supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
 
-    ws.onopen = () => {
-      isConnectingRef.current = false;
-      setIsConnected(true);
-      setError(null);
-      reconnectAttempts.current = 0;
-    };
+      const channel = supabase.channel(`dm:${conversationId}`, {
+        config: {
+          broadcast: { self: false },
+        },
+      });
 
-    ws.onmessage = (event) => {
-      try {
-        const data: DMWSMessage = JSON.parse(event.data);
+      // ------------------------------------------------------------------
+      // 1. postgres_changes — novas mensagens diretas
+      // ------------------------------------------------------------------
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'direct_messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const raw = payload.new as RawDirectMessageInsert;
 
-        switch (data.type) {
-          case 'message':
-            if (onMessageRef.current && data.message_id && data.sender_id && data.username) {
-              onMessageRef.current({
-                id: data.message_id,
-                conversation_id: conversationId,
-                sender_id: data.sender_id,
-                sender_username: data.username,
-                sender_profile_picture: data.profile_picture || null,
-                content: data.content || '',
-                image_url: data.image_url || null,
-                is_read: false,
-                created_at: data.timestamp || new Date().toISOString(),
-              });
-            }
-            break;
+          if (seenMessageIdsRef.current.has(raw.id)) return;
+          seenMessageIdsRef.current.add(raw.id);
 
-          case 'typing':
-            if (onTypingRef.current && data.user_id && data.username) {
-              onTypingRef.current(data.user_id, data.username);
-            }
-            break;
+          const isOwnMessage = raw.sender_id === currentUserRef.current?.id;
+          const resolvedUsername = isOwnMessage
+            ? (currentUserRef.current?.username ?? '')
+            : '';
+          const resolvedPicture = isOwnMessage
+            ? (currentUserRef.current?.profile_picture ?? null)
+            : null;
 
-          case 'read':
-            if (onReadRef.current && data.user_id) {
-              onReadRef.current(data.user_id);
-            }
-            break;
+          const message: DirectMessageType = {
+            id: raw.id,
+            conversation_id: raw.conversation_id,
+            sender_id: raw.sender_id,
+            sender_username: resolvedUsername,
+            sender_profile_picture: resolvedPicture,
+            content: raw.content,
+            image_url: raw.image_url,
+            is_read: raw.is_read,
+            created_at: raw.created_at,
+          };
+
+          onMessageRef.current?.(message);
         }
-      } catch {
-        // Invalid JSON
-      }
-    };
+      );
 
-    ws.onerror = () => {
-      isConnectingRef.current = false;
-      setError('Connection error');
-    };
+      // ------------------------------------------------------------------
+      // 2. Broadcast — typing
+      // ------------------------------------------------------------------
+      channel.on('broadcast', { event: 'typing' }, ({ payload }) => {
+        const { user_id, username } = payload as { user_id: number; username: string };
+        onTypingRef.current?.(user_id, username);
+      });
 
-    ws.onclose = (event) => {
-      isConnectingRef.current = false;
+      // ------------------------------------------------------------------
+      // Inscreve o canal
+      // ------------------------------------------------------------------
+      channel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          setIsConnected(true);
+          setError(null);
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          setIsConnected(false);
+          setError('Connection error');
+        } else if (status === 'CLOSED') {
+          setIsConnected(false);
+        }
+      });
+
+      channelRef.current = channel;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Connection error');
       setIsConnected(false);
-      wsRef.current = null;
-
-      if (event.code === 1000 || event.code === 4001 || event.code === 4003) {
-        return;
-      }
-
-      if (reconnectAttempts.current < 5) {
-        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
-        reconnectTimeoutRef.current = setTimeout(() => {
-          reconnectAttempts.current++;
-          connect();
-        }, delay);
-      } else {
-        setError('Connection lost. Please refresh the page.');
-      }
-    };
-
-    wsRef.current = ws;
+    }
   }, [conversationId]);
 
-  const disconnect = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
+  const disconnect = useCallback(async () => {
+    if (channelRef.current) {
+      try {
+        const supabase = await getSupabaseClient();
+        await supabase.removeChannel(channelRef.current);
+      } catch {
+        // silencia erro ao desconectar
+      }
+      channelRef.current = null;
     }
-    if (wsRef.current) {
-      wsRef.current.close(1000, 'User disconnected');
-      wsRef.current = null;
-    }
-    isConnectingRef.current = false;
     setIsConnected(false);
-  }, []);
-
-  const sendMessage = useCallback((content: string, imageUrl?: string) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        type: 'message',
-        content,
-        image_url: imageUrl,
-      }));
-    }
-  }, []);
-
-  const sendTyping = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'typing' }));
-    }
-  }, []);
-
-  const sendRead = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'read' }));
-    }
   }, []);
 
   useEffect(() => {
     if (!conversationId) return;
     connect();
-    return () => disconnect();
+    return () => {
+      disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
+
+  // --------------------------------------------------------------------------
+  // sendMessage: POST REST (endpoint já existia antes da migração)
+  // --------------------------------------------------------------------------
+  const sendMessage = useCallback(
+    async (content: string, imageUrl?: string): Promise<DirectMessageType | null> => {
+      try {
+        const response = await api.post<DirectMessageType>(
+          `/dm/conversations/${conversationId}/messages`,
+          { content, image_url: imageUrl ?? null }
+        );
+
+        // Registra o ID para ignorar o evento duplicado do postgres_changes
+        seenMessageIdsRef.current.add(response.id);
+
+        return response;
+      } catch (err) {
+        throw err;
+      }
+    },
+    [conversationId]
+  );
+
+  // --------------------------------------------------------------------------
+  // sendTyping: broadcast no canal
+  // --------------------------------------------------------------------------
+  const sendTyping = useCallback(() => {
+    if (!channelRef.current || !currentUserRef.current) return;
+    channelRef.current.send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: {
+        user_id: currentUserRef.current.id,
+        username: currentUserRef.current.username,
+      },
+    });
+  }, []);
+
+  // sendRead mantido na interface pública para não quebrar a página que chama;
+  // a marcação de leitura continua via REST (PUT /dm/conversations/{id}/read),
+  // que a página já faz no carregamento inicial.
+  const sendRead = useCallback(() => {
+    // No-op: leitura é marcada via REST na página.
+    // Mantido para compatibilidade de interface com o código anterior.
+  }, []);
 
   return {
     isConnected,

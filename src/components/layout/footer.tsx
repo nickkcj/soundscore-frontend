@@ -13,6 +13,13 @@ export function Footer() {
             <span className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} All rights reserved.
             </span>
+            <span className="text-muted-foreground/50 max-md:hidden">·</span>
+            <Link
+              href="/privacy"
+              className="text-sm text-muted-foreground hover:text-wine-600 dark:hover:text-wine-400 hover:underline"
+            >
+              Privacy Policy
+            </Link>
           </div>
 
           {/* Social Icons */}

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "br.com.soundscore.app",
+      "sha256_cert_fingerprints": [
+        "8F:9B:FD:12:20:28:4B:2C:37:A1:79:F5:79:EA:98:FF:15:33:AB:94:DD:81:16:E4:73:D0:D1:D0:38:39:30:92"
+      ]
+    }
+  }
+]

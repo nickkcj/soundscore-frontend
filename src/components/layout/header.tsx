@@ -7,6 +7,7 @@ import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun, Music, Messa
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -176,15 +177,17 @@ export function Header() {
 
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-3">
-                  {/* Messages */}
-                  <Link href="/messages" className="relative p-2 hover:bg-muted rounded-full transition-colors">
-                    <MessageSquare className={cn('h-5 w-5', isActive('/messages') ? 'text-wine-600 dark:text-wine-300' : 'text-foreground/70')} />
-                    {unreadDMs > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-wine-600 text-white text-[10px] font-bold flex items-center justify-center">
-                        {unreadDMs > 99 ? '99+' : unreadDMs}
-                      </span>
-                    )}
-                  </Link>
+                  {/* Messages — mesmo wrapper/estilo do sino de notificações */}
+                  <Button variant="ghost" size="icon" className="relative" asChild>
+                    <Link href="/messages">
+                      <MessageSquare className={cn('size-5', isActive('/messages') && 'text-wine-600 dark:text-wine-300')} />
+                      {unreadDMs > 0 && (
+                        <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-wine-600 text-[10px] font-bold text-white">
+                          {unreadDMs > 9 ? '9+' : unreadDMs}
+                        </span>
+                      )}
+                    </Link>
+                  </Button>
 
                   {/* Notifications */}
                   <NotificationDropdown />

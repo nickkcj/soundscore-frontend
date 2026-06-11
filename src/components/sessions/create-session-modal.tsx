@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, Music, Search, PenLine } from 'lucide-react';
+import { Loader2, Music, Search, PenLine, ImagePlus, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -39,7 +39,11 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
   // Manual mode state
   const [manualArtist, setManualArtist] = useState('');
   const [manualTitle, setManualTitle] = useState('');
+  // manualCover guarda a chave S3 retornada pelo upload; coverPreview, a URL
+  // assinada para mostrar a thumb no modal
   const [manualCover, setManualCover] = useState('');
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [manualTracksText, setManualTracksText] = useState('');
 
   const resetState = useCallback(() => {
@@ -49,8 +53,39 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
     setManualArtist('');
     setManualTitle('');
     setManualCover('');
+    setCoverPreview(null);
     setManualTracksText('');
   }, []);
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB');
+      return;
+    }
+
+    setIsUploadingCover(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await api.postForm<{ image_path: string; image_url: string }>(
+        '/sessions/upload-cover',
+        formData
+      );
+      setManualCover(res.image_path);
+      setCoverPreview(res.image_url);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to upload cover');
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
 
   const handleAlbumSelect = useCallback(async (album: SpotifyAlbumResult) => {
     setSelectedAlbum(album);
@@ -237,13 +272,53 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="manual-cover">Cover Image URL (optional)</Label>
-              <Input
-                id="manual-cover"
-                placeholder="https://..."
-                value={manualCover}
-                onChange={(e) => setManualCover(e.target.value)}
-              />
+              <Label>Cover Image (optional)</Label>
+              {coverPreview ? (
+                <div className="flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={coverPreview}
+                    alt="Cover preview"
+                    className="h-16 w-16 rounded-lg object-cover border border-border"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setManualCover('');
+                      setCoverPreview(null);
+                    }}
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Remove
+                  </Button>
+                </div>
+              ) : (
+                <label
+                  className={`flex items-center justify-center gap-2 h-16 rounded-lg border-2 border-dashed border-border text-sm text-muted-foreground cursor-pointer transition-colors hover:border-wine-400 hover:text-wine-600 ${
+                    isUploadingCover ? 'opacity-60 pointer-events-none' : ''
+                  }`}
+                >
+                  {isUploadingCover ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus className="h-4 w-4" />
+                      Upload cover image
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={handleCoverUpload}
+                  />
+                </label>
+              )}
             </div>
 
             <div className="space-y-1.5">

@@ -130,7 +130,7 @@ export function Header() {
               alt="SoundScore"
               width={500}
               height={120}
-              className="h-32 -my-12 w-auto object-contain group-hover:opacity-90 transition-opacity"
+              className="h-32 -my-12 w-auto object-contain group-hover:opacity-90 transition-opacity dark:brightness-0 dark:invert"
             />
           </Link>
 

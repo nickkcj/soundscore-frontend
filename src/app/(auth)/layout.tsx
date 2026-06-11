@@ -22,7 +22,7 @@ export default function AuthLayout({
               alt="SoundScore Logo"
               width={56}
               height={56}
-              className="rounded-full"
+              className="rounded-full dark:brightness-0 dark:invert"
             />
           </div>
           {isAuthenticated && (
@@ -95,7 +95,7 @@ export default function AuthLayout({
               alt="SoundScore Logo"
               width={40}
               height={40}
-              className="rounded-full"
+              className="rounded-full dark:brightness-0 dark:invert"
             />
             <span className="font-bold text-xl text-wine-700 dark:text-wine-400">
               SoundScore

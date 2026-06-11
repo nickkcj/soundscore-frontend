@@ -52,8 +52,8 @@ export default function SessionsPage() {
             Listening Parties
           </h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Ouça um álbum com seus amigos, dê notas track a track às cegas e
-            descubram juntos quem é o crítico mais exigente.
+            Listen to an album with your friends, rate it track by track blindly,
+            and find out together who the toughest critic is.
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export default function SessionsPage() {
             <Input
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-              placeholder="Tenho um código (ex: XK4P2)"
+              placeholder="Have a code? (e.g. XK4P2)"
               maxLength={8}
               className="h-12 rounded-xl uppercase tracking-widest"
             />
@@ -103,9 +103,9 @@ export default function SessionsPage() {
             </div>
           ) : sessions.length === 0 ? (
             <div className="px-5 py-12 text-center text-muted-foreground">
-              <p className="font-medium">Nenhuma sessão ainda.</p>
+              <p className="font-medium">No sessions yet.</p>
               <p className="text-sm mt-1">
-                Crie a primeira e mande o código para a galera!
+                Create your first one and share the code with your friends!
               </p>
             </div>
           ) : (

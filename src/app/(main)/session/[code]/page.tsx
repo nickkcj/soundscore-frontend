@@ -53,9 +53,9 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
       try {
         await sessionsApi.join(session.code);
         await onMutationSuccess();
-        toast.success('Você entrou na sessão!');
+        toast.success('You joined the session!');
       } catch {
-        toast.error('Não foi possível entrar na sessão');
+        toast.error('Could not join the session');
       }
     };
     autoJoin();
@@ -78,9 +78,9 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copiado! Manda para a galera 🎧');
+      toast.success('Link copied! Share it with your friends 🎧');
     } catch {
-      toast.error('Não foi possível copiar o link');
+      toast.error('Could not copy the link');
     }
   };
 
@@ -103,12 +103,12 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
     return (
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-3xl px-4 py-20 text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Sessão não encontrada</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Session not found</h1>
           <p className="text-muted-foreground mb-6">
-            Confere se o código <span className="font-mono font-semibold">{code.toUpperCase()}</span> está certo.
+            Double-check that the code <span className="font-mono font-semibold">{code.toUpperCase()}</span> is correct.
           </p>
           <Button asChild className="bg-wine-600 hover:bg-wine-700 text-white rounded-xl">
-            <Link href="/sessions">Voltar para Listening Parties</Link>
+            <Link href="/sessions">Back to Listening Parties</Link>
           </Button>
         </main>
       </div>

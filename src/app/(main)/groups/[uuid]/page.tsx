@@ -251,13 +251,13 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Tipo de arquivo inválido. Use JPG, PNG, WebP ou GIF.');
+      toast.error('Invalid file type. Use JPG, PNG, WebP or GIF.');
       return;
     }
 
     // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Arquivo muito grande. Máximo: 5MB');
+      toast.error('File too large. Maximum: 5MB');
       return;
     }
 
@@ -298,7 +298,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
         imagePath = response.image_path;
         imagePreviewUrl = response.image_url;
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Falha ao enviar imagem');
+        toast.error(err instanceof Error ? err.message : 'Failed to upload image');
         setIsUploading(false);
         return;
       }
@@ -339,7 +339,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
     } catch (err) {
       // Reverte o optimistic em caso de falha
       setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
-      toast.error(err instanceof Error ? err.message : 'Falha ao enviar mensagem');
+      toast.error(err instanceof Error ? err.message : 'Failed to send message');
     }
   };
 
@@ -724,11 +724,11 @@ function TypingIndicator({ typingUsers }: { typingUsers: Map<number, { username:
 
   let text = '';
   if (users.length === 1) {
-    text = `${users[0].username} está digitando`;
+    text = `${users[0].username} is typing`;
   } else if (users.length === 2) {
-    text = `${users[0].username} e ${users[1].username} estão digitando`;
+    text = `${users[0].username} and ${users[1].username} are typing`;
   } else {
-    text = 'Várias pessoas estão digitando';
+    text = 'Several people are typing';
   }
 
   return (

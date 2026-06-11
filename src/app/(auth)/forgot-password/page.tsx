@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { authApi } from '@/lib/api';
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Por favor, insira um email válido'),
+  email: z.string().email('Please enter a valid email'),
 });
 
 type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
@@ -36,9 +36,9 @@ export default function ForgotPasswordPage() {
     try {
       await authApi.forgotPassword(data.email);
       setIsSubmitted(true);
-      toast.success('Verifique seu email para instruções de recuperação');
+      toast.success('Check your email for recovery instructions');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Algo deu errado');
+      toast.error(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setIsLoading(false);
     }
@@ -52,10 +52,10 @@ export default function ForgotPasswordPage() {
             <Mail className="w-8 h-8 text-primary" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Verifique seu email</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Check your email</h1>
             <p className="text-muted-foreground">
-              Se existe uma conta com esse email, enviamos um link para redefinir sua senha.
-              O link expira em 15 minutos.
+              If an account with that email exists, we've sent a link to reset your password.
+              The link expires in 15 minutes.
             </p>
           </div>
         </div>
@@ -66,13 +66,13 @@ export default function ForgotPasswordPage() {
             className="w-full"
             onClick={() => setIsSubmitted(false)}
           >
-            Tentar outro email
+            Try another email
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
             <Link href="/login" className="text-primary hover:underline font-medium">
               <ArrowLeft className="inline w-4 h-4 mr-1" />
-              Voltar para login
+              Back to login
             </Link>
           </p>
         </div>
@@ -83,9 +83,9 @@ export default function ForgotPasswordPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">Esqueceu a senha?</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Forgot your password?</h1>
         <p className="text-muted-foreground">
-          Digite seu email e enviaremos um link para redefinir sua senha.
+          Enter your email and we'll send you a link to reset your password.
         </p>
       </div>
 
@@ -95,7 +95,7 @@ export default function ForgotPasswordPage() {
           <Input
             id="email"
             type="email"
-            placeholder="Digite seu email"
+            placeholder="Enter your email"
             {...register('email')}
             disabled={isLoading}
           />
@@ -106,14 +106,14 @@ export default function ForgotPasswordPage() {
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Enviar link de recuperação
+          Send recovery link
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Lembrou a senha?{' '}
+        Remembered your password?{' '}
         <Link href="/login" className="text-primary hover:underline font-medium">
-          Entrar
+          Sign in
         </Link>
       </p>
     </div>

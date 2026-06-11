@@ -15,10 +15,10 @@ import { Label } from '@/components/ui/label';
 import { authApi } from '@/lib/api';
 
 const resetPasswordSchema = z.object({
-  password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: 'As senhas não coincidem',
+  message: 'Passwords do not match',
   path: ['confirmPassword'],
 });
 
@@ -43,7 +43,7 @@ function ResetPasswordContent() {
 
   useEffect(() => {
     if (!token) {
-      setError('Link inválido. Por favor, solicite uma nova redefinição de senha.');
+      setError('Invalid link. Please request a new password reset.');
     }
   }, [token]);
 
@@ -54,10 +54,10 @@ function ResetPasswordContent() {
     try {
       await authApi.resetPassword(token, data.password);
       setIsSuccess(true);
-      toast.success('Senha redefinida com sucesso!');
+      toast.success('Password reset successfully!');
       setTimeout(() => router.push('/login'), 3000);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Falha ao redefinir senha';
+      const message = err instanceof Error ? err.message : 'Failed to reset password';
       setError(message);
       toast.error(message);
     } finally {
@@ -73,15 +73,15 @@ function ResetPasswordContent() {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Senha redefinida!</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Password reset!</h1>
             <p className="text-muted-foreground">
-              Sua senha foi alterada com sucesso. Redirecionando para o login...
+              Your password was changed successfully. Redirecting to login...
             </p>
           </div>
         </div>
 
         <Button asChild className="w-full">
-          <Link href="/login">Ir para o login</Link>
+          <Link href="/login">Go to login</Link>
         </Button>
       </div>
     );
@@ -95,18 +95,18 @@ function ResetPasswordContent() {
             <XCircle className="w-8 h-8 text-destructive" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Falha na redefinição</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Reset failed</h1>
             <p className="text-muted-foreground">{error}</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <Button asChild className="w-full">
-            <Link href="/forgot-password">Solicitar novo link</Link>
+            <Link href="/forgot-password">Request a new link</Link>
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             <Link href="/login" className="text-primary hover:underline font-medium">
-              Voltar para login
+              Back to login
             </Link>
           </p>
         </div>
@@ -117,19 +117,19 @@ function ResetPasswordContent() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">Redefinir senha</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Reset password</h1>
         <p className="text-muted-foreground">
-          Digite sua nova senha abaixo.
+          Enter your new password below.
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="password">Nova senha</Label>
+          <Label htmlFor="password">New password</Label>
           <Input
             id="password"
             type="password"
-            placeholder="Digite a nova senha"
+            placeholder="Enter your new password"
             {...register('password')}
             disabled={isLoading}
           />
@@ -139,11 +139,11 @@ function ResetPasswordContent() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirmar senha</Label>
+          <Label htmlFor="confirmPassword">Confirm password</Label>
           <Input
             id="confirmPassword"
             type="password"
-            placeholder="Confirme a nova senha"
+            placeholder="Confirm your new password"
             {...register('confirmPassword')}
             disabled={isLoading}
           />
@@ -154,14 +154,14 @@ function ResetPasswordContent() {
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Redefinir senha
+          Reset password
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Lembrou a senha?{' '}
+        Remembered your password?{' '}
         <Link href="/login" className="text-primary hover:underline font-medium">
-          Entrar
+          Sign in
         </Link>
       </p>
     </div>

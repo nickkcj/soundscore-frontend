@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun, Music, MessageSquare } from 'lucide-react';
+import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun, Music, MessageSquare, Radio } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -234,6 +234,12 @@ export function Header() {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
+                          <Link href="/sessions" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
+                            <Radio className="h-4 w-4" />
+                            <span>Listening Party</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
                           <Link href="/my-reviews" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
                             <ClipboardList className="h-4 w-4" />
                             <span>My Reviews</span>
@@ -332,6 +338,12 @@ export function Header() {
                       <Link href="/library" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
                         <Music className="h-4 w-4" />
                         <span>Library</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/sessions" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
+                        <Radio className="h-4 w-4" />
+                        <span>Listening Party</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>

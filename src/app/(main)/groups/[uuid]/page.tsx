@@ -170,6 +170,28 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
         return newMap;
       });
     },
+    onMembersChanged: async () => {
+      // Alguém entrou/saiu do grupo (evento do Realtime em group_members):
+      // refaz o fetch para atualizar lista de membros e contador na sidebar
+      try {
+        interface GroupDetailResponse {
+          group: Group;
+          members: GroupMember[];
+          recent_messages: GroupMessage[];
+          is_member: boolean;
+          user_role: string | null;
+        }
+        const data = await api.get<GroupDetailResponse>(`/groups/${groupUuid}`);
+        setGroup({
+          ...data.group,
+          is_member: data.is_member,
+          role: data.user_role as Group['role'],
+        });
+        setMembers(data.members);
+      } catch {
+        // silencioso — a lista atual continua válida até o próximo evento
+      }
+    },
     onMemberJoined: (data) => {
       // New member joined the group - update members list and count
       setMembers((prev) => {

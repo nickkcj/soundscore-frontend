@@ -117,6 +117,31 @@ export function useDMWebSocket({
             created_at: raw.created_at,
           };
 
+          // O INSERT traz image_url como chave S3 crua (renderiza quebrada/404).
+          // Busca a versão assinada via REST antes de entregar.
+          if (raw.image_url && !/^https?:\/\//.test(raw.image_url)) {
+            api
+              .get<{ messages: DirectMessageType[] }>(
+                `/dm/conversations/${conversationId}/messages?per_page=20`
+              )
+              .then((res) => {
+                const match = res.messages.find((m) => m.id === raw.id);
+                onMessageRef.current?.(
+                  match
+                    ? {
+                        ...message,
+                        image_url: match.image_url,
+                        sender_username: message.sender_username || match.sender_username,
+                        sender_profile_picture:
+                          message.sender_profile_picture ?? match.sender_profile_picture,
+                      }
+                    : { ...message, image_url: null }
+                );
+              })
+              .catch(() => onMessageRef.current?.({ ...message, image_url: null }));
+            return;
+          }
+
           onMessageRef.current?.(message);
         }
       );

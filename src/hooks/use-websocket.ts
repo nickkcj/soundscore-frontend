@@ -35,6 +35,8 @@ interface UseWebSocketOptions {
   onOnlineUsers?: (users: { user_id: number; username: string; profile_picture: string }[]) => void;
   onTyping?: (userId: number, username: string) => void;
   onMemberJoined?: (data: MemberJoinedData) => void;
+  /** Disparado quando alguém entra/sai do grupo (INSERT/DELETE em group_members) */
+  onMembersChanged?: () => void;
 }
 
 // Payload cru vindo do postgres_changes INSERT em group_messages
@@ -78,6 +80,7 @@ export function useGroupWebSocket({
   onOnlineUsers,
   onTyping,
   onMemberJoined,
+  onMembersChanged,
 }: UseWebSocketOptions) {
   const channelRef = useRef<RealtimeChannel | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -92,6 +95,7 @@ export function useGroupWebSocket({
   const onOnlineUsersRef = useRef(onOnlineUsers);
   const onTypingRef = useRef(onTyping);
   const onMemberJoinedRef = useRef(onMemberJoined);
+  const onMembersChangedRef = useRef(onMembersChanged);
 
   useEffect(() => {
     onMessageRef.current = onMessage;
@@ -100,7 +104,8 @@ export function useGroupWebSocket({
     onOnlineUsersRef.current = onOnlineUsers;
     onTypingRef.current = onTyping;
     onMemberJoinedRef.current = onMemberJoined;
-  }, [onMessage, onUserJoined, onUserLeft, onOnlineUsers, onTyping, onMemberJoined]);
+    onMembersChangedRef.current = onMembersChanged;
+  }, [onMessage, onUserJoined, onUserLeft, onOnlineUsers, onTyping, onMemberJoined, onMembersChanged]);
 
   // Membro atual para o Presence
   const currentUserRef = useRef(user);
@@ -172,8 +177,55 @@ export function useGroupWebSocket({
             profile_picture: resolvedPicture,
           };
 
+          // O INSERT traz image_url como chave S3 crua (ex: "group_messages/x.webp"),
+          // que renderiza quebrada/404. Busca a versão assinada via REST antes de entregar.
+          if (raw.image_url && !/^https?:\/\//.test(raw.image_url)) {
+            api
+              .get<{ messages: GroupMessage[] }>(`/groups/${groupUuid}/messages?page=1&per_page=20`)
+              .then((res) => {
+                const match = res.messages.find((m) => m.id === raw.id);
+                onMessageRef.current?.(
+                  match
+                    ? {
+                        ...message,
+                        image_url: match.image_url,
+                        username: message.username || match.username,
+                        profile_picture: message.profile_picture ?? match.profile_picture,
+                      }
+                    : { ...message, image_url: null }
+                );
+              })
+              .catch(() => onMessageRef.current?.({ ...message, image_url: null }));
+            return;
+          }
+
           onMessageRef.current?.(message);
         }
+      );
+
+      // ------------------------------------------------------------------
+      // 1b. postgres_changes — entrada/saída de membros (sidebar)
+      // ------------------------------------------------------------------
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'group_members',
+          filter: `group_id=eq.${groupId}`,
+        },
+        () => onMembersChangedRef.current?.()
+      );
+      // DELETE não suporta filter (o evento só carrega a PK da linha antiga);
+      // o callback apenas refaz o fetch da lista, então over-fire é inofensivo
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'group_members',
+        },
+        () => onMembersChangedRef.current?.()
       );
 
       // ------------------------------------------------------------------

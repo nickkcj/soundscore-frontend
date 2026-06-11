@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, MoreHorizontal, Pencil, Trash2, Music, Share2 } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -100,6 +99,11 @@ interface ReviewCardProps {
   showCommentPreview?: boolean;
 }
 
+/**
+ * Post de review em layout flat ("estilo Twitter"): avatar em coluna à
+ * esquerda, header inline, texto como protagonista e o álbum como anexo
+ * compacto. Os pais empilham os posts com divide-y (sem card por item).
+ */
 export function ReviewCard({ review, onLike, onDelete, showComments = true, showCommentPreview = true }: ReviewCardProps) {
   const { user } = useAuthStore();
   const isOwner = user?.id === review.user_id;
@@ -123,58 +127,67 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow">
-      <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-3">
+    <article className="flex gap-3 px-4 py-3 transition-colors hover:bg-muted/30">
+      <Link href={`/profile/${review.username}`} className="shrink-0 self-start">
         <UserAvatar
           username={review.username}
           profilePicture={review.user_profile_picture}
           size="md"
         />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <Link
-                href={`/profile/${review.username}`}
-                className="font-semibold hover:underline"
-              >
-                {review.username}
-              </Link>
-              <p className="text-sm text-muted-foreground">
-                {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
-              </p>
-            </div>
-            {isOwner && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href={`/reviews/${review.uuid}/edit`}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onDelete?.(review.uuid)}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </div>
-      </CardHeader>
+      </Link>
 
-      <CardContent className="pb-3">
-        {/* Album Info */}
-        <div className="flex gap-4 mb-4">
-          <Link href={`/album/${review.album.spotify_id}`} className="relative h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+      <div className="min-w-0 flex-1">
+        {/* Header inline: nome · tempo + menu do dono */}
+        <div className="flex items-center gap-1.5">
+          <Link
+            href={`/profile/${review.username}`}
+            className="truncate text-sm font-semibold hover:underline"
+          >
+            {review.username}
+          </Link>
+          <span className="text-sm text-muted-foreground">·</span>
+          <span className="shrink-0 text-sm text-muted-foreground">
+            {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
+          </span>
+          {isOwner && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="ml-auto h-7 w-7 text-muted-foreground">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href={`/reviews/${review.uuid}/edit`}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onDelete?.(review.uuid)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+
+        {/* Texto da review como protagonista */}
+        {review.text && (
+          <p className="mt-0.5 whitespace-pre-wrap text-[15px] leading-snug text-foreground/90">
+            {review.text}
+          </p>
+        )}
+
+        {/* Álbum como anexo compacto (link-card) */}
+        <Link
+          href={`/album/${review.album.spotify_id}`}
+          className="mt-2 flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-2 transition-colors hover:bg-muted/60"
+        >
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted">
             {review.album.cover_image ? (
               <Image
                 src={review.album.cover_image}
@@ -183,43 +196,32 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
                 className="object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
-                <Music className="h-8 w-8 text-muted-foreground/50" />
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
+                <Music className="h-6 w-6 text-muted-foreground/50" />
               </div>
             )}
-          </Link>
-          <div className="min-w-0 flex-1">
-            <Link href={`/album/${review.album.spotify_id}`} className="font-semibold truncate block hover:underline">
-              {review.album.title}
-            </Link>
-            <p className="text-sm text-muted-foreground truncate">{review.album.artist}</p>
-            <div className="mt-2">
-              <StarRating rating={review.rating} size="sm" />
-            </div>
-            {review.is_favorite && (
-              <span className="inline-flex items-center mt-2 text-xs text-primary font-medium">
-                <Heart className="h-3 w-3 mr-1 fill-current" />
-                Favorite
-              </span>
-            )}
           </div>
-        </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium">{review.album.title}</p>
+            <p className="truncate text-xs text-muted-foreground">{review.album.artist}</p>
+            <div className="mt-1 flex items-center gap-2">
+              <StarRating rating={review.rating} size="sm" />
+              {review.is_favorite && (
+                <Heart aria-label="Favorite" className="h-3.5 w-3.5 fill-current text-primary" />
+              )}
+            </div>
+          </div>
+        </Link>
 
-        {/* Review Text */}
-        {review.text && (
-          <p className="text-sm text-foreground/90 whitespace-pre-wrap">{review.text}</p>
-        )}
-      </CardContent>
-
-      <CardFooter className="border-t pt-3 flex-col items-stretch gap-3">
-        <div className="flex items-center gap-6">
+        {/* Ações compactas inline */}
+        <div className="-ml-2 mt-1 flex items-center gap-4 text-muted-foreground">
           <div className="relative">
             <FloatingHearts key={animationKey} show={showHearts} />
             <Button
               variant="ghost"
               size="sm"
               className={cn(
-                'gap-2 h-8 transition-transform active:scale-95',
+                'h-8 gap-1.5 px-2 text-xs transition-transform active:scale-95',
                 review.is_liked && 'text-red-500 hover:text-red-600'
               )}
               onClick={handleLike}
@@ -237,7 +239,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
 
           {showComments && (
             <Link href={`/reviews/${review.uuid}`}>
-              <Button variant="ghost" size="sm" className="gap-2 h-8">
+              <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2 text-xs">
                 <MessageCircle className="h-4 w-4" />
                 <span>{review.comment_count}</span>
               </Button>
@@ -245,7 +247,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
           )}
 
           <ShareModal reviewUuid={review.uuid}>
-            <Button variant="ghost" size="sm" className="gap-2 h-8">
+            <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2 text-xs">
               <Share2 className="h-4 w-4" />
             </Button>
           </ShareModal>
@@ -253,45 +255,35 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
 
         {/* Comment Preview */}
         {showCommentPreview && review.comment_count > 0 && (
-          <div className="w-full">
+          <div className="mt-1 w-full">
             <CommentPreview reviewUuid={review.uuid} commentCount={review.comment_count} />
           </div>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+    </article>
   );
 }
 
 export function ReviewCardSkeleton() {
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-3">
-        <Skeleton className="h-10 w-10 rounded-full" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-3 w-16" />
-        </div>
-      </CardHeader>
-      <CardContent className="pb-3">
-        <div className="flex gap-4 mb-4">
-          <Skeleton className="h-24 w-24 rounded-lg flex-shrink-0" />
+    <div className="flex gap-3 px-4 py-3">
+      <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+      <div className="min-w-0 flex-1 space-y-2">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-3 w-4/5" />
+        <div className="flex items-center gap-3 rounded-xl border border-border p-2">
+          <Skeleton className="h-14 w-14 shrink-0 rounded-lg" />
           <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-3/4" />
             <Skeleton className="h-3 w-1/2" />
-            <Skeleton className="h-4 w-20" />
           </div>
         </div>
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-full" />
-          <Skeleton className="h-3 w-4/5" />
-        </div>
-      </CardContent>
-      <CardFooter className="border-t pt-3">
         <div className="flex gap-4">
-          <Skeleton className="h-8 w-16" />
-          <Skeleton className="h-8 w-16" />
+          <Skeleton className="h-6 w-12" />
+          <Skeleton className="h-6 w-12" />
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

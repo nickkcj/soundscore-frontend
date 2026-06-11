@@ -257,7 +257,7 @@ export default function FeedPage() {
             )}
 
             {isLoading && reviews.length === 0 ? (
-              <div className="space-y-10">
+              <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <ReviewCardSkeleton key={i} />
                 ))}
@@ -277,7 +277,7 @@ export default function FeedPage() {
                 onLoadMore={handleLoadMore}
                 loader={<ReviewCardSkeleton />}
               >
-                <div className="space-y-10">
+                <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
                   {reviews.map((review) => (
                     <ReviewCard
                       key={review.uuid}

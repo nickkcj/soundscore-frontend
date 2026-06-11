@@ -11,7 +11,6 @@ import {
   Star,
   Disc3,
   AlertCircle,
-  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,12 +18,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api';
 import type { ArtistDetail } from '@/types';
-
-function formatFollowers(count: number): string {
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}K`;
-  return count.toString();
-}
 
 function formatReleaseYear(date: string | null): string {
   if (!date) return '';
@@ -128,10 +121,6 @@ export default function ArtistPage({ params }: PageProps) {
 
             {/* Stats */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-muted-foreground mb-4">
-              <span className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                {formatFollowers(artist.followers)} followers
-              </span>
               <span className="flex items-center gap-1">
                 <Disc3 className="h-4 w-4" />
                 {artist.albums.length} albums

@@ -131,10 +131,28 @@ export function ActiveView({ session, onlineUsers, onMutationSuccess }: ActiveVi
       {/* Current track card */}
       <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
         <div className="p-5 border-b border-border">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-            Now Rating
-          </p>
-          <h2 className="text-2xl font-bold">{currentTrack?.name}</h2>
+          <div className="flex items-center gap-4">
+            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted shadow-sm">
+              {session.album_cover_image ? (
+                <Image
+                  src={session.album_cover_image}
+                  alt={session.album_title}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-wine-500/20 to-wine-800/20">
+                  <Music className="h-6 w-6 text-muted-foreground/50" />
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                Now Rating
+              </p>
+              <h2 className="text-2xl font-bold leading-tight">{currentTrack?.name}</h2>
+            </div>
+          </div>
         </div>
 
         {!isRevealed ? (

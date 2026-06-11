@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { QueryProvider } from '@/components/providers/query-provider';
+import { SWRegister } from '@/components/providers/sw-register';
 import './globals.css';
 
 const inter = Inter({
@@ -16,6 +17,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
+  themeColor: '#722F37',
 };
 
 export const metadata: Metadata = {
@@ -25,7 +27,12 @@ export const metadata: Metadata = {
   keywords: ['music', 'reviews', 'albums', 'ratings', 'social', 'discover'],
   icons: {
     icon: '/images/logo_only_soundscore.png',
-    apple: '/images/logo_only_soundscore.png',
+    apple: '/icons/apple-touch-icon.png',
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'SoundScore',
   },
 };
 
@@ -48,6 +55,7 @@ export default function RootLayout({
             <Toaster position="bottom-right" richColors />
           </ThemeProvider>
         </QueryProvider>
+        <SWRegister />
       </body>
     </html>
   );

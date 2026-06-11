@@ -58,6 +58,10 @@ export interface SessionListItem {
   album_cover_image: string | null;
   participants_count: number;
   created_at: string;
+  /** Média do grupo no álbum — só em sessões finalizadas */
+  album_avg: number | null;
+  /** Sua média no álbum — só em sessões finalizadas */
+  my_avg: number | null;
 }
 
 export interface CreateSessionPayload {

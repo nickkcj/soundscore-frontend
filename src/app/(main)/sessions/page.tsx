@@ -135,7 +135,20 @@ export default function SessionsPage() {
                     <Users className="h-3.5 w-3.5" />
                     {s.participants_count}
                   </span>
-                  <SessionStatusBadge status={s.status} />
+                  {s.status === 'finished' && s.album_avg !== null ? (
+                    <span className="flex flex-col items-center shrink-0 rounded-lg bg-wine-50 dark:bg-wine-950/30 px-2.5 py-1">
+                      <span className="text-base font-bold leading-tight text-wine-600 dark:text-wine-300">
+                        {s.album_avg.toFixed(1)}
+                      </span>
+                      {s.my_avg !== null && (
+                        <span className="text-[10px] leading-tight text-muted-foreground">
+                          you: {s.my_avg.toFixed(1)}
+                        </span>
+                      )}
+                    </span>
+                  ) : (
+                    <SessionStatusBadge status={s.status} />
+                  )}
                 </Link>
               ))}
             </div>

@@ -122,8 +122,8 @@ export default function FeedPage() {
 
       <div className="container mx-auto px-4 py-10">
         <div className="flex flex-col lg:flex-row gap-10">
-          {/* LEFT SIDEBAR: Groups */}
-          <div className="lg:w-64 w-full flex-shrink-0">
+          {/* LEFT SIDEBAR: Groups — hidden on mobile (groups have their own tab in the bottom bar) */}
+          <div className="hidden lg:block lg:w-64 w-full flex-shrink-0">
             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden sticky top-28">
               {/* Header */}
               <div className="px-5 py-4 border-b border-border">
@@ -484,8 +484,8 @@ function FeedSkeleton() {
     <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-10">
         <div className="flex flex-col lg:flex-row gap-10">
-          {/* Left Sidebar Skeleton */}
-          <div className="lg:w-64 w-full flex-shrink-0">
+          {/* Left Sidebar Skeleton — hidden on mobile */}
+          <div className="hidden lg:block lg:w-64 w-full flex-shrink-0">
             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
               <div className="px-5 py-4 border-b border-border">
                 <div className="h-5 w-24 bg-muted rounded animate-pulse" />

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/providers/theme-provider';
@@ -9,6 +9,14 @@ const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
 });
+
+// viewport-fit=cover: o app desenha até as bordas (notch/home indicator);
+// elementos fixos usam env(safe-area-inset-*) para não ficar embaixo delas
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: 'SoundScore - Share Your Music Taste',

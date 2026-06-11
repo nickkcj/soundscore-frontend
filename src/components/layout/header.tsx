@@ -283,165 +283,131 @@ export function Header() {
             )}
           </nav>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 text-foreground hover:text-wine-600 transition-colors"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Mobile right-side actions (authenticated: notifications + account) */}
+          {isAuthenticated ? (
+            <div className="md:hidden flex items-center gap-1">
+              <NotificationDropdown />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="relative focus:outline-none p-1">
+                    <Avatar className="h-8 w-8 ring-2 ring-wine-200 hover:ring-wine-400 dark:ring-wine-800 dark:hover:ring-wine-600 transition-all cursor-pointer">
+                      <AvatarImage src={user?.profile_picture || undefined} alt={user?.username} />
+                      <AvatarFallback className="bg-wine-600 text-white font-semibold text-sm">
+                        {user?.username?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border border-border">
+                  <div className="flex items-center gap-3 p-3 border-b border-border">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user?.profile_picture || undefined} />
+                      <AvatarFallback className="bg-wine-600 text-white text-sm">
+                        {user?.username?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-semibold text-foreground truncate">{user?.username}</span>
+                      <span className="text-xs text-muted-foreground truncate">{user?.email}</span>
+                    </div>
+                  </div>
+                  <div className="py-1">
+                    <DropdownMenuItem asChild>
+                      <Link href="/messages" className="flex items-center justify-between gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
+                        <div className="flex items-center gap-2">
+                          <MessageSquare className="h-4 w-4" />
+                          <span>Messages</span>
+                        </div>
+                        {unreadDMs > 0 && (
+                          <span className="h-4 min-w-[16px] px-1 rounded-full bg-wine-600 text-white text-[10px] font-bold flex items-center justify-center">
+                            {unreadDMs > 99 ? '99+' : unreadDMs}
+                          </span>
+                        )}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/library" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
+                        <Music className="h-4 w-4" />
+                        <span>Library</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/my-reviews" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
+                        <ClipboardList className="h-4 w-4" />
+                        <span>My Reviews</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/account" className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
+                        <Settings className="h-4 w-4" />
+                        <span>Settings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <div className="py-1">
+                    <DropdownMenuItem
+                      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                      className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300"
+                    >
+                      {mounted && theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                      <span>{mounted && theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                    </DropdownMenuItem>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <div className="py-1">
+                    <DropdownMenuItem
+                      onClick={logout}
+                      className="flex items-center gap-2 px-3 py-2 cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-700"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            /* Mobile menu button for unauthenticated users */
+            <button
+              className="md:hidden p-2 text-foreground hover:text-wine-600 transition-colors"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Mobile Navigation */}
-      {mobileMenuOpen && (
+      {/* Mobile Navigation for unauthenticated users only */}
+      {mobileMenuOpen && !isAuthenticated && (
         <div className="md:hidden border-t border-border bg-background">
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
-            {isAuthenticated ? (
-              <>
-                {/* User Info */}
-                <div className="flex items-center gap-3 p-3 mb-2 bg-muted rounded-lg">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.profile_picture || undefined} />
-                    <AvatarFallback className="bg-wine-600 text-white">
-                      {user?.username?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold text-foreground">{user?.username}</p>
-                    <p className="text-xs text-muted-foreground">{user?.email}</p>
-                  </div>
-                </div>
-
-                <Link
-                  href="/feed"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/feed') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  Feed
-                </Link>
-                <Link
-                  href="/discover"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/discover') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  Discover
-                </Link>
-                <Link
-                  href="/groups"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/groups') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  Groups
-                </Link>
-                <Link
-                  href="/messages"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors flex items-center justify-between ${
-                    isActive('/messages') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  <span>Messages</span>
-                  {unreadDMs > 0 && (
-                    <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-wine-600 text-white text-xs font-medium flex items-center justify-center">
-                      {unreadDMs}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  href={`/profile/${user?.username}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive(`/profile/${user?.username}`) ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  My Profile
-                </Link>
-                <Link
-                  href="/library"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/library') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  Library
-                </Link>
-                <Link
-                  href="/my-reviews"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/my-reviews') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  My Reviews
-                </Link>
-                <Link
-                  href="/account"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/account') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  Settings
-                </Link>
-                <hr className="my-2 border-border" />
-                <button
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="py-2 px-4 rounded-lg text-base font-medium text-foreground hover:bg-muted text-left transition-colors flex items-center gap-2"
-                >
-                  {mounted && theme === 'dark' ? (
-                    <Sun className="h-4 w-4" />
-                  ) : (
-                    <Moon className="h-4 w-4" />
-                  )}
-                  {mounted && theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                </button>
-                <hr className="my-2 border-border" />
-                <button
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="py-2 px-4 rounded-lg text-base font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950 text-left transition-colors"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/about"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/about') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  About
-                </Link>
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
-                    isActive('/login') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-2 px-4 rounded-lg text-base font-medium bg-wine-600 text-white text-center"
-                >
-                  Register
-                </Link>
-              </>
-            )}
+            <Link
+              href="/about"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
+                isActive('/about') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
+              }`}
+            >
+              About
+            </Link>
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
+                isActive('/login') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
+              }`}
+            >
+              Login
+            </Link>
+            <Link
+              href="/register"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-4 rounded-lg text-base font-medium bg-wine-600 text-white text-center"
+            >
+              Register
+            </Link>
           </nav>
         </div>
       )}

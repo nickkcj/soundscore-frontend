@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User } from '@/types';
-import { authApi, clearTokens, getAccessToken } from '@/lib/api';
+import { authApi, clearTokens, getAccessToken, ApiException } from '@/lib/api';
 import { destroySupabaseClient } from '@/lib/supabase';
 
 interface AuthState {
@@ -71,9 +71,16 @@ export const useAuthStore = create<AuthState>()(
         try {
           const user = await authApi.getMe();
           set({ user, isAuthenticated: true, isLoading: false });
-        } catch {
-          clearTokens();
-          set({ user: null, isAuthenticated: false, isLoading: false });
+        } catch (err) {
+          // Only destroy the session on a real 401 from the server.
+          // Network errors / CORS / 5xx must not log the user out.
+          if (err instanceof ApiException && err.status === 401) {
+            clearTokens();
+            set({ user: null, isAuthenticated: false, isLoading: false });
+          } else {
+            // Keep the current auth state; just clear loading flag.
+            set({ isLoading: false });
+          }
         }
       },
 

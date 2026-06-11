@@ -241,13 +241,13 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
       {/* Banner Section */}
       <div className="relative">
         {/* Banner Image */}
-        <div className="h-48 md:h-64 bg-wine-600 relative overflow-hidden">
+        <div className="h-36 sm:h-48 md:h-64 bg-wine-600 relative overflow-hidden">
           {profile.banner_image && (
             <Image
               src={profile.banner_image}
               alt="Profile banner"
               fill
-              className="object-cover"
+              className="object-cover object-center"
               priority
             />
           )}

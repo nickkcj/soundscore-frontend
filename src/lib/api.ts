@@ -55,8 +55,12 @@ async function refreshAccessToken(): Promise<string | null> {
       body: JSON.stringify({ refresh_token: refreshToken }),
     });
 
+    // Only clear tokens when the server explicitly rejects them (4xx auth errors).
+    // Network failures (TypeError) must not clear tokens.
     if (!response.ok) {
-      clearTokens();
+      if (response.status === 401 || response.status === 403) {
+        clearTokens();
+      }
       return null;
     }
 
@@ -64,7 +68,7 @@ async function refreshAccessToken(): Promise<string | null> {
     setTokens(tokens);
     return tokens.access_token;
   } catch {
-    clearTokens();
+    // Network/CORS error — do NOT clear tokens; the user is still authenticated.
     return null;
   }
 }

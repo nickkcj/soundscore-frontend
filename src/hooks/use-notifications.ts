@@ -2,10 +2,9 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { useNotificationStore } from '@/stores/notification-store';
-import { getAccessToken } from '@/lib/api';
-import type { Notification } from '@/types';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+import { getSupabaseClient } from '@/lib/supabase';
+import { useAuthStore } from '@/stores/auth-store';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export function useNotifications() {
   const {
@@ -37,73 +36,78 @@ export function useNotifications() {
   };
 }
 
-// SSE hook for real-time notifications
+// Supabase Realtime hook for real-time notifications (replaces SSE)
 export function useNotificationStream() {
-  const eventSourceRef = useRef<EventSource | null>(null);
-  const { addNotification, fetchUnreadCount, fetchNotifications } = useNotificationStore();
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const { fetchUnreadCount, fetchNotifications } = useNotificationStore();
+  const user = useAuthStore((s) => s.user);
 
-  // Fetch initial data when stream connects
+  // Fetch initial data on mount
   useEffect(() => {
     fetchUnreadCount();
     fetchNotifications(true);
   }, [fetchUnreadCount, fetchNotifications]);
 
-  const connect = useCallback(() => {
-    const token = getAccessToken();
-    if (!token) return;
+  const subscribe = useCallback(async () => {
+    if (!user?.id) return;
 
-    // Close existing connection
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
+    // Tear down any existing channel before creating a new one
+    if (channelRef.current) {
+      channelRef.current.unsubscribe();
+      channelRef.current = null;
     }
 
-    const url = `${API_BASE_URL}/feed/notifications/stream?token=${token}`;
-    const eventSource = new EventSource(url);
+    let supabase;
+    try {
+      supabase = await getSupabaseClient();
+    } catch {
+      // If we cannot reach the Realtime token endpoint (network error, etc.)
+      // just skip — the periodic fallback poll below will cover unread count.
+      return;
+    }
 
-    // Listen for named 'notification' event from SSE
-    eventSource.addEventListener('notification', (event) => {
-      try {
-        const notification: Notification = JSON.parse(event.data);
-        addNotification(notification);
-      } catch {
-        // Invalid data
-      }
-    });
+    const channel = supabase
+      .channel(`notifications:user:${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `recipient_id=eq.${user.id}`,
+        },
+        () => {
+          // Payload is raw row — refetch instead of injecting partial data
+          // so the store stays consistent with the REST shape (with joins, etc.)
+          fetchUnreadCount();
+          fetchNotifications(true);
+        }
+      )
+      .subscribe();
 
-    // Handle ping events (keepalive)
-    eventSource.addEventListener('ping', () => {
-      // Keepalive - no action needed
-    });
+    channelRef.current = channel;
+  }, [user?.id, fetchUnreadCount, fetchNotifications]);
 
-    eventSource.onerror = () => {
-      eventSource.close();
-      // Retry after 5 seconds
-      setTimeout(connect, 5000);
-    };
-
-    eventSourceRef.current = eventSource;
-  }, [addNotification]);
-
-  const disconnect = useCallback(() => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
+  const unsubscribe = useCallback(() => {
+    if (channelRef.current) {
+      channelRef.current.unsubscribe();
+      channelRef.current = null;
     }
   }, []);
 
   useEffect(() => {
-    connect();
-    return () => disconnect();
-  }, [connect, disconnect]);
+    subscribe();
+    return () => unsubscribe();
+  }, [subscribe, unsubscribe]);
 
-  // Periodic refresh as fallback
+  // Periodic refresh as fallback (covers the case where Realtime is unavailable)
   useEffect(() => {
     const interval = setInterval(() => {
       fetchUnreadCount();
-    }, 60000); // Every minute
+    }, 60_000);
 
     return () => clearInterval(interval);
   }, [fetchUnreadCount]);
 
-  return { reconnect: connect };
+  return { reconnect: subscribe };
 }

@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { SWRegister } from '@/components/providers/sw-register';
+import { InstallPrompt } from '@/components/providers/install-prompt';
 import './globals.css';
 
 const inter = Inter({
@@ -56,6 +57,7 @@ export default function RootLayout({
           </ThemeProvider>
         </QueryProvider>
         <SWRegister />
+        <InstallPrompt />
       </body>
     </html>
   );

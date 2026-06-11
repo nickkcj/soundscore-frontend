@@ -368,7 +368,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         <section className="py-6 border-t border-border">
           <h2 className="text-lg font-semibold mb-4">Reviews</h2>
           {reviewsLoading && reviews.length === 0 ? (
-            <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden divide-y divide-border">
               {Array.from({ length: 3 }).map((_, i) => (
                 <ReviewCardSkeleton key={i} />
               ))}
@@ -384,7 +384,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               isLoading={reviewsLoading}
               onLoadMore={() => fetchReviews(false)}
             >
-              <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+              <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden divide-y divide-border">
                 {reviews.map((review) => (
                   <ReviewCard
                     key={review.id}
@@ -439,7 +439,7 @@ function ProfileSkeleton() {
           {/* Reviews Skeleton */}
           <div className="py-6">
             <div className="h-6 w-24 bg-muted rounded animate-pulse mb-6" />
-            <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden divide-y divide-border">
               {Array.from({ length: 3 }).map((_, i) => (
                 <ReviewCardSkeleton key={i} />
               ))}

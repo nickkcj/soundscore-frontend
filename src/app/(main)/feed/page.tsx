@@ -212,41 +212,6 @@ export default function FeedPage() {
 
           {/* MAIN CONTENT: Feed */}
           <div className="lg:flex-1 mt-3">
-            <div className="flex items-center justify-between mb-10">
-              <h1 className="text-2xl font-bold text-foreground flex items-center">
-                <Music className="h-7 w-7 mr-2 text-wine-500" />
-                Latest Reviews
-              </h1>
-              <div className="flex items-center gap-2">
-                {/* Reload Button */}
-                <button
-                  onClick={handleReload}
-                  disabled={isRefetching}
-                  className="text-sm text-wine-600 dark:text-wine-300 font-medium flex items-center px-3 py-1.5 bg-wine-50 dark:bg-wine-950 rounded-full shadow-sm hover:bg-wine-100 dark:hover:bg-wine-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Reload feed"
-                >
-                  <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
-                </button>
-                {/* Sort Toggle Button */}
-                <button
-                  onClick={toggleSort}
-                  className="text-sm text-wine-600 dark:text-wine-300 font-medium flex items-center px-3 py-1.5 bg-wine-50 dark:bg-wine-950 rounded-full shadow-sm hover:bg-wine-100 dark:hover:bg-wine-900 transition-colors"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className={`w-4 h-4 mr-1 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" />
-                  </svg>
-                  <span>{sortOrder === 'desc' ? 'Latest first' : 'Oldest first'}</span>
-                </button>
-              </div>
-            </div>
-
             {error && (
               <div className="bg-red-50 dark:bg-red-950 text-red-600 p-4 rounded-xl mb-8 shadow-sm border border-red-100 dark:border-red-900">
                 {error}
@@ -256,14 +221,51 @@ export default function FeedPage() {
               </div>
             )}
 
+            {/* Painel no mesmo padrão dos sidebars (My Groups/Trending Albums) */}
+            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+              <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+                <h1 className="font-semibold text-foreground flex items-center">
+                  <Music className="h-4 w-4 mr-2 text-wine-500" />
+                  Latest Reviews
+                </h1>
+                <div className="flex items-center gap-2">
+                  {/* Reload Button */}
+                  <button
+                    onClick={handleReload}
+                    disabled={isRefetching}
+                    className="text-sm text-wine-600 dark:text-wine-300 font-medium flex items-center p-1.5 rounded-full hover:bg-wine-50 dark:hover:bg-wine-950 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Reload feed"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
+                  </button>
+                  {/* Sort Toggle Button */}
+                  <button
+                    onClick={toggleSort}
+                    className="text-sm text-wine-600 dark:text-wine-300 font-medium flex items-center px-2.5 py-1.5 rounded-full hover:bg-wine-50 dark:hover:bg-wine-950 transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className={`w-4 h-4 mr-1 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" />
+                    </svg>
+                    <span>{sortOrder === 'desc' ? 'Latest first' : 'Oldest first'}</span>
+                  </button>
+                </div>
+              </div>
+
             {isLoading && reviews.length === 0 ? (
-              <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+              <div className="divide-y divide-border">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <ReviewCardSkeleton key={i} />
                 ))}
               </div>
             ) : reviews.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 bg-card rounded-xl shadow-sm border border-border">
+              <div className="flex flex-col items-center justify-center py-16">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16 text-wine-200 dark:text-wine-800 mb-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
                 </svg>
@@ -277,7 +279,7 @@ export default function FeedPage() {
                 onLoadMore={handleLoadMore}
                 loader={<ReviewCardSkeleton />}
               >
-                <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+                <div className="divide-y divide-border">
                   {reviews.map((review) => (
                     <ReviewCard
                       key={review.uuid}
@@ -289,6 +291,7 @@ export default function FeedPage() {
                 </div>
               </InfiniteScroll>
             )}
+            </div>
 
             {/* Load more button */}
             {hasMore && !isLoadingMore && reviews.length > 0 && (

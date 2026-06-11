@@ -319,7 +319,7 @@ export default function AlbumPage({ params }: PageProps) {
               </CardContent>
             </Card>
           ) : (
-            <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden divide-y divide-border">
               {reviews.map((review) => (
                 <ReviewCard
                   key={review.id}

@@ -27,7 +27,7 @@ export default function AboutPage() {
           <div className="flex-1 flex justify-center lg:justify-end">
             <img
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/27032dba77e68e55a80db39bdfcbc3e2ccb4b98f"
-              className="w-[320px] h-[320px] md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] object-contain"
+              className="w-[320px] h-[320px] md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] object-contain invert"
               alt="Person listening to music with headphones"
             />
           </div>

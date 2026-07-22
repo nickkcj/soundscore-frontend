@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun, Music, MessageSquare, Radio } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -89,8 +89,14 @@ function NavPill({ isActive }: { isActive: (path: string) => boolean }) {
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleLogout = useCallback(() => {
+    logout();
+    router.push('/');
+  }, [logout, router]);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [unreadDMs, setUnreadDMs] = useState(0);
@@ -275,7 +281,7 @@ export function Header() {
                       {/* Logout */}
                       <div className="py-1">
                         <DropdownMenuItem
-                          onClick={logout}
+                          onClick={handleLogout}
                           className="flex items-center gap-2 px-3 py-2 cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-700"
                         >
                           <LogOut className="h-4 w-4" />
@@ -372,7 +378,7 @@ export function Header() {
                   <DropdownMenuSeparator />
                   <div className="py-1">
                     <DropdownMenuItem
-                      onClick={logout}
+                      onClick={handleLogout}
                       className="flex items-center gap-2 px-3 py-2 cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-700"
                     >
                       <LogOut className="h-4 w-4" />

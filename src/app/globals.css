@@ -68,8 +68,10 @@
 :root {
   /* Declara o esquema de cor ao navegador: impede que modos escuros
      forçados (Samsung Internet, Chrome auto-dark) invertam o site —
-     o tema é controlado pela classe .dark via next-themes */
-  color-scheme: light;
+     o tema é controlado pela classe .dark via next-themes.
+     O "only" é obrigatório: sem ele o Auto Dark do Chrome Android ignora
+     a declaração e escurece o site à força no TWA/celular */
+  color-scheme: only light;
   --radius: 0.625rem;
   --background: #fafafa;
   --foreground: #171717;

@@ -19,6 +19,9 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: '#722F37',
+  // Meta color-scheme: opt-out do Auto Dark do Chrome Android (o CSS
+  // color-scheme sozinho não é suficiente; o Chrome exige a meta tag)
+  colorScheme: 'only light',
 };
 
 export const metadata: Metadata = {

@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/footer';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { useAuthStore } from '@/stores/auth-store';
 import { useNotificationStream } from '@/hooks/use-notifications';
+import { cn } from '@/lib/utils';
 
 function NotificationStreamConnector() {
   useNotificationStream();
@@ -25,12 +26,16 @@ export default function MainLayout({
   }, [fetchUser]);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div
+      className={cn(
+        'app-shell flex flex-col',
+        isAuthenticated && 'app-shell--authenticated'
+      )}
+    >
       <Header />
       {isAuthenticated && <NotificationStreamConnector />}
-      {/* pb-20 gives mobile content room above the bottom nav bar */}
-      <main className="flex-1 pb-20 md:pb-0">{children}</main>
-      <Footer />
+      <main className="app-main flex-1">{children}</main>
+      {!isAuthenticated && <Footer />}
       <BottomNav />
     </div>
   );

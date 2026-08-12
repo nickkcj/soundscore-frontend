@@ -88,7 +88,7 @@ export function InviteMemberModal({ groupUuid }: InviteMemberModalProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="h-11 w-full lg:h-9">
           <Send className="h-4 w-4 mr-2" />
           Invite Members
         </Button>
@@ -104,7 +104,7 @@ export function InviteMemberModal({ groupUuid }: InviteMemberModalProps) {
             placeholder="Search by username..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="h-11 pl-9"
           />
         </div>
 
@@ -124,7 +124,7 @@ export function InviteMemberModal({ groupUuid }: InviteMemberModalProps) {
               {users.map((user) => (
                 <div
                   key={user.id}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-muted"
+                  className="flex min-h-14 items-center justify-between gap-2 rounded-lg p-2 hover:bg-muted"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
@@ -147,6 +147,7 @@ export function InviteMemberModal({ groupUuid }: InviteMemberModalProps) {
                     onClick={() => handleInvite(user.username, user.id)}
                     disabled={invitingUser === user.id || invitedUsers.has(user.id)}
                     variant={invitedUsers.has(user.id) ? 'secondary' : 'default'}
+                    className="h-11 min-w-16 lg:h-9"
                   >
                     {invitingUser === user.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

@@ -20,7 +20,7 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8">
+    <div className="container max-w-6xl mx-auto px-4 py-4 md:py-8">
       <LibraryContent username={user.username} />
     </div>
   );

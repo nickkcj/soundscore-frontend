@@ -120,14 +120,14 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
 
   if (!review) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-12">
+      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-6 md:py-12">
         <div className="container max-w-2xl mx-auto px-4">
           <Card className="shadow-md border-border">
-            <CardContent className="py-12 text-center">
+            <CardContent className="px-4 py-10 text-center sm:px-6 sm:py-12">
               <p className="text-muted-foreground">Review not found</p>
-              <Link href="/my-reviews">
-                <Button className="mt-4 bg-wine-600 hover:bg-wine-700">Back to My Reviews</Button>
-              </Link>
+              <Button asChild className="mt-4 bg-wine-600 hover:bg-wine-700">
+                <Link href="/my-reviews">Back to My Reviews</Link>
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -136,22 +136,22 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-12">
+    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-6 md:py-12">
       <div className="container max-w-2xl mx-auto px-4">
-        <Link href="/my-reviews" className="inline-flex items-center gap-2 text-muted-foreground hover:text-wine-600 dark:hover:text-wine-400 transition-colors mb-6">
+        <Link href="/my-reviews" className="mb-4 inline-flex min-h-11 items-center gap-2 text-muted-foreground transition-colors active:text-wine-600 md:mb-6 md:hover:text-wine-600 dark:active:text-wine-400 md:dark:hover:text-wine-400">
           <ArrowLeft className="h-4 w-4" />
           Back to My Reviews
         </Link>
 
-        <Card className="shadow-md border-border">
-        <CardHeader>
-          <CardTitle>Edit Review</CardTitle>
+        <Card className="border-border shadow-sm md:shadow-md">
+        <CardHeader className="px-4 pt-5 sm:px-6 sm:pt-6">
+          <CardTitle className="text-2xl">Edit Review</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="px-4 sm:px-6">
+          <form onSubmit={handleSubmit} className="space-y-5 pb-5 sm:space-y-6 sm:pb-0">
             {/* Album Preview (not editable) */}
-            <div className="flex gap-4 p-4 rounded-lg bg-muted/50">
-              <div className="relative h-24 w-24 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+            <div className="flex min-w-0 items-center gap-3 rounded-xl bg-muted/50 p-3 sm:items-start sm:gap-4 sm:p-4">
+              <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-muted sm:h-24 sm:w-24">
                 {review.album.cover_image ? (
                   <Image
                     src={review.album.cover_image}
@@ -165,9 +165,9 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
                   </div>
                 )}
               </div>
-              <div>
-                <h3 className="font-semibold">{review.album.title}</h3>
-                <p className="text-sm text-muted-foreground">{review.album.artist}</p>
+              <div className="min-w-0">
+                <h3 className="truncate font-semibold">{review.album.title}</h3>
+                <p className="truncate text-sm text-muted-foreground">{review.album.artist}</p>
                 {review.album.release_date && (
                   <p className="text-sm text-muted-foreground">
                     {new Date(review.album.release_date).getFullYear()}
@@ -179,13 +179,15 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
             {/* Rating */}
             <div className="space-y-2">
               <Label>Rating</Label>
-              <div className="flex items-center gap-2">
-                <StarRating
-                  rating={rating}
-                  size="lg"
-                  interactive
-                  onChange={setRating}
-                />
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <div className="[&>div>button]:flex [&>div>button]:h-11 [&>div>button]:w-11 [&>div>button]:items-center [&>div>button]:justify-center">
+                  <StarRating
+                    rating={rating}
+                    size="lg"
+                    interactive
+                    onChange={setRating}
+                  />
+                </div>
                 <span className="text-sm text-muted-foreground">
                   {rating > 0 ? `${rating}/5` : 'Select a rating'}
                 </span>
@@ -201,11 +203,12 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={5}
+                className="min-h-32 resize-none"
               />
             </div>
 
             {/* Favorite */}
-            <div className="flex items-center gap-2">
+            <div className="flex min-h-11 items-center gap-2">
               <Checkbox
                 id="favorite"
                 checked={isFavorite}
@@ -223,8 +226,8 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
             )}
 
             {/* Submit */}
-            <div className="flex gap-4">
-              <Button type="submit" disabled={isLoading || rating === 0}>
+            <div className="flex gap-3 sm:gap-4">
+              <Button type="submit" disabled={isLoading || rating === 0} className="min-h-11 flex-1 sm:flex-none">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -234,7 +237,7 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
                   'Save Changes'
                 )}
               </Button>
-              <Button type="button" variant="outline" onClick={() => router.back()}>
+              <Button type="button" variant="outline" onClick={() => router.back()} className="min-h-11 flex-1 sm:flex-none">
                 Cancel
               </Button>
             </div>
@@ -248,16 +251,16 @@ export default function EditReviewPage({ params }: { params: Promise<{ uuid: str
 
 function EditReviewSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-12">
+    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background py-6 md:py-12">
       <div className="container max-w-2xl mx-auto px-4">
-        <Skeleton className="h-6 w-32 mb-6" />
+        <Skeleton className="mb-4 h-11 w-32 md:mb-6" />
         <Card className="shadow-md border-border">
-          <CardHeader>
+          <CardHeader className="px-4 sm:px-6">
             <Skeleton className="h-6 w-24" />
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex gap-4 p-4 rounded-lg bg-muted/50">
-              <Skeleton className="h-24 w-24 rounded-lg" />
+          <CardContent className="space-y-5 px-4 sm:space-y-6 sm:px-6">
+            <div className="flex gap-3 rounded-lg bg-muted/50 p-3 sm:gap-4 sm:p-4">
+              <Skeleton className="h-16 w-16 rounded-lg sm:h-24 sm:w-24" />
               <div className="space-y-2">
                 <Skeleton className="h-5 w-32" />
                 <Skeleton className="h-4 w-24" />

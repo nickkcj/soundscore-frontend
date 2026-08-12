@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun, Music, MessageSquare, Radio } from 'lucide-react';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from 'react';
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,8 @@ const NAV_ITEMS = [
   { label: 'Login', href: '/login' },
   { label: 'Register', href: '/register' },
 ];
+
+const subscribeToHydration = () => () => {};
 
 function NavPill({ isActive }: { isActive: (path: string) => boolean }) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -98,12 +100,12 @@ export function Header() {
     router.push('/');
   }, [logout, router]);
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false
+  );
   const [unreadDMs, setUnreadDMs] = useState(0);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Poll unread DM count
   useEffect(() => {
@@ -126,18 +128,25 @@ export function Header() {
   const isActive = (path: string) => pathname === path || pathname.startsWith(path + '/');
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-sm bg-background border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/95 pt-[var(--safe-area-top)] shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-background/85">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex h-[var(--app-header-height)] items-center justify-between gap-3">
           {/* Logo */}
-          <Link href={isAuthenticated ? '/feed' : '/'} className="flex items-center group">
+          <Link
+            href={isAuthenticated ? '/feed' : '/'}
+            className="group flex min-h-11 min-w-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
             <Image
-              src="/images/logo_soundscore.png"
-              alt="SoundScore"
-              width={500}
-              height={120}
-              className="h-32 -my-12 w-auto object-contain group-hover:opacity-90 transition-opacity dark:brightness-0 dark:invert"
+              src="/images/logo_only_soundscore.png"
+              alt=""
+              width={40}
+              height={40}
+              priority
+              className="h-8 w-8 shrink-0 object-contain transition-opacity group-hover:opacity-90 dark:brightness-0 dark:invert md:h-9 md:w-9"
             />
+            <span className="truncate text-xl font-bold tracking-tight text-wine-800 transition-opacity group-hover:opacity-90 dark:text-wine-300 md:text-2xl">
+              SoundScore
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -300,11 +309,11 @@ export function Header() {
 
           {/* Mobile right-side actions (authenticated: notifications + account) */}
           {isAuthenticated ? (
-            <div className="md:hidden flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-0.5 md:hidden [&_button]:min-h-11 [&_button]:min-w-11">
               <NotificationDropdown />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="relative focus:outline-none p-1">
+                  <button className="relative flex min-h-11 min-w-11 items-center justify-center rounded-full p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                     <Avatar className="h-8 w-8 ring-2 ring-wine-200 hover:ring-wine-400 dark:ring-wine-800 dark:hover:ring-wine-600 transition-all cursor-pointer">
                       <AvatarImage src={user?.profile_picture || undefined} alt={user?.username} />
                       <AvatarFallback className="bg-wine-600 text-white font-semibold text-sm">
@@ -391,8 +400,11 @@ export function Header() {
           ) : (
             /* Mobile menu button for unauthenticated users */
             <button
-              className="md:hidden p-2 text-foreground hover:text-wine-600 transition-colors"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted hover:text-wine-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-public-navigation"
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -402,12 +414,12 @@ export function Header() {
 
       {/* Mobile Navigation for unauthenticated users only */}
       {mobileMenuOpen && !isAuthenticated && (
-        <div className="md:hidden border-t border-border bg-background">
-          <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
+        <div id="mobile-public-navigation" className="border-t border-border bg-background md:hidden">
+          <nav className="container mx-auto flex flex-col gap-2 px-4 py-3">
             <Link
               href="/about"
               onClick={() => setMobileMenuOpen(false)}
-              className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
+              className={`flex min-h-11 items-center rounded-lg px-4 py-2 text-base font-medium transition-colors ${
                 isActive('/about') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
               }`}
             >
@@ -416,7 +428,7 @@ export function Header() {
             <Link
               href="/login"
               onClick={() => setMobileMenuOpen(false)}
-              className={`py-2 px-4 rounded-lg text-base font-medium transition-colors ${
+              className={`flex min-h-11 items-center rounded-lg px-4 py-2 text-base font-medium transition-colors ${
                 isActive('/login') ? 'bg-wine-50 text-wine-600 dark:bg-wine-950 dark:text-wine-300' : 'text-foreground hover:bg-muted'
               }`}
             >
@@ -425,7 +437,7 @@ export function Header() {
             <Link
               href="/register"
               onClick={() => setMobileMenuOpen(false)}
-              className="py-2 px-4 rounded-lg text-base font-medium bg-wine-600 text-white text-center"
+              className="flex min-h-11 items-center justify-center rounded-lg bg-wine-600 px-4 py-2 text-center text-base font-medium text-white"
             >
               Register
             </Link>

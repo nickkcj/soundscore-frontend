@@ -58,7 +58,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
         <p className="text-muted-foreground">
@@ -66,7 +66,7 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
         <div className="space-y-2">
           <Label htmlFor="username">Username</Label>
           <Input
@@ -74,6 +74,7 @@ export default function RegisterPage() {
             placeholder="Choose a username"
             {...register('username')}
             disabled={isLoading}
+            className="h-11"
           />
           {errors.username && (
             <p className="text-sm text-destructive">{errors.username.message}</p>
@@ -88,6 +89,7 @@ export default function RegisterPage() {
             placeholder="Enter your email"
             {...register('email')}
             disabled={isLoading}
+            className="h-11"
           />
           {errors.email && (
             <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -102,6 +104,7 @@ export default function RegisterPage() {
             placeholder="Create a password"
             {...register('password')}
             disabled={isLoading}
+            className="h-11"
           />
           {errors.password && (
             <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -116,13 +119,14 @@ export default function RegisterPage() {
             placeholder="Confirm your password"
             {...register('confirmPassword')}
             disabled={isLoading}
+            className="h-11"
           />
           {errors.confirmPassword && (
             <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
           )}
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="h-11 w-full" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Create account
         </Button>

@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import type { ReviewListResponse, LikeResponse, Review } from '@/types';
+import type { ReviewListResponse, LikeResponse } from '@/types';
 
 /**
  * Hook for fetching feed with infinite scroll support

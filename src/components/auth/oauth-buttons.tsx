@@ -32,13 +32,13 @@ export function OAuthButtons({ disabled }: OAuthButtonsProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-3">
         <Button
           variant="outline"
           type="button"
           disabled={disabled || loadingProvider !== null}
           onClick={() => handleOAuthLogin('google')}
-          className="w-full"
+          className="h-11 min-w-0 w-full px-2 sm:px-4"
         >
           {loadingProvider === 'google' ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -53,7 +53,7 @@ export function OAuthButtons({ disabled }: OAuthButtonsProps) {
           type="button"
           disabled={disabled || loadingProvider !== null}
           onClick={() => handleOAuthLogin('spotify')}
-          className="w-full"
+          className="h-11 min-w-0 w-full px-2 sm:px-4"
         >
           {loadingProvider === 'spotify' ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

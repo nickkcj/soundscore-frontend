@@ -25,11 +25,11 @@ export function LobbyView({
   const onlineIds = new Set(onlineUsers.map((u) => u.user_id));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Album Header */}
-      <div className="bg-card rounded-xl shadow-sm border border-border p-6">
-        <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-          <div className="relative w-32 h-32 shrink-0 rounded-xl overflow-hidden shadow-xl">
+      <div className="rounded-xl border border-border bg-card p-4 shadow-sm md:p-6">
+        <div className="flex items-center gap-4 sm:items-start sm:gap-6">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl shadow-lg sm:h-32 sm:w-32 sm:shadow-xl">
             {session.album_cover_image ? (
               <Image
                 src={session.album_cover_image}
@@ -40,14 +40,14 @@ export function LobbyView({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-wine-500/20 to-wine-800/20">
-                <Music className="h-12 w-12 text-muted-foreground/50" />
+                <Music className="h-8 w-8 text-muted-foreground/50 sm:h-12 sm:w-12" />
               </div>
             )}
           </div>
-          <div className="text-center sm:text-left flex-1">
-            <h1 className="text-2xl font-bold mb-1">{session.album_title}</h1>
-            <p className="text-lg text-muted-foreground mb-3">{session.album_artist}</p>
-            <p className="text-sm text-muted-foreground">
+          <div className="min-w-0 flex-1 text-left">
+            <h1 className="mb-1 line-clamp-2 text-xl font-bold leading-tight sm:text-2xl">{session.album_title}</h1>
+            <p className="mb-1 truncate text-sm text-muted-foreground sm:mb-3 sm:text-lg">{session.album_artist}</p>
+            <p className="text-xs text-muted-foreground sm:text-sm">
               {session.tracks.length} tracks &bull; Code:{' '}
               <span className="font-mono font-semibold text-foreground tracking-widest">
                 {session.code}
@@ -58,18 +58,18 @@ export function LobbyView({
       </div>
 
       {/* Participants */}
-      <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+      <div className="rounded-xl border border-border bg-card p-4 shadow-sm md:p-6">
         <h2 className="font-semibold flex items-center gap-2 mb-4">
           <Users className="h-5 w-5 text-wine-500" />
           Participants ({session.participants.length})
         </h2>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           {session.participants.map((p) => {
             const isOnline = onlineIds.has(p.user_id);
             return (
               <div
                 key={p.user_id}
-                className="flex items-center gap-2 bg-muted/50 rounded-full px-3 py-1.5"
+                className="flex min-h-11 items-center gap-2 rounded-full bg-muted/50 px-3 py-1.5"
               >
                 <div className="relative">
                   <Avatar className="h-7 w-7">
@@ -100,7 +100,7 @@ export function LobbyView({
       </div>
 
       {/* Tracklist */}
-      <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+      <div className="rounded-xl border border-border bg-card p-4 shadow-sm md:p-6">
         <h2 className="font-semibold mb-4">Tracklist</h2>
         <ol className="divide-y divide-border">
           {session.tracks.map((track) => (
@@ -108,17 +108,17 @@ export function LobbyView({
               <span className="w-6 text-sm text-muted-foreground text-right shrink-0">
                 {track.index + 1}
               </span>
-              <span className="text-sm">{track.name}</span>
+              <span className="min-w-0 break-words text-sm">{track.name}</span>
             </li>
           ))}
         </ol>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
         <Button
           variant="outline"
-          className="flex-1"
+          className="h-11 w-full"
           onClick={onCopyLink}
         >
           <Link2 className="h-4 w-4" />
@@ -127,7 +127,7 @@ export function LobbyView({
         {session.is_host && (
           <Button
             className={cn(
-              'flex-1 bg-wine-600 hover:bg-wine-700 text-white',
+              'h-11 w-full bg-wine-600 hover:bg-wine-700 text-white',
               'disabled:opacity-70'
             )}
             onClick={onStart}

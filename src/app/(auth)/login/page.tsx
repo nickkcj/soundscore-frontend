@@ -49,7 +49,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
         <p className="text-muted-foreground">
@@ -65,6 +65,7 @@ export default function LoginPage() {
             placeholder="Enter your username"
             {...register('username')}
             disabled={isLoading}
+            className="h-11"
           />
           {errors.username && (
             <p className="text-sm text-destructive">{errors.username.message}</p>
@@ -79,6 +80,7 @@ export default function LoginPage() {
             placeholder="Enter your password"
             {...register('password')}
             disabled={isLoading}
+            className="h-11"
           />
           {errors.password && (
             <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -88,13 +90,13 @@ export default function LoginPage() {
         <div className="flex justify-end">
           <Link
             href="/forgot-password"
-            className="text-sm text-primary hover:underline"
+            className="flex min-h-11 items-center text-sm text-primary hover:underline"
           >
             Forgot password?
           </Link>
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="h-11 w-full" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Sign in
         </Button>

@@ -2,8 +2,8 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="bg-background mt-auto border-t border-border py-4">
-      <div className="container mx-auto px-8">
+    <footer className="mt-auto border-t border-border bg-background py-4">
+      <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between max-md:flex-col max-md:gap-4">
           {/* Brand & Copyright */}
           <div className="flex items-center gap-2 max-md:flex-col max-md:gap-1">

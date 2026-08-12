@@ -107,27 +107,27 @@ export default function HomePage() {
             #121212 100%)`,
         }}
       >
-        <div className="flex justify-center items-center p-10 pl-8 md:pl-32 mx-auto max-md:flex-col max-md:p-5 w-full max-w-7xl animate-[fadeIn_1s_ease-in-out]">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-4 py-8 animate-[fadeIn_1s_ease-in-out] max-md:flex-col md:p-10 md:pl-32">
           {/* Text section */}
-          <div className="w-full md:w-1/2 text-center md:text-left px-4 animate-[slideInLeft_1.2s_ease-out]">
-            <h1 className="text-white text-6xl font-bold tracking-[-1px] mb-5 max-md:text-[36px] max-sm:text-3xl animate-[fadeUp_1.4s_ease-out]">
+          <div className="w-full px-0 text-center animate-[slideInLeft_1.2s_ease-out] sm:px-4 md:w-1/2 md:text-left">
+            <h1 className="mb-4 text-3xl font-bold tracking-[-1px] text-white animate-[fadeUp_1.4s_ease-out] sm:text-4xl md:mb-5 md:text-6xl">
               Rank your taste in music
             </h1>
-            <p className="text-white/90 text-xl mb-8 max-md:text-lg max-sm:text-base animate-[fadeUp_1.6s_ease-out]">
+            <p className="mb-6 text-base text-white/90 animate-[fadeUp_1.6s_ease-out] sm:text-lg md:mb-8 md:text-xl">
               SoundScore allows you to rank every album that has ever launched. You
               can discuss and review other people&apos;s score.
             </p>
             {isAuthenticated ? (
               <Link
                 href={`/my-reviews`}
-                className="inline-block cursor-pointer bg-white text-wine-700 hover:bg-wine-50 px-7 py-3 rounded-full max-md:mx-auto max-md:block max-sm:w-full max-sm:text-base transition-all duration-200 text-center animate-[fadeUp_1.8s_ease-out] shadow-md hover:shadow-lg text-base font-semibold"
+                className="mx-auto flex min-h-11 w-full max-w-sm cursor-pointer items-center justify-center rounded-full bg-white px-7 py-3 text-center text-base font-semibold text-wine-700 shadow-md transition-all duration-200 animate-[fadeUp_1.8s_ease-out] hover:bg-wine-50 hover:shadow-lg md:mx-0 md:inline-flex md:w-auto"
               >
                 Start Ranking
               </Link>
             ) : (
               <Link
                 href="/register"
-                className="inline-block cursor-pointer bg-white text-wine-700 hover:bg-wine-50 px-7 py-3 rounded-full max-md:mx-auto max-md:block max-sm:w-full max-sm:text-base transition-all duration-200 text-center animate-[fadeUp_1.8s_ease-out] shadow-md hover:shadow-lg text-base font-semibold"
+                className="mx-auto flex min-h-11 w-full max-w-sm cursor-pointer items-center justify-center rounded-full bg-white px-7 py-3 text-center text-base font-semibold text-wine-700 shadow-md transition-all duration-200 animate-[fadeUp_1.8s_ease-out] hover:bg-wine-50 hover:shadow-lg md:mx-0 md:inline-flex md:w-auto"
               >
                 Start Ranking
               </Link>
@@ -135,11 +135,11 @@ export default function HomePage() {
           </div>
 
           {/* Image section with float animation */}
-          <div className="w-full md:w-1/2 flex justify-center px-4 animate-[slideInRight_1.2s_ease-out] relative">
+          <div className="relative flex w-full justify-center px-4 animate-[slideInRight_1.2s_ease-out] md:w-1/2">
             <div className="absolute inset-0 bg-white/10 rounded-full blur-3xl scale-75" />
             <img
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/27032dba77e68e55a80db39bdfcbc3e2ccb4b98f"
-              className="w-[550px] h-[550px] max-md:w-full max-md:h-auto max-md:mt-6 object-contain animate-[float_6s_ease-in-out_infinite] relative brightness-0 invert opacity-90 contrast-200"
+              className="relative mt-5 h-56 w-56 object-contain opacity-90 brightness-0 invert contrast-200 animate-[float_6s_ease-in-out_infinite] sm:h-72 sm:w-72 md:mt-0 md:h-[550px] md:w-[550px]"
               alt="Music illustration"
             />
           </div>
@@ -150,8 +150,8 @@ export default function HomePage() {
       <section className="relative bg-[#121212] overflow-hidden">
         <div className="container mx-auto px-4 md:px-10">
           {/* Albums Showcase */}
-          <div className="text-center py-16">
-            <h2 className="text-white text-3xl md:text-4xl font-bold tracking-tight mb-8 max-sm:text-2xl">
+          <div className="py-10 text-center md:py-16">
+            <h2 className="mb-6 text-2xl font-bold tracking-tight text-white md:mb-8 md:text-4xl">
               All albums you have ever imagined
             </h2>
             <figure className="relative">
@@ -165,22 +165,22 @@ export default function HomePage() {
           </div>
 
           {/* Divider */}
-          <div className="flex items-center justify-center gap-4 py-8">
+          <div className="flex items-center justify-center gap-4 py-5 md:py-8">
             <div className="h-px w-24 bg-gradient-to-r from-transparent to-wine-600/50" />
             <div className="w-2 h-2 rounded-full bg-wine-600/50" />
             <div className="h-px w-24 bg-gradient-to-l from-transparent to-wine-600/50" />
           </div>
 
           {/* Latest Reviews */}
-          <div id="reviews" className="py-12">
-            <div className="text-center mb-10">
+          <div id="reviews" className="py-8 md:py-12">
+            <div className="mb-6 text-center md:mb-10">
               <span className="text-wine-500 text-sm font-medium tracking-wider uppercase">Community</span>
               <h2 className="text-white text-3xl md:text-4xl font-bold tracking-tight mt-2">
                 Latest Reviews
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
               {loadingReviews ? (
                 <>
                   <ReviewCardSkeleton />
@@ -208,7 +208,7 @@ export default function HomePage() {
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     </div>
-                    <div className="p-4">
+                    <div className="p-3 sm:p-4">
                       <div className="flex items-center gap-3 mb-3">
                         {review.user_profile_picture ? (
                           <img
@@ -223,7 +223,7 @@ export default function HomePage() {
                             </span>
                           </div>
                         )}
-                        <span className="text-white font-semibold">{review.username}</span>
+                        <span className="min-w-0 truncate text-sm font-semibold text-white sm:text-base">{review.username}</span>
                       </div>
                       <StarRating rating={review.rating} />
                       {review.text && (
@@ -238,7 +238,7 @@ export default function HomePage() {
                   </Link>
                 ))
               ) : (
-                <div className="col-span-3 text-center text-gray-400 py-10">
+                <div className="col-span-full py-10 text-center text-gray-400">
                   No reviews yet. Be the first to review an album!
                 </div>
               )}
@@ -247,7 +247,7 @@ export default function HomePage() {
             <div className="text-center mt-8">
               <Link
                 href={isAuthenticated ? '/feed' : '/register'}
-                className="inline-flex items-center gap-2 bg-transparent border border-wine-600/50 hover:bg-wine-600/10 text-wine-500 hover:text-wine-400 text-sm font-medium py-2.5 px-6 rounded-full transition-all duration-300"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-wine-600/50 bg-transparent px-6 py-2.5 text-sm font-medium text-wine-500 transition-all duration-300 hover:bg-wine-600/10 hover:text-wine-400"
               >
                 View All Reviews
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,15 +258,15 @@ export default function HomePage() {
           </div>
 
           {/* Divider */}
-          <div className="flex items-center justify-center gap-4 py-8">
+          <div className="flex items-center justify-center gap-4 py-5 md:py-8">
             <div className="h-px w-32 bg-gradient-to-r from-transparent via-yellow-500/30 to-transparent" />
             <div className="w-3 h-3 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/30" />
             <div className="h-px w-32 bg-gradient-to-r from-transparent via-yellow-500/30 to-transparent" />
           </div>
 
           {/* Weekly Top Albums - Podium Style */}
-          <div id="top-albums" className="py-12 pb-20">
-            <div className="text-center mb-12">
+          <div id="top-albums" className="pb-14 pt-8 md:py-12 md:pb-20">
+            <div className="mb-8 text-center md:mb-12">
               <span className="text-yellow-500 text-sm font-medium tracking-wider uppercase">This Week</span>
               <h2 className="text-white text-3xl md:text-5xl font-bold tracking-tight mt-2">
                 Top Albums
@@ -275,18 +275,18 @@ export default function HomePage() {
             </div>
 
             {loadingAlbums ? (
-              <div className="flex justify-center items-end gap-4 md:gap-8 max-w-4xl mx-auto">
-                <div className="flex-1 max-w-[200px]"><AlbumCardSkeleton /></div>
-                <div className="flex-1 max-w-[280px]"><AlbumCardSkeleton /></div>
-                <div className="flex-1 max-w-[180px]"><AlbumCardSkeleton /></div>
+              <div className="mx-auto grid max-w-4xl grid-cols-2 items-end gap-3 md:flex md:justify-center md:gap-8">
+                <div className="order-2 max-w-[200px] md:flex-1"><AlbumCardSkeleton /></div>
+                <div className="order-1 col-span-2 mx-auto w-full max-w-[240px] md:order-none md:flex-1 md:max-w-[280px]"><AlbumCardSkeleton /></div>
+                <div className="order-3 max-w-[180px] md:flex-1"><AlbumCardSkeleton /></div>
               </div>
             ) : topAlbums.length > 0 ? (
-              <div className="flex justify-center items-end gap-3 md:gap-6 max-w-5xl mx-auto px-2">
+              <div className="mx-auto grid max-w-5xl grid-cols-2 items-end justify-items-center gap-3 px-2 md:flex md:justify-center md:gap-6">
                 {/* 2nd Place - Left */}
                 {topAlbums[1] && (
                   <Link
                     href={`/album/${topAlbums[1].spotify_id}`}
-                    className="flex-1 max-w-[180px] md:max-w-[220px] bg-[#1c1c1e] backdrop-blur-sm rounded-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300 shadow-xl border border-gray-400/20 relative group"
+                    className="group relative order-2 w-full max-w-[180px] overflow-hidden rounded-xl border border-gray-400/20 bg-[#1c1c1e] shadow-xl backdrop-blur-sm transition-all duration-300 hover:scale-105 md:order-none md:flex-1 md:max-w-[220px]"
                   >
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-gray-400/10 to-transparent opacity-50 pointer-events-none"></div>
                     <div className="relative">
@@ -325,7 +325,7 @@ export default function HomePage() {
                 {topAlbums[0] && (
                   <Link
                     href={`/album/${topAlbums[0].spotify_id}`}
-                    className="flex-1 max-w-[220px] md:max-w-[300px] bg-[#1c1c1e] backdrop-blur-sm rounded-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300 shadow-2xl shadow-yellow-500/10 border border-yellow-500/30 relative -mt-8 group"
+                    className="group relative order-1 col-span-2 w-full max-w-[240px] overflow-hidden rounded-xl border border-yellow-500/30 bg-[#1c1c1e] shadow-2xl shadow-yellow-500/10 backdrop-blur-sm transition-all duration-300 hover:scale-105 md:order-none md:-mt-8 md:flex-1 md:max-w-[300px]"
                   >
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-yellow-500/20 to-transparent opacity-60 pointer-events-none"></div>
                     <div className="relative">
@@ -364,7 +364,7 @@ export default function HomePage() {
                 {topAlbums[2] && (
                   <Link
                     href={`/album/${topAlbums[2].spotify_id}`}
-                    className="flex-1 max-w-[160px] md:max-w-[200px] bg-[#1c1c1e] backdrop-blur-sm rounded-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300 shadow-xl border border-amber-700/20 relative group"
+                    className="group relative order-3 w-full max-w-[160px] overflow-hidden rounded-xl border border-amber-700/20 bg-[#1c1c1e] shadow-xl backdrop-blur-sm transition-all duration-300 hover:scale-105 md:order-none md:flex-1 md:max-w-[200px]"
                   >
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-amber-700/10 to-transparent opacity-50 pointer-events-none"></div>
                     <div className="relative">
@@ -408,7 +408,7 @@ export default function HomePage() {
             <div className="flex justify-center mt-12 max-w-5xl mx-auto px-2">
               <Link
                 href="/discover"
-                className="inline-flex items-center gap-2 bg-wine-600 hover:bg-wine-700 text-white text-base font-semibold py-3 px-8 rounded-full transition-all duration-200 shadow-md hover:shadow-lg"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-wine-600 px-8 py-3 text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-wine-700 hover:shadow-lg"
               >
                 Discover More Albums
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

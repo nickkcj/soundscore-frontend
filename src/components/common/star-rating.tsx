@@ -1,6 +1,6 @@
 'use client';
 
-import { Star, StarHalf } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface StarRatingProps {
@@ -33,53 +33,61 @@ export function StarRating({
   };
 
   return (
-    <div className="flex items-center gap-0.5">
+    <div
+      className="flex items-center gap-0.5"
+      role={interactive ? 'group' : 'img'}
+      aria-label={interactive ? `Select a rating, current rating ${rating} out of ${maxRating}` : `Rating: ${rating} out of ${maxRating}`}
+    >
       {Array.from({ length: maxRating }, (_, i) => {
         const value = i + 1;
         const isFull = value <= rating;
         const isHalf = !isFull && value - 0.5 <= rating;
 
+        const star = isHalf ? (
+          <div className="relative">
+            <Star
+              className={cn(
+                sizeClasses[size],
+                'fill-transparent text-muted-foreground/40'
+              )}
+            />
+            <div className="absolute inset-0 w-1/2 overflow-hidden">
+              <Star
+                className={cn(
+                  sizeClasses[size],
+                  'fill-amber-400 text-amber-400'
+                )}
+              />
+            </div>
+          </div>
+        ) : (
+          <Star
+            className={cn(
+              sizeClasses[size],
+              'transition-colors',
+              isFull
+                ? 'fill-amber-400 text-amber-400'
+                : 'fill-transparent text-muted-foreground/40'
+            )}
+          />
+        );
+
+        if (!interactive) {
+          return <span key={i} aria-hidden="true">{star}</span>;
+        }
+
         return (
           <button
             key={i}
             type="button"
-            disabled={!interactive}
             onClick={() => handleClick(value)}
+            aria-label={`${value} out of ${maxRating} stars`}
+            aria-pressed={value === rating}
             className={cn(
-              'transition-colors relative',
-              interactive && 'cursor-pointer hover:scale-110',
-              !interactive && 'cursor-default'
+              'relative cursor-pointer transition-colors hover:scale-110'
             )}
           >
-            {isHalf ? (
-              // Half star: show empty star with half filled overlay
-              <div className="relative">
-                <Star
-                  className={cn(
-                    sizeClasses[size],
-                    'fill-transparent text-muted-foreground/40'
-                  )}
-                />
-                <div className="absolute inset-0 overflow-hidden w-1/2">
-                  <Star
-                    className={cn(
-                      sizeClasses[size],
-                      'fill-amber-400 text-amber-400'
-                    )}
-                  />
-                </div>
-              </div>
-            ) : (
-              <Star
-                className={cn(
-                  sizeClasses[size],
-                  'transition-colors',
-                  isFull
-                    ? 'fill-amber-400 text-amber-400'
-                    : 'fill-transparent text-muted-foreground/40'
-                )}
-              />
-            )}
+            {star}
           </button>
         );
       })}

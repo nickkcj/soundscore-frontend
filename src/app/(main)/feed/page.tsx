@@ -118,10 +118,10 @@ export default function FeedPage() {
   const error = feedError ? (feedError as Error).message : null;
 
   return (
-    <div className="bg-background min-h-screen relative">
+    <div className="app-usable-viewport relative min-w-0 bg-background">
 
-      <div className="container mx-auto px-4 py-10">
-        <div className="flex flex-col lg:flex-row gap-10">
+      <div className="container mx-auto px-4 py-3 sm:py-6 lg:py-10">
+        <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:gap-10">
           {/* LEFT SIDEBAR: Groups — hidden on mobile (groups have their own tab in the bottom bar) */}
           <div className="hidden lg:block lg:w-64 w-full flex-shrink-0">
             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden sticky top-28">
@@ -211,11 +211,11 @@ export default function FeedPage() {
           </div>
 
           {/* MAIN CONTENT: Feed */}
-          <div className="lg:flex-1 mt-3">
+          <div className="min-w-0 lg:mt-3 lg:flex-1">
             {error && (
-              <div className="bg-red-50 dark:bg-red-950 text-red-600 p-4 rounded-xl mb-8 shadow-sm border border-red-100 dark:border-red-900">
+              <div className="mb-4 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600 shadow-sm dark:border-red-900 dark:bg-red-950 sm:mb-8 sm:p-4">
                 {error}
-                <Button variant="link" className="ml-2" onClick={() => refetch()}>
+                <Button variant="link" className="ml-1 min-h-11 px-2" onClick={() => refetch()}>
                   Try again
                 </Button>
               </div>
@@ -223,25 +223,27 @@ export default function FeedPage() {
 
             {/* Painel no mesmo padrão dos sidebars (My Groups/Trending Albums) */}
             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-              <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-                <h1 className="font-semibold text-foreground flex items-center">
+              <div className="flex min-h-14 items-center justify-between gap-2 border-b border-border px-3 py-2 sm:px-5 sm:py-4">
+                <h1 className="flex min-w-0 items-center text-sm font-semibold text-foreground sm:text-base">
                   <Music className="h-4 w-4 mr-2 text-wine-500" />
                   Latest Reviews
                 </h1>
-                <div className="flex items-center gap-2">
+                <div className="flex shrink-0 items-center gap-1 sm:gap-2">
                   {/* Reload Button */}
                   <button
                     onClick={handleReload}
                     disabled={isRefetching}
-                    className="text-sm text-wine-600 dark:text-wine-300 font-medium flex items-center p-1.5 rounded-full hover:bg-wine-50 dark:hover:bg-wine-950 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex h-11 w-11 items-center justify-center rounded-full text-sm font-medium text-wine-600 transition-colors hover:bg-wine-50 disabled:cursor-not-allowed disabled:opacity-50 dark:text-wine-300 dark:hover:bg-wine-950"
                     title="Reload feed"
+                    aria-label="Reload feed"
                   >
                     <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
                   </button>
                   {/* Sort Toggle Button */}
                   <button
                     onClick={toggleSort}
-                    className="text-sm text-wine-600 dark:text-wine-300 font-medium flex items-center px-2.5 py-1.5 rounded-full hover:bg-wine-50 dark:hover:bg-wine-950 transition-colors"
+                    className="flex min-h-11 items-center rounded-full px-2 text-xs font-medium text-wine-600 transition-colors hover:bg-wine-50 dark:text-wine-300 dark:hover:bg-wine-950 sm:px-2.5 sm:text-sm"
+                    aria-label={sortOrder === 'desc' ? 'Show oldest reviews first' : 'Show latest reviews first'}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -249,11 +251,11 @@ export default function FeedPage() {
                       viewBox="0 0 24 24"
                       strokeWidth="1.5"
                       stroke="currentColor"
-                      className={`w-4 h-4 mr-1 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
+                      className={`h-4 w-4 transition-transform sm:mr-1 ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" />
                     </svg>
-                    <span>{sortOrder === 'desc' ? 'Latest first' : 'Oldest first'}</span>
+                    <span className="hidden min-[390px]:inline">{sortOrder === 'desc' ? 'Latest first' : 'Oldest first'}</span>
                   </button>
                 </div>
               </div>
@@ -265,8 +267,8 @@ export default function FeedPage() {
                 ))}
               </div>
             ) : reviews.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16 text-wine-200 dark:text-wine-800 mb-4">
+              <div className="flex flex-col items-center justify-center px-4 py-10 text-center sm:py-16">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="mb-3 h-12 w-12 text-wine-200 dark:text-wine-800 sm:mb-4 sm:h-16 sm:w-16">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
                 </svg>
                 <p className="text-muted-foreground font-medium">No recent reviews yet.</p>
@@ -295,10 +297,10 @@ export default function FeedPage() {
 
             {/* Load more button */}
             {hasMore && !isLoadingMore && reviews.length > 0 && (
-              <div className="mt-12 text-center">
+              <div className="mt-5 text-center sm:mt-12">
                 <button
                   onClick={handleLoadMore}
-                  className="px-6 py-2.5 bg-wine-600 hover:bg-wine-700 text-white rounded-full text-sm font-medium transition-all hover:shadow-md flex items-center mx-auto"
+                  className="mx-auto flex min-h-11 items-center rounded-full bg-wine-600 px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-wine-700 hover:shadow-md"
                 >
                   <span>Load more</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -310,7 +312,7 @@ export default function FeedPage() {
           </div>
 
           {/* RIGHT SIDEBAR: Trending Albums & Suggested Users */}
-          <div className="lg:w-72 w-full">
+          <div className="hidden w-full lg:block lg:w-72">
             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden sticky top-28">
               {/* Trending Albums Section */}
               <div className="px-5 py-4 border-b border-border">
@@ -484,9 +486,9 @@ function TrendingAlbumSkeleton() {
 
 function FeedSkeleton() {
   return (
-    <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-10">
-        <div className="flex flex-col lg:flex-row gap-10">
+    <div className="app-usable-viewport bg-background">
+      <div className="container mx-auto px-4 py-3 sm:py-6 lg:py-10">
+        <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:gap-10">
           {/* Left Sidebar Skeleton — hidden on mobile */}
           <div className="hidden lg:block lg:w-64 w-full flex-shrink-0">
             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
@@ -508,10 +510,10 @@ function FeedSkeleton() {
           </div>
 
           {/* Main Content Skeleton */}
-          <div className="lg:flex-1 space-y-10">
-            <div className="flex items-center justify-between mb-6">
-              <div className="h-8 w-40 rounded bg-muted animate-pulse" />
-              <div className="h-8 w-28 rounded-full bg-muted animate-pulse" />
+          <div className="min-w-0 space-y-4 lg:flex-1 lg:space-y-10">
+            <div className="mb-3 flex min-h-14 items-center justify-between sm:mb-6">
+              <div className="h-6 w-36 rounded bg-muted animate-pulse sm:h-8 sm:w-40" />
+              <div className="h-11 w-24 rounded-full bg-muted animate-pulse sm:w-28" />
             </div>
             {Array.from({ length: 3 }).map((_, i) => (
               <ReviewCardSkeleton key={i} />
@@ -519,7 +521,7 @@ function FeedSkeleton() {
           </div>
 
           {/* Right Sidebar Skeleton */}
-          <div className="lg:w-72 w-full">
+          <div className="hidden w-full lg:block lg:w-72">
             <div className="bg-card rounded-xl shadow-sm border border-border p-5">
               <div className="space-y-4">
                 {Array.from({ length: 5 }).map((_, i) => (

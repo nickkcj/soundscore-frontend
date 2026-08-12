@@ -68,8 +68,8 @@ export function LibraryTab({ username }: LibraryTabProps) {
 
   if (!status?.connected) {
     return (
-      <div className="text-center py-12">
-        <Music className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+      <div className="text-center py-8 md:py-12">
+        <Music className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-muted-foreground/30" />
         <h3 className="text-lg font-medium mb-2">Spotify Not Connected</h3>
         <p className="text-muted-foreground mb-4">
           {isOwnProfile
@@ -91,34 +91,34 @@ export function LibraryTab({ username }: LibraryTabProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Stats Header */}
       {!statsLoading && stats && (
-        <div className="grid grid-cols-3 gap-4 p-4 bg-card rounded-lg border">
+        <div className="grid grid-cols-3 gap-2 rounded-lg border bg-card p-3 sm:gap-4 sm:p-4">
           <div className="text-center">
-            <span className="block text-2xl font-bold text-foreground">
+            <span className="block text-xl font-bold text-foreground sm:text-2xl">
               {stats.total_scrobbles}
             </span>
-            <span className="text-sm text-muted-foreground">Scrobbles</span>
+            <span className="text-xs text-muted-foreground sm:text-sm">Scrobbles</span>
           </div>
           <div className="text-center">
-            <span className="block text-lg font-bold text-foreground truncate">
+            <span className="block truncate text-sm font-bold text-foreground sm:text-lg">
               {stats.top_artist?.name || '-'}
             </span>
-            <span className="text-sm text-muted-foreground">Top Artist</span>
+            <span className="text-xs text-muted-foreground sm:text-sm">Top Artist</span>
           </div>
           <div className="text-center">
-            <span className="block text-lg font-bold text-foreground truncate">
+            <span className="block truncate text-sm font-bold text-foreground sm:text-lg">
               {stats.top_track?.name || '-'}
             </span>
-            <span className="text-sm text-muted-foreground">Top Track</span>
+            <span className="text-xs text-muted-foreground sm:text-sm">Top Track</span>
           </div>
         </div>
       )}
 
       {/* Activity Chart */}
       {stats?.scrobbles_by_day && stats.scrobbles_by_day.length > 0 && (
-        <div className="p-4 bg-card rounded-lg border">
+        <div className="rounded-lg border bg-card p-3 sm:p-4">
           <ActivityChart data={stats.scrobbles_by_day} isLoading={statsLoading} />
         </div>
       )}
@@ -129,6 +129,7 @@ export function LibraryTab({ username }: LibraryTabProps) {
           <Button
             variant="outline"
             size="sm"
+            className="h-11"
             onClick={handleSync}
             disabled={isSyncing}
           >
@@ -143,10 +144,10 @@ export function LibraryTab({ username }: LibraryTabProps) {
       )}
 
       {/* Sub-tabs */}
-      <div className="flex gap-2 border-b border-border">
+      <div className="-mx-4 flex gap-1 overflow-x-auto border-b border-border px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0">
         <button
           onClick={() => setActiveSubTab('scrobbles')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+          className={`min-h-11 shrink-0 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
             activeSubTab === 'scrobbles'
               ? 'border-primary text-foreground'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -156,7 +157,7 @@ export function LibraryTab({ username }: LibraryTabProps) {
         </button>
         <button
           onClick={() => setActiveSubTab('artists')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+          className={`min-h-11 shrink-0 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
             activeSubTab === 'artists'
               ? 'border-primary text-foreground'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -166,7 +167,7 @@ export function LibraryTab({ username }: LibraryTabProps) {
         </button>
         <button
           onClick={() => setActiveSubTab('tracks')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+          className={`min-h-11 shrink-0 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
             activeSubTab === 'tracks'
               ? 'border-primary text-foreground'
               : 'border-transparent text-muted-foreground hover:text-foreground'

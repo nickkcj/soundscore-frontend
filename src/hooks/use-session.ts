@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
 import { sessionsApi } from '@/lib/sessions-api';
-import { ApiException } from '@/lib/api';
 import type { SessionState, SessionPresencePayload } from '@/types/sessions';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 

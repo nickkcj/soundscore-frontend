@@ -181,7 +181,7 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
         onOpenChange(v);
       }}
     >
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-lg overflow-y-auto p-4 sm:max-h-[90vh] sm:w-full sm:p-6">
         <DialogHeader>
           <DialogTitle>Create Listening Party</DialogTitle>
         </DialogHeader>
@@ -191,7 +191,7 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
           <button
             type="button"
             onClick={() => setMode('spotify')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+            className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-2 py-2 text-sm font-medium transition-all sm:px-3 ${
               mode === 'spotify'
                 ? 'bg-background shadow-sm text-foreground'
                 : 'text-muted-foreground hover:text-foreground'
@@ -203,7 +203,7 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
           <button
             type="button"
             onClick={() => setMode('manual')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+            className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-2 py-2 text-sm font-medium transition-all sm:px-3 ${
               mode === 'manual'
                 ? 'bg-background shadow-sm text-foreground'
                 : 'text-muted-foreground hover:text-foreground'
@@ -250,7 +250,7 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
         {/* Manual Mode */}
         {mode === 'manual' && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="manual-artist">Artist</Label>
                 <Input
@@ -343,17 +343,17 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
         )}
 
         {/* Footer */}
-        <div className="flex gap-3 pt-2">
+        <div className="grid grid-cols-2 gap-2 pt-2 sm:gap-3">
           <Button
             variant="outline"
-            className="flex-1"
+            className="h-11 w-full"
             onClick={() => onOpenChange(false)}
             disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button
-            className="flex-1 bg-wine-600 hover:bg-wine-700 text-white"
+            className="h-11 w-full bg-wine-600 text-white hover:bg-wine-700"
             onClick={handleSubmit}
             disabled={!canSubmit || isSubmitting}
           >

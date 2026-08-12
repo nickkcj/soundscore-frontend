@@ -23,8 +23,8 @@ export function ScrobbleList({ scrobbles, isLoading }: ScrobbleListProps) {
 
   if (scrobbles.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <Music className="w-12 h-12 mx-auto mb-2 opacity-30" />
+      <div className="text-center py-6 text-muted-foreground">
+        <Music className="w-10 h-10 mx-auto mb-2 opacity-30" />
         <p>No scrobbles yet</p>
         <p className="text-sm">Connect Spotify and sync to see your listening history</p>
       </div>
@@ -42,7 +42,7 @@ export function ScrobbleList({ scrobbles, isLoading }: ScrobbleListProps) {
 
 function ScrobbleItem({ scrobble }: { scrobble: Scrobble }) {
   return (
-    <div className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors">
+    <div className="flex min-w-0 items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50">
       {/* Album Art */}
       <div className="relative w-10 h-10 rounded overflow-hidden bg-muted flex-shrink-0">
         {scrobble.album_image_url ? (
@@ -66,7 +66,7 @@ function ScrobbleItem({ scrobble }: { scrobble: Scrobble }) {
       </div>
 
       {/* Time */}
-      <div className="text-xs text-muted-foreground flex-shrink-0">
+      <div className="max-w-20 flex-shrink-0 text-right text-[11px] leading-tight text-muted-foreground sm:max-w-none sm:text-xs">
         {formatDistanceToNow(new Date(scrobble.played_at), { addSuffix: true })}
       </div>
     </div>

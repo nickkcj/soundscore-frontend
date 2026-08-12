@@ -87,9 +87,9 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-3xl px-4 py-12">
+        <main className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
           <div className="flex flex-col items-center gap-4">
-            <Skeleton className="h-48 w-48 rounded-xl" />
+            <Skeleton className="h-32 w-32 rounded-xl md:h-48 md:w-48" />
             <Skeleton className="h-6 w-56" />
             <Skeleton className="h-4 w-36" />
             <Skeleton className="h-40 w-full rounded-xl mt-4" />
@@ -102,7 +102,7 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
   if (error || !session) {
     return (
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-3xl px-4 py-20 text-center">
+        <main className="container mx-auto max-w-3xl px-4 py-12 text-center md:py-20">
           <h1 className="text-2xl font-bold text-foreground mb-2">Session not found</h1>
           <p className="text-muted-foreground mb-6">
             Double-check that the code <span className="font-mono font-semibold">{code.toUpperCase()}</span> is correct.
@@ -117,7 +117,7 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto max-w-3xl px-4 py-6 md:py-10">
+      <main className="container mx-auto max-w-3xl px-4 py-4 md:py-10">
         {session.status === 'lobby' && (
           <LobbyView
             session={session}

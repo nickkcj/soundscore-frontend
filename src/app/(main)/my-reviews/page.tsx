@@ -79,9 +79,9 @@ export default function MyReviewsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/50">
-      <main className="container mx-auto max-w-7xl px-4 py-12 md:py-20">
+      <main className="container mx-auto max-w-7xl px-4 py-6 md:py-20">
         {/* User Profile Section */}
-        <section className="mb-16 md:mb-20">
+        <section className="mb-8 md:mb-20">
           <div className="relative overflow-hidden rounded-2xl shadow-lg bg-wine-600 text-white">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-15">
@@ -97,7 +97,7 @@ export default function MyReviewsPage() {
               </svg>
             </div>
 
-            <div className="relative p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
+            <div className="relative flex flex-wrap items-center gap-4 p-4 sm:p-6 md:flex-nowrap md:gap-8 md:p-10">
               {/* Profile Picture */}
               <div className="flex-shrink-0 relative">
                 <div className="rounded-full overflow-hidden ring-4 ring-white/30 shadow-xl">
@@ -106,20 +106,20 @@ export default function MyReviewsPage() {
                     alt={user.username}
                     width={160}
                     height={160}
-                    className="w-32 h-32 md:w-40 md:h-40 object-cover"
+                    className="h-20 w-20 object-cover sm:h-24 sm:w-24 md:h-40 md:w-40"
                   />
                 </div>
               </div>
 
               {/* User Info */}
-              <div className="text-center md:text-left">
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">{user.username}</h1>
-                <div className="flex flex-wrap justify-center md:justify-start gap-4 mb-6 mt-2">
-                  <div className="bg-white/20 backdrop-blur-sm py-1.5 px-4 rounded-full">
+              <div className="min-w-0 flex-1 text-left">
+                <h1 className="mb-2 truncate text-2xl font-bold md:text-4xl">{user.username}</h1>
+                <div className="flex flex-wrap justify-start gap-2 md:mb-6 md:mt-2 md:gap-4">
+                  <div className="rounded-full bg-white/20 px-3 py-1.5 text-sm backdrop-blur-sm md:px-4 md:text-base">
                     <span className="font-medium">{total || 0}</span>
                     <span className="text-white/80 ml-1">Reviews</span>
                   </div>
-                  <div className="bg-white/20 backdrop-blur-sm py-1.5 px-4 rounded-full flex items-center">
+                  <div className="flex items-center rounded-full bg-white/20 px-3 py-1.5 text-sm backdrop-blur-sm md:px-4 md:text-base">
                     <Star className="w-4 h-4 mr-1 text-yellow-300 fill-yellow-300" />
                     <span className="font-medium">{averageRating}</span>
                     <span className="text-white/80 ml-1">Avg</span>
@@ -128,10 +128,10 @@ export default function MyReviewsPage() {
               </div>
 
               {/* Create New Review Button */}
-              <div className="md:ml-auto">
+              <div className="w-full md:ml-auto md:w-auto">
                 <button
                   onClick={() => setCreateReviewOpen(true)}
-                  className="inline-flex items-center px-6 py-3 bg-background text-wine-600 dark:text-wine-400 font-medium rounded-full hover:bg-muted transition duration-300 shadow-md"
+                  className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-background px-5 py-2.5 font-medium text-wine-600 shadow-md transition active:scale-[0.98] md:w-auto md:rounded-full md:px-6 md:py-3 md:hover:bg-muted dark:text-wine-400"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Create New Review
@@ -142,23 +142,26 @@ export default function MyReviewsPage() {
         </section>
 
         {/* Favorite Albums Section */}
-        <section className="mb-16 md:mb-20">
-          <h2 className="text-3xl font-bold text-foreground mb-6 border-b border-border pb-3 flex items-center">
-            <Heart className="w-8 h-8 mr-2 text-wine-500 fill-wine-500" />
+        <section className="mb-8 md:mb-20">
+          <h2 className="mb-4 flex items-center border-b border-border pb-3 text-2xl font-bold text-foreground md:mb-6 md:text-3xl">
+            <Heart className="mr-2 h-6 w-6 fill-wine-500 text-wine-500 md:h-8 md:w-8" />
             Favorite Albums
           </h2>
           {favoriteAlbums.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
               {favoriteAlbums.map((review) => (
-                <div
+                <button
+                  type="button"
                   key={review.id}
-                  className="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border transform hover:-translate-y-1 group"
+                  aria-label={`View review of ${review.album.title}`}
+                  className="group min-w-0 overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wine-500 md:hover:-translate-y-1 md:hover:shadow-xl"
+                  onClick={() => setViewReview(review)}
                 >
                   <div className="aspect-square overflow-hidden relative">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-start p-3 z-10">
+                    <div className="absolute inset-x-0 bottom-0 z-10 flex items-end bg-gradient-to-t from-black/80 to-transparent p-2 pt-8 opacity-100 transition-opacity md:p-3 md:opacity-0 md:group-hover:opacity-100">
                       <div className="flex items-center">
                         <StarRating rating={review.rating} size="sm" />
-                        <span className="ml-2 text-sm text-white font-medium">({review.rating}/5)</span>
+                        <span className="ml-1.5 text-xs font-medium text-white md:text-sm">{review.rating}/5</span>
                       </div>
                     </div>
                     <Image
@@ -166,19 +169,19 @@ export default function MyReviewsPage() {
                       alt={review.album.title}
                       width={300}
                       height={300}
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                      className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-105"
                     />
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-foreground truncate mb-1">{review.album.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">{review.album.artist}</p>
+                  <div className="min-w-0 p-2.5 md:p-4">
+                    <h3 className="mb-0.5 truncate text-sm font-semibold text-foreground md:mb-1 md:text-lg">{review.album.title}</h3>
+                    <p className="truncate text-xs text-muted-foreground md:text-sm">{review.album.artist}</p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           ) : (
-            <div className="bg-card border border-border rounded-lg p-8 text-center">
-              <Heart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+            <div className="rounded-xl border border-border bg-card p-6 text-center md:p-8">
+              <Heart className="mx-auto mb-3 h-10 w-10 text-muted-foreground/30 md:mb-4 md:h-16 md:w-16" />
               <p className="text-muted-foreground italic">You haven&apos;t marked any albums as favorites yet.</p>
             </div>
           )}
@@ -186,20 +189,20 @@ export default function MyReviewsPage() {
 
         {/* All Reviews Section */}
         <section>
-          <h2 className="text-3xl font-bold text-foreground mb-6 border-b border-border pb-3 flex items-center">
-            <ClipboardList className="w-8 h-8 mr-2 text-wine-500" />
+          <h2 className="mb-4 flex items-center border-b border-border pb-3 text-2xl font-bold text-foreground md:mb-6 md:text-3xl">
+            <ClipboardList className="mr-2 h-6 w-6 text-wine-500 md:h-8 md:w-8" />
             All Reviews
           </h2>
           {isLoading && reviews.length === 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-6">
               {Array.from({ length: 4 }).map((_, i) => (
                 <ReviewItemSkeleton key={i} />
               ))}
             </div>
           ) : reviews.length === 0 ? (
-            <div className="text-center py-16 bg-card rounded-xl shadow-sm border border-border">
-              <div className="bg-wine-50 dark:bg-wine-950/30 w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6">
-                <ClipboardList className="w-12 h-12 text-wine-400" />
+            <div className="rounded-xl border border-border bg-card px-4 py-10 text-center shadow-sm md:py-16">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-wine-50 md:mb-6 md:h-24 md:w-24 dark:bg-wine-950/30">
+                <ClipboardList className="h-8 w-8 text-wine-400 md:h-12 md:w-12" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">No Reviews Yet</h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
@@ -207,7 +210,7 @@ export default function MyReviewsPage() {
               </p>
               <button
                 onClick={() => setCreateReviewOpen(true)}
-                className="inline-flex items-center px-6 py-3 bg-wine-600 hover:bg-wine-700 text-white font-medium rounded-full transition duration-300 shadow-md"
+                className="inline-flex min-h-11 items-center rounded-full bg-wine-600 px-6 py-3 font-medium text-white shadow-md transition active:scale-[0.98] md:hover:bg-wine-700"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Write Your First Review
@@ -219,49 +222,56 @@ export default function MyReviewsPage() {
               isLoading={isLoading}
               onLoadMore={() => fetchReviews(false)}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-6">
                 {reviews.map((review) => (
                   <div
                     key={review.id}
-                    className="flex bg-card rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-border overflow-hidden relative min-h-[140px] cursor-pointer"
-                    onClick={() => setViewReview(review)}
+                    className="relative flex min-h-28 overflow-hidden rounded-xl border border-border bg-card shadow-sm transition md:min-h-[140px] md:hover:shadow-lg"
                   >
-                    {/* Album Cover */}
-                    <div className="w-[140px] flex-shrink-0 relative">
-                      <Image
-                        src={review.album.cover_image || '/images/default_album.png'}
-                        alt={review.album.title}
-                        width={300}
-                        height={300}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    {/* Review Content */}
-                    <div className="flex-1 p-4 pr-12 flex flex-col">
-                      <h3 className="text-lg font-semibold text-foreground truncate">{review.album.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">{review.album.artist}</p>
-
-                      {review.text && (
-                        <p className="text-sm text-muted-foreground italic line-clamp-2 mb-2">&quot;{review.text}&quot;</p>
-                      )}
-
-                      <div className="mt-auto flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <StarRating rating={review.rating} size="sm" />
-                          <span className="text-sm text-muted-foreground">{review.rating}/5</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground/70">
-                          {review.created_at?.slice(0, 10) || 'N/A'}
-                        </span>
+                    <button
+                      type="button"
+                      onClick={() => setViewReview(review)}
+                      aria-label={`View review of ${review.album.title}`}
+                      className="flex min-w-0 flex-1 text-left transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-wine-500"
+                    >
+                      {/* Album Cover */}
+                      <div className="relative w-24 flex-shrink-0 sm:w-28 md:w-[140px]">
+                        <Image
+                          src={review.album.cover_image || '/images/default_album.png'}
+                          alt={review.album.title}
+                          width={300}
+                          height={300}
+                          className="h-full w-full object-cover"
+                        />
                       </div>
-                    </div>
+
+                      {/* Review Content */}
+                      <div className="flex min-w-0 flex-1 flex-col p-3 pr-12 md:p-4 md:pr-12">
+                        <h3 className="truncate text-sm font-semibold text-foreground md:text-lg">{review.album.title}</h3>
+                        <p className="mb-1 truncate text-xs text-muted-foreground md:mb-2 md:text-sm">{review.album.artist}</p>
+
+                        {review.text && (
+                          <p className="mb-1 line-clamp-2 text-xs italic text-muted-foreground md:mb-2 md:text-sm">&quot;{review.text}&quot;</p>
+                        )}
+
+                        <div className="mt-auto flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <StarRating rating={review.rating} size="sm" />
+                            <span className="hidden text-sm text-muted-foreground sm:inline">{review.rating}/5</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground/70">
+                            {review.created_at?.slice(0, 10) || 'N/A'}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
 
                     {/* Action Buttons */}
-                    <div className="absolute top-2 right-2 flex flex-col gap-2">
+                    <div className="absolute right-1 top-1 z-10 flex flex-col md:right-2 md:top-2 md:gap-1">
                       <button
                         onClick={(e) => { e.stopPropagation(); openDeleteDialog(review); }}
-                        className="p-1.5 bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400 rounded-full hover:bg-wine-100 dark:hover:bg-wine-950/50 transition-colors duration-200"
+                        aria-label={`Delete review of ${review.album.title}`}
+                        className="flex h-11 w-11 items-center justify-center rounded-full text-wine-600 transition-colors active:bg-wine-100 md:h-9 md:w-9 md:bg-wine-50 md:hover:bg-wine-100 dark:text-wine-400 md:dark:bg-wine-950/30 md:dark:hover:bg-wine-950/50"
                         title="Delete Review"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -270,7 +280,8 @@ export default function MyReviewsPage() {
                         href={`/reviews/${review.id}/edit`}
                         onClick={(e) => e.stopPropagation()}
                         title="Edit Review"
-                        className="p-1.5 bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400 rounded-full hover:bg-wine-100 dark:hover:bg-wine-950/50 transition-colors duration-200"
+                        aria-label={`Edit review of ${review.album.title}`}
+                        className="flex h-11 w-11 items-center justify-center rounded-full text-wine-600 transition-colors active:bg-wine-100 md:h-9 md:w-9 md:bg-wine-50 md:hover:bg-wine-100 dark:text-wine-400 md:dark:bg-wine-950/30 md:dark:hover:bg-wine-950/50"
                       >
                         <Pencil className="w-4 h-4" />
                       </Link>
@@ -292,12 +303,12 @@ export default function MyReviewsPage() {
 
       {/* View Review Modal */}
       <Dialog open={!!viewReview} onOpenChange={() => setViewReview(null)}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-4 sm:max-w-lg sm:p-6">
           {viewReview && (
             <div className="space-y-4">
               {/* Album Info */}
-              <div className="flex gap-4">
-                <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+              <div className="flex min-w-0 gap-3 sm:gap-4">
+                <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg sm:h-24 sm:w-24">
                   <Image
                     src={viewReview.album.cover_image || '/images/default_album.png'}
                     alt={viewReview.album.title}
@@ -307,8 +318,8 @@ export default function MyReviewsPage() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-bold text-foreground">{viewReview.album.title}</h2>
-                  <p className="text-muted-foreground">{viewReview.album.artist}</p>
+                  <DialogTitle className="truncate text-lg font-bold leading-normal text-foreground sm:text-xl">{viewReview.album.title}</DialogTitle>
+                  <p className="truncate text-sm text-muted-foreground sm:text-base">{viewReview.album.artist}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <StarRating rating={viewReview.rating} size="md" />
                     <span className="text-muted-foreground">{viewReview.rating}/5</span>
@@ -326,21 +337,21 @@ export default function MyReviewsPage() {
               )}
 
               {/* Footer */}
-              <div className="flex items-center justify-between pt-2 border-t border-border">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-2">
                 <span className="text-sm text-muted-foreground">
                   {viewReview.created_at?.slice(0, 10)}
                 </span>
                 <div className="flex gap-2">
                   <Link
                     href={`/reviews/${viewReview.id}/edit`}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400 rounded-lg hover:bg-wine-100 dark:hover:bg-wine-950/50 transition-colors"
+                    className="inline-flex min-h-11 items-center gap-1 rounded-lg bg-wine-50 px-3 py-2 text-sm text-wine-600 transition-colors active:bg-wine-100 md:hover:bg-wine-100 dark:bg-wine-950/30 dark:text-wine-400 dark:active:bg-wine-950/50 md:dark:hover:bg-wine-950/50"
                   >
                     <Pencil className="w-4 h-4" />
                     Edit
                   </Link>
                   <button
                     onClick={() => { setViewReview(null); openDeleteDialog(viewReview); }}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors"
+                    className="inline-flex min-h-11 items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition-colors active:bg-red-100 md:hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400 dark:active:bg-red-950/50 md:dark:hover:bg-red-950/50"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete
@@ -354,10 +365,10 @@ export default function MyReviewsPage() {
 
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="rounded-2xl max-w-md">
+        <DialogContent className="max-w-[calc(100%-2rem)] rounded-2xl p-5 sm:max-w-md sm:p-6">
           <DialogHeader>
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-              <Trash2 className="h-10 w-10 text-red-500" />
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 sm:mb-4 sm:h-16 sm:w-16">
+              <Trash2 className="h-7 w-7 text-red-500 sm:h-10 sm:w-10" />
             </div>
             <DialogTitle className="text-center text-xl font-bold text-foreground">Delete Review</DialogTitle>
             <DialogDescription className="text-center text-muted-foreground">
@@ -365,7 +376,7 @@ export default function MyReviewsPage() {
             </DialogDescription>
             <p className="text-muted-foreground text-sm mt-2 text-center">This action cannot be undone.</p>
           </DialogHeader>
-          <DialogFooter className="flex justify-center gap-4 sm:justify-center">
+          <DialogFooter className="flex flex-row justify-center gap-3 sm:justify-center sm:gap-4">
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
@@ -406,15 +417,15 @@ function ReviewItemSkeleton() {
 function MyReviewsSkeleton() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/50">
-      <main className="container mx-auto max-w-7xl px-4 py-12 md:py-20">
+      <main className="container mx-auto max-w-7xl px-4 py-6 md:py-20">
         {/* Profile Header Skeleton */}
-        <section className="mb-16 md:mb-20">
-          <div className="rounded-2xl shadow-lg bg-wine-600 p-8 md:p-10">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-white/20 animate-pulse" />
-              <div className="space-y-4 text-center md:text-left">
-                <div className="h-8 w-40 bg-white/20 rounded animate-pulse mx-auto md:mx-0" />
-                <div className="flex gap-4 justify-center md:justify-start">
+        <section className="mb-8 md:mb-20">
+          <div className="rounded-2xl bg-wine-600 p-4 shadow-lg sm:p-6 md:p-10">
+            <div className="flex items-center gap-4 md:gap-8">
+              <div className="h-20 w-20 shrink-0 animate-pulse rounded-full bg-white/20 sm:h-24 sm:w-24 md:h-40 md:w-40" />
+              <div className="min-w-0 space-y-3 text-left md:space-y-4">
+                <div className="h-7 w-32 animate-pulse rounded bg-white/20 md:h-8 md:w-40" />
+                <div className="flex gap-2 md:gap-4">
                   <div className="h-8 w-24 bg-white/20 rounded-full animate-pulse" />
                   <div className="h-8 w-24 bg-white/20 rounded-full animate-pulse" />
                 </div>
@@ -424,13 +435,13 @@ function MyReviewsSkeleton() {
         </section>
 
         {/* Favorites Skeleton */}
-        <section className="mb-16">
-          <div className="h-10 w-48 bg-muted rounded mb-6 animate-pulse" />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <section className="mb-8 md:mb-16">
+          <div className="mb-4 h-8 w-48 animate-pulse rounded bg-muted md:mb-6 md:h-10" />
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="bg-card rounded-lg overflow-hidden shadow-md">
                 <div className="aspect-square bg-muted animate-pulse" />
-                <div className="p-4 space-y-2">
+                <div className="space-y-2 p-2.5 md:p-4">
                   <div className="h-5 w-3/4 bg-muted rounded animate-pulse" />
                   <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
                 </div>
@@ -441,8 +452,8 @@ function MyReviewsSkeleton() {
 
         {/* Reviews Skeleton */}
         <section>
-          <div className="h-10 w-36 bg-muted rounded mb-6 animate-pulse" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="mb-4 h-8 w-36 animate-pulse rounded bg-muted md:mb-6 md:h-10" />
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <ReviewItemSkeleton key={i} />
             ))}

@@ -26,8 +26,8 @@ export function TopArtists({ artists, isLoading }: TopArtistsProps) {
 
   if (artists.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <User className="w-12 h-12 mx-auto mb-2 opacity-30" />
+      <div className="text-center py-6 text-muted-foreground">
+        <User className="w-10 h-10 mx-auto mb-2 opacity-30" />
         <p>No top artists yet</p>
       </div>
     );
@@ -65,7 +65,7 @@ export function TopArtists({ artists, isLoading }: TopArtistsProps) {
           </div>
 
           {artist.scrobble_count && (
-            <div className="text-xs text-muted-foreground">
+            <div className="shrink-0 text-xs text-muted-foreground">
               {artist.scrobble_count} plays
             </div>
           )}

@@ -11,15 +11,15 @@ export default function OAuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { fetchUser } = useAuthStore();
-  const [error, setError] = useState<string | null>(null);
+  const accessToken = searchParams.get('access_token');
+  const refreshToken = searchParams.get('refresh_token');
+  const errorMsg = searchParams.get('error');
+  const [error, setError] = useState<string | null>(
+    errorMsg || (!accessToken || !refreshToken ? 'Missing authentication tokens' : null)
+  );
 
   useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    const errorMsg = searchParams.get('error');
-
     if (errorMsg) {
-      setError(errorMsg);
       toast.error(errorMsg);
       setTimeout(() => router.push('/login'), 2000);
       return;
@@ -44,14 +44,13 @@ export default function OAuthCallbackPage() {
           setTimeout(() => router.push('/login'), 2000);
         });
     } else {
-      setError('Missing authentication tokens');
       setTimeout(() => router.push('/login'), 2000);
     }
-  }, [searchParams, router, fetchUser]);
+  }, [accessToken, refreshToken, errorMsg, router, fetchUser]);
 
   return (
-    <div className="flex min-h-[400px] items-center justify-center">
-      <div className="text-center">
+    <div className="flex min-h-[min(400px,60dvh)] items-center justify-center px-4">
+      <div className="max-w-sm break-words text-center">
         {error ? (
           <div className="text-destructive">
             <p className="text-lg font-medium">{error}</p>

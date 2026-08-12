@@ -222,11 +222,11 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="h-48 md:h-64 bg-wine-600" />
-        <div className="container mx-auto max-w-3xl px-4 py-12">
-          <div className="text-center p-10 bg-card rounded-lg border border-dashed border-border">
-            <div className="text-5xl text-muted-foreground/30 mb-3 inline-block">?</div>
+      <div className="app-usable-viewport bg-background">
+        <div className="h-28 bg-wine-600 sm:h-48 md:h-64" />
+        <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-12">
+          <div className="rounded-lg border border-dashed border-border bg-card p-6 text-center sm:p-10">
+            <div className="mb-2 inline-block text-4xl text-muted-foreground/30 sm:mb-3 sm:text-5xl">?</div>
             <p className="text-muted-foreground font-medium">User not found</p>
           </div>
         </div>
@@ -237,11 +237,11 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const avgRating = profile.avg_rating ? profile.avg_rating.toFixed(1) : null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="app-usable-viewport min-w-0 bg-background">
       {/* Banner Section */}
       <div className="relative">
         {/* Banner Image */}
-        <div className="h-36 sm:h-48 md:h-64 bg-wine-600 relative overflow-hidden">
+        <div className="relative h-28 overflow-hidden bg-wine-600 sm:h-48 md:h-64">
           {profile.banner_image && (
             <Image
               src={profile.banner_image}
@@ -265,8 +265,9 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               <button
                 onClick={() => bannerInputRef.current?.click()}
                 disabled={isUploadingBanner}
-                className="absolute bottom-4 right-4 p-2.5 bg-black/50 text-white rounded-full
+                className="absolute bottom-3 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white
                            hover:bg-black/70 transition-colors disabled:opacity-50 cursor-pointer"
+                aria-label="Change profile banner"
               >
                 {isUploadingBanner ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -280,8 +281,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
         {/* Profile Picture - Overlapping Banner */}
         <div className="container mx-auto max-w-3xl px-4">
-          <div className="relative -mt-16 md:-mt-20 flex justify-between items-end">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-background
+          <div className="relative -mt-12 flex items-end justify-between gap-3 md:-mt-20">
+            <div className="h-24 w-24 shrink-0 rounded-full border-4 border-background sm:h-32 sm:w-32 md:h-40 md:w-40
                           shadow-lg overflow-hidden bg-muted">
               <Image
                 src={profile.profile_picture || '/images/default.jpg'}
@@ -293,28 +294,28 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             </div>
 
             {/* Action Button - positioned to the right */}
-            <div className="mb-4">
+            <div className="mb-1 min-w-0 sm:mb-4">
               {isOwnProfile ? (
-                <Link href="/account">
-                  <Button variant="outline" className="gap-2 rounded-full">
+                <Button asChild variant="outline" className="min-h-11 gap-2 rounded-full px-3 sm:px-4">
+                  <Link href="/account">
                     <Pencil className="w-4 h-4" />
                     Edit Profile
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               ) : currentUser ? (
                 <Button
                   onClick={handleFollow}
                   disabled={followLoading}
                   variant={isFollowing ? "outline" : "default"}
-                  className={`rounded-full ${isFollowing ? "" : "bg-wine-500 hover:bg-wine-600"}`}
+                  className={`min-h-11 rounded-full ${isFollowing ? "" : "bg-wine-500 hover:bg-wine-600"}`}
                 >
                   {followLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {isFollowing ? 'Unfollow' : 'Follow'}
                 </Button>
               ) : (
-                <Link href="/login">
-                  <Button className="rounded-full bg-wine-500 hover:bg-wine-600">Follow</Button>
-                </Link>
+                <Button asChild className="min-h-11 rounded-full bg-wine-500 hover:bg-wine-600">
+                  <Link href="/login">Follow</Link>
+                </Button>
               )}
             </div>
           </div>
@@ -322,16 +323,16 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
       </div>
 
       {/* Profile Info Section */}
-      <main className="container mx-auto max-w-3xl px-4 pt-4 pb-8">
+      <main className="container mx-auto max-w-3xl min-w-0 px-4 pb-6 pt-3 sm:pb-8 sm:pt-4">
         {/* Username & Bio */}
-        <div className="mb-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+        <div className="mb-3 sm:mb-4">
+          <h1 className="break-words text-xl font-bold text-foreground sm:text-2xl md:text-3xl">
             {profile.username}
           </h1>
           {profile.bio && (
-            <p className="text-muted-foreground mt-2 max-w-lg whitespace-pre-wrap">{profile.bio}</p>
+            <p className="mt-1.5 max-w-lg whitespace-pre-wrap break-words text-sm text-muted-foreground sm:mt-2 sm:text-base">{profile.bio}</p>
           )}
-          <p className="text-sm text-muted-foreground/70 mt-2 flex items-center gap-1">
+          <p className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground/70 sm:mt-2 sm:text-sm">
             <Calendar className="h-4 w-4" />
             Joined {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true })}
           </p>
@@ -343,30 +344,30 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         </div>
 
         {/* Stats Row */}
-        <div className="flex gap-6 pb-6 border-b border-border">
-          <div className="text-center">
-            <span className="block text-xl font-bold text-foreground">{profile.review_count}</span>
-            <span className="text-sm text-muted-foreground">Reviews</span>
+        <div className={`grid gap-1 pb-4 sm:flex sm:gap-6 sm:pb-6 ${avgRating ? 'grid-cols-4' : 'grid-cols-3'}`}>
+          <div className="min-w-0 text-center">
+            <span className="block text-lg font-bold text-foreground sm:text-xl">{profile.review_count}</span>
+            <span className="text-xs text-muted-foreground sm:text-sm">Reviews</span>
           </div>
           {avgRating && (
-            <div className="text-center">
-              <span className="block text-xl font-bold text-amber-500">{avgRating}</span>
-              <span className="text-sm text-muted-foreground">Avg Rating</span>
+            <div className="min-w-0 text-center">
+              <span className="block text-lg font-bold text-amber-500 sm:text-xl">{avgRating}</span>
+              <span className="text-xs leading-tight text-muted-foreground sm:text-sm">Avg Rating</span>
             </div>
           )}
-          <div className="text-center">
-            <span className="block text-xl font-bold text-foreground">{profile.followers_count}</span>
-            <span className="text-sm text-muted-foreground">Followers</span>
+          <div className="min-w-0 text-center">
+            <span className="block text-lg font-bold text-foreground sm:text-xl">{profile.followers_count}</span>
+            <span className="text-xs text-muted-foreground sm:text-sm">Followers</span>
           </div>
-          <div className="text-center">
-            <span className="block text-xl font-bold text-foreground">{profile.following_count}</span>
-            <span className="text-sm text-muted-foreground">Following</span>
+          <div className="min-w-0 text-center">
+            <span className="block text-lg font-bold text-foreground sm:text-xl">{profile.following_count}</span>
+            <span className="text-xs text-muted-foreground sm:text-sm">Following</span>
           </div>
         </div>
 
         {/* Reviews Section */}
-        <section className="py-6 border-t border-border">
-          <h2 className="text-lg font-semibold mb-4">Reviews</h2>
+        <section className="border-t border-border py-4 sm:py-6">
+          <h2 className="mb-3 text-lg font-semibold sm:mb-4">Reviews</h2>
           {reviewsLoading && reviews.length === 0 ? (
             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden divide-y divide-border">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -374,8 +375,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               ))}
             </div>
           ) : reviews.length === 0 ? (
-            <div className="text-center py-12 bg-card rounded-xl border border-dashed border-border">
-              <div className="text-5xl text-muted-foreground/30 mb-3">🎧</div>
+            <div className="rounded-xl border border-dashed border-border bg-card py-8 text-center sm:py-12">
+              <div className="mb-2 text-4xl text-muted-foreground/30 sm:mb-3 sm:text-5xl">🎧</div>
               <p className="text-muted-foreground">No reviews yet.</p>
             </div>
           ) : (
@@ -404,41 +405,41 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
 function ProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="app-usable-viewport bg-background">
       {/* Banner Skeleton */}
-      <div className="h-48 md:h-64 bg-muted animate-pulse" />
+      <div className="h-28 bg-muted animate-pulse sm:h-48 md:h-64" />
 
       {/* Profile Content */}
       <div className="container mx-auto max-w-3xl px-4">
         {/* Profile Picture Skeleton */}
-        <div className="relative -mt-16 md:-mt-20 flex justify-between items-end">
-          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-muted border-4 border-background animate-pulse" />
-          <div className="mb-4">
-            <div className="h-10 w-28 bg-muted rounded-full animate-pulse" />
+        <div className="relative -mt-12 flex items-end justify-between md:-mt-20">
+          <div className="h-24 w-24 rounded-full border-4 border-background bg-muted animate-pulse sm:h-32 sm:w-32 md:h-40 md:w-40" />
+          <div className="mb-1 sm:mb-4">
+            <div className="h-11 w-28 rounded-full bg-muted animate-pulse" />
           </div>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-3 sm:pt-4">
           {/* Name skeleton */}
-          <div className="h-8 w-48 bg-muted rounded animate-pulse mb-2" />
+          <div className="mb-2 h-7 w-40 rounded bg-muted animate-pulse sm:h-8 sm:w-48" />
           {/* Bio skeleton */}
-          <div className="h-4 w-72 bg-muted rounded animate-pulse mb-2" />
+          <div className="mb-2 h-4 w-2/3 rounded bg-muted animate-pulse sm:w-72" />
           {/* Date skeleton */}
           <div className="h-4 w-40 bg-muted rounded animate-pulse mb-4" />
 
           {/* Stats Skeleton */}
-          <div className="flex gap-6 py-6 border-b border-border">
+          <div className="grid grid-cols-4 gap-1 py-4 sm:flex sm:gap-6 sm:py-6">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="text-center">
-                <div className="h-6 w-12 bg-muted rounded animate-pulse mx-auto mb-1" />
-                <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                <div className="mx-auto mb-1 h-5 w-10 rounded bg-muted animate-pulse sm:h-6 sm:w-12" />
+                <div className="mx-auto h-3 w-12 rounded bg-muted animate-pulse sm:h-4 sm:w-16" />
               </div>
             ))}
           </div>
 
           {/* Reviews Skeleton */}
-          <div className="py-6">
-            <div className="h-6 w-24 bg-muted rounded animate-pulse mb-6" />
+          <div className="border-t border-border py-4 sm:py-6">
+            <div className="mb-3 h-6 w-24 rounded bg-muted animate-pulse sm:mb-6" />
             <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden divide-y divide-border">
               {Array.from({ length: 3 }).map((_, i) => (
                 <ReviewCardSkeleton key={i} />

@@ -138,9 +138,9 @@ export default function CreateGroupPage() {
 
   if (authLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="container mx-auto max-w-2xl px-4 py-4 md:py-8">
         <Card>
-          <CardContent className="py-12">
+          <CardContent className="py-8 md:py-12">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-muted rounded w-1/3" />
               <div className="h-4 bg-muted rounded w-2/3" />
@@ -154,10 +154,10 @@ export default function CreateGroupPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto max-w-2xl px-4 py-4 md:py-8">
       <Button
         variant="ghost"
-        className="mb-6 gap-2"
+        className="mb-3 h-11 gap-2 px-2 md:mb-6"
         onClick={() => router.back()}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -165,8 +165,8 @@ export default function CreateGroupPage() {
       </Button>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="gap-1 p-4 md:p-6">
+          <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
             <Users className="h-5 w-5" />
             Create a New Group
           </CardTitle>
@@ -174,8 +174,8 @@ export default function CreateGroupPage() {
             Create a community for music lovers to discuss and share
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             {error && (
               <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
                 {error}
@@ -187,7 +187,7 @@ export default function CreateGroupPage() {
               <Label>Cover Image</Label>
               <div
                 className={cn(
-                  'relative h-40 rounded-lg border-2 border-dashed transition-colors overflow-hidden',
+                  'relative h-32 overflow-hidden rounded-lg border-2 border-dashed transition-colors md:h-40',
                   coverPreview ? 'border-transparent' : 'border-muted-foreground/25 hover:border-muted-foreground/50'
                 )}
               >
@@ -199,13 +199,14 @@ export default function CreateGroupPage() {
                       fill
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/35 opacity-100 transition-opacity md:opacity-0 md:hover:opacity-100">
                       <Button
                         type="button"
                         size="sm"
                         variant="secondary"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isSubmitting}
+                        className="h-11 md:h-9"
                       >
                         Change
                       </Button>
@@ -215,6 +216,8 @@ export default function CreateGroupPage() {
                         variant="destructive"
                         onClick={removeCover}
                         disabled={isSubmitting}
+                        className="h-11 w-11 md:h-9 md:w-9"
+                        aria-label="Remove cover image"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -225,11 +228,11 @@ export default function CreateGroupPage() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isSubmitting}
-                    className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-4 text-muted-foreground transition-colors hover:text-foreground"
                   >
                     <ImagePlus className="h-8 w-8" />
                     <span className="text-sm">Click to add a cover image</span>
-                    <span className="text-xs">JPG, PNG, WebP or GIF (max 5MB)</span>
+                    <span className="text-center text-xs">JPG, PNG, WebP or GIF (max 5MB)</span>
                   </button>
                 )}
               </div>
@@ -253,6 +256,7 @@ export default function CreateGroupPage() {
                 }
                 maxLength={100}
                 disabled={isSubmitting}
+                className="h-11"
               />
               <p className="text-xs text-muted-foreground">
                 {formData.name.length}/100 characters
@@ -269,7 +273,7 @@ export default function CreateGroupPage() {
                   setFormData((prev) => ({ ...prev, description: e.target.value }))
                 }
                 maxLength={1000}
-                rows={4}
+                rows={3}
                 disabled={isSubmitting}
               />
               <p className="text-xs text-muted-foreground">
@@ -286,7 +290,7 @@ export default function CreateGroupPage() {
                 }
                 disabled={isSubmitting}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-11">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -307,7 +311,7 @@ export default function CreateGroupPage() {
                   onClick={() => setFormData((prev) => ({ ...prev, privacy: 'public' }))}
                   disabled={isSubmitting}
                   className={cn(
-                    'w-full flex items-start space-x-3 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer text-left transition-colors',
+                    'flex min-h-14 w-full cursor-pointer items-start space-x-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50',
                     formData.privacy === 'public' && 'border-primary bg-primary/5'
                   )}
                 >
@@ -332,7 +336,7 @@ export default function CreateGroupPage() {
                   onClick={() => setFormData((prev) => ({ ...prev, privacy: 'private' }))}
                   disabled={isSubmitting}
                   className={cn(
-                    'w-full flex items-start space-x-3 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer text-left transition-colors',
+                    'flex min-h-14 w-full cursor-pointer items-start space-x-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50',
                     formData.privacy === 'private' && 'border-primary bg-primary/5'
                   )}
                 >
@@ -355,20 +359,20 @@ export default function CreateGroupPage() {
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-3 pt-2 md:pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
                 disabled={isSubmitting}
-                className="flex-1"
+                className="h-11 flex-1"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting || !formData.name.trim()}
-                className="flex-1"
+                className="h-11 flex-1"
               >
                 {isSubmitting ? (
                   <>

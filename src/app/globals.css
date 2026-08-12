@@ -115,6 +115,19 @@
 
   /* Star rating */
   --star: #facc15;
+
+  /* Mobile app shell. Keep viewport arithmetic in one place so screens that
+     need to fit above the navigation (chats, groups, composers) do not rely
+     on device-specific pixel values. */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --app-header-height: 4rem;
+  --app-header-total-height: calc(var(--app-header-height) + var(--safe-area-top));
+  --app-bottom-nav-height: 4rem;
+  --app-bottom-nav-total-height: 0px;
+  --app-usable-height: calc(100dvh - var(--app-header-total-height) - var(--app-bottom-nav-total-height));
 }
 
 .dark {
@@ -156,8 +169,56 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    min-height: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
   body {
     @apply bg-background text-foreground;
+    min-height: 100dvh;
+    max-width: 100%;
+    overflow-x: clip;
+    overscroll-behavior-x: none;
+  }
+}
+
+@layer components {
+  .app-shell {
+    min-height: 100vh;
+    min-height: 100dvh;
+    min-width: 0;
+  }
+
+  .app-main {
+    min-width: 0;
+  }
+
+  /* Reusable by full-height mobile screens. `height` is intentionally not
+     forced so regular pages can grow naturally beyond the viewport. */
+  .app-usable-viewport {
+    min-height: var(--app-usable-height);
+  }
+}
+
+@media (max-width: 767px) {
+  .app-shell--authenticated {
+    --app-bottom-nav-total-height: calc(var(--app-bottom-nav-height) + var(--safe-area-bottom));
+  }
+
+  .app-shell--authenticated .app-main {
+    padding-bottom: var(--app-bottom-nav-total-height);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

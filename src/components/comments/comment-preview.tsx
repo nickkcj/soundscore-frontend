@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle } from 'lucide-react';
 import { api } from '@/lib/api';
 import { UserAvatar } from '@/components/common/user-avatar';
 import { Skeleton } from '@/components/ui/skeleton';

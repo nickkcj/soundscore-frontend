@@ -57,8 +57,8 @@ export function LibraryContent({ username }: LibraryContentProps) {
 
   if (!status?.connected) {
     return (
-      <div className="text-center py-12">
-        <Music className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+      <div className="text-center py-8 md:py-12">
+        <Music className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-muted-foreground/30" />
         <h3 className="text-lg font-medium mb-2">Spotify Not Connected</h3>
         <p className="text-muted-foreground mb-4">
           {isOwnProfile
@@ -80,7 +80,7 @@ export function LibraryContent({ username }: LibraryContentProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header Banner */}
       <LibraryHeaderBanner
         topArtist={artists[0] || null}
@@ -89,7 +89,7 @@ export function LibraryContent({ username }: LibraryContentProps) {
       />
 
       {/* Stats Counter & Controls Row */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-stretch">
         <StatsCounter
           totalScrobbles={stats?.total_scrobbles || 0}
           uniqueArtists={stats?.unique_artists_count || 0}
@@ -103,9 +103,9 @@ export function LibraryContent({ username }: LibraryContentProps) {
       <LibraryTabs activeTab={activeSubTab} onTabChange={setActiveSubTab} />
 
       {/* Two-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
         {/* Left Column - Main Content (2/3) */}
-        <div className="lg:col-span-2 min-h-[400px]">
+        <div className="min-w-0 lg:col-span-2 lg:min-h-[400px]">
           {activeSubTab === 'scrobbles' && (
             <ScrobbleList scrobbles={scrobbles} isLoading={scrobblesLoading} />
           )}
@@ -122,7 +122,7 @@ export function LibraryContent({ username }: LibraryContentProps) {
 
         {/* Right Column - Activity Chart (1/3) */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24 p-4 bg-card rounded-lg border">
+          <div className="rounded-xl border bg-card p-3 sm:p-4 lg:sticky lg:top-24">
             <ActivityChart
               data={stats?.scrobbles_by_day || []}
               isLoading={statsLoading}

@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { api, homeApi } from '@/lib/api';
-import type { GroupListResponse, PaginatedUsersResponse, TrendingAlbumsResponse } from '@/types';
+import type { GroupListResponse, PaginatedUsersResponse } from '@/types';
 
 /**
  * Hook for fetching trending albums

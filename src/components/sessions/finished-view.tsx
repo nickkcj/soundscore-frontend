@@ -49,12 +49,12 @@ export function FinishedView({ session }: FinishedViewProps) {
       : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Hero: Album avg */}
       <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-        <div className="bg-gradient-to-br from-wine-600 to-wine-800 p-6 text-white text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-            <div className="relative h-24 w-24 shrink-0 rounded-xl overflow-hidden shadow-2xl">
+        <div className="bg-gradient-to-br from-wine-600 to-wine-800 p-4 text-white sm:p-6 sm:text-center">
+          <div className="flex items-center justify-center gap-4 sm:gap-5">
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl shadow-xl sm:h-24 sm:w-24 sm:shadow-2xl">
               {session.album_cover_image ? (
                 <Image
                   src={session.album_cover_image}
@@ -68,17 +68,17 @@ export function FinishedView({ session }: FinishedViewProps) {
                 </div>
               )}
             </div>
-            <div className="text-center sm:text-left">
+            <div className="min-w-0 text-left">
               <p className="text-white/80 text-sm mb-0.5">Listening Party Complete</p>
-              <h1 className="text-xl font-bold mb-0.5">{session.album_title}</h1>
-              <p className="text-white/80">{session.album_artist}</p>
+              <h1 className="mb-0.5 line-clamp-2 text-lg font-bold leading-tight sm:text-xl">{session.album_title}</h1>
+              <p className="truncate text-sm text-white/80 sm:text-base">{session.album_artist}</p>
             </div>
           </div>
         </div>
 
-        <div className="p-6 text-center border-t border-border">
+        <div className="border-t border-border p-4 text-center sm:p-6">
           <p className="text-sm text-muted-foreground mb-1">Album Average</p>
-          <p className="text-6xl font-black text-wine-600 dark:text-wine-400">
+          <p className="text-5xl font-black text-wine-600 dark:text-wine-400 sm:text-6xl">
             {summary?.album_avg?.toFixed(1) ?? '—'}
           </p>
           <div className="flex items-center justify-center gap-1 mt-1">
@@ -99,26 +99,26 @@ export function FinishedView({ session }: FinishedViewProps) {
       </div>
 
       {/* Highlights */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {bestTrack && (
-          <div className="bg-card rounded-xl shadow-sm border border-border p-4">
+          <div className="min-w-0 rounded-xl border border-border bg-card p-3 shadow-sm sm:p-4">
             <div className="flex items-center gap-2 mb-2">
               <Trophy className="h-5 w-5 text-amber-500" />
               <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">Best Track</span>
             </div>
-            <p className="font-bold">{bestTrack.name}</p>
+            <p className="line-clamp-2 text-sm font-bold sm:text-base">{bestTrack.name}</p>
             <p className="text-2xl font-black text-wine-600 dark:text-wine-400 mt-1">
               {bestTrack.avg_rating?.toFixed(1) ?? '—'}
             </p>
           </div>
         )}
         {divisiveTrack && (
-          <div className="bg-card rounded-xl shadow-sm border border-border p-4">
+          <div className="min-w-0 rounded-xl border border-border bg-card p-3 shadow-sm sm:p-4">
             <div className="flex items-center gap-2 mb-2">
               <Zap className="h-5 w-5 text-orange-500" />
               <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">Most Divisive</span>
             </div>
-            <p className="font-bold">{divisiveTrack.name}</p>
+            <p className="line-clamp-2 text-sm font-bold sm:text-base">{divisiveTrack.name}</p>
             <p className="text-2xl font-black text-wine-600 dark:text-wine-400 mt-1">
               {divisiveTrack.avg_rating?.toFixed(1) ?? '—'}
             </p>
@@ -128,15 +128,15 @@ export function FinishedView({ session }: FinishedViewProps) {
 
       {/* Tracks × Participants table */}
       <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-        <div className="p-4 border-b border-border flex items-center gap-2">
+        <div className="flex items-center gap-2 border-b border-border p-3 sm:p-4">
           <BarChart3 className="h-5 w-5 text-wine-500" />
           <h2 className="font-semibold">Ratings by Track</h2>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="max-w-full overflow-x-auto overscroll-x-contain">
+          <table className="w-full min-w-max text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/30">
-                <th className="text-left p-3 font-medium text-muted-foreground min-w-[140px]">Track</th>
+                <th className="sticky left-0 z-10 min-w-[132px] bg-muted/95 p-2.5 text-left font-medium text-muted-foreground sm:min-w-[140px] sm:p-3">Track</th>
                 {session.participants.map((p) => (
                   <th key={p.user_id} className="text-center p-3 font-medium whitespace-nowrap">
                     {p.username}
@@ -152,9 +152,9 @@ export function FinishedView({ session }: FinishedViewProps) {
                 const avg = summary?.avg_by_track?.[idx];
                 return (
                   <tr key={track.index} className="hover:bg-muted/30 transition-colors">
-                    <td className="p-3">
+                    <td className="sticky left-0 z-10 max-w-[180px] bg-card p-2.5 sm:p-3">
                       <span className="text-muted-foreground text-xs mr-1.5">{idx + 1}.</span>
-                      {track.name}
+                      <span className="line-clamp-2">{track.name}</span>
                     </td>
                     {session.participants.map((p) => {
                       const r = track.ratings?.find((rt) => rt.user_id === p.user_id);
@@ -192,7 +192,7 @@ export function FinishedView({ session }: FinishedViewProps) {
       {/* User Rankings */}
       {summary && summary.avg_by_user.length > 0 && (
         <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-          <div className="p-4 border-b border-border">
+          <div className="border-b border-border p-3 sm:p-4">
             <h2 className="font-semibold">Listener Rankings</h2>
             <p className="text-xs text-muted-foreground mt-0.5">Average rating given</p>
           </div>
@@ -200,15 +200,15 @@ export function FinishedView({ session }: FinishedViewProps) {
             {[...summary.avg_by_user]
               .sort((a, b) => b.avg - a.avg)
               .map((u, idx) => (
-                <div key={u.user_id} className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-3">
+                <div key={u.user_id} className="flex min-w-0 items-center justify-between gap-3 p-3 sm:p-4">
+                  <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                     <span className="text-sm font-medium text-muted-foreground w-4">{idx + 1}</span>
-                    <span className="font-medium">{u.username}</span>
+                    <span className="truncate font-medium">{u.username}</span>
                     {idx === 0 && (
-                      <span className="text-xs text-muted-foreground">(most generous)</span>
+                      <span className="hidden text-xs text-muted-foreground sm:inline">(most generous)</span>
                     )}
                     {idx === summary.avg_by_user.length - 1 && summary.avg_by_user.length > 1 && (
-                      <span className="text-xs text-muted-foreground">(harshest critic)</span>
+                      <span className="hidden text-xs text-muted-foreground sm:inline">(harshest critic)</span>
                     )}
                   </div>
                   <span className="text-xl font-black text-wine-600 dark:text-wine-400">
@@ -221,17 +221,17 @@ export function FinishedView({ session }: FinishedViewProps) {
       )}
 
       {/* Action buttons */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
         <Button
           variant="outline"
-          className="flex-1"
+          className="h-11 w-full"
           onClick={handleShare}
         >
           <Share2 className="h-4 w-4" />
           {copied ? 'Copied!' : 'Share Session'}
         </Button>
         {session.album_spotify_id && (
-          <Button asChild className="flex-1 bg-wine-600 hover:bg-wine-700 text-white">
+          <Button asChild className="h-11 w-full bg-wine-600 text-white hover:bg-wine-700">
             <Link href={`/album/${session.album_spotify_id}`}>
               <ExternalLink className="h-4 w-4" />
               View Album

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -31,25 +31,25 @@ export function UserAvatar({
   showLink = true,
   className,
 }: UserAvatarProps) {
-  // Verifica se a imagem já está em cache no momento da renderização inicial
-  const isAlreadyCached = useMemo(
-    () => (profilePicture ? loadedImages.has(profilePicture) : false),
-    [profilePicture]
+  const [loadedProfilePicture, setLoadedProfilePicture] = useState<string | null>(null);
+  const imageLoaded = Boolean(
+    profilePicture &&
+      (loadedImages.has(profilePicture) || loadedProfilePicture === profilePicture)
   );
 
-  const [imageLoaded, setImageLoaded] = useState(isAlreadyCached);
-
   useEffect(() => {
-    if (profilePicture && !loadedImages.has(profilePicture)) {
-      const img = new window.Image();
-      img.onload = () => {
-        loadedImages.add(profilePicture);
-        setImageLoaded(true);
-      };
-      img.src = profilePicture;
-    } else if (profilePicture && loadedImages.has(profilePicture)) {
-      setImageLoaded(true);
-    }
+    if (!profilePicture || loadedImages.has(profilePicture)) return;
+
+    const img = new window.Image();
+    img.onload = () => {
+      loadedImages.add(profilePicture);
+      setLoadedProfilePicture(profilePicture);
+    };
+    img.src = profilePicture;
+
+    return () => {
+      img.onload = null;
+    };
   }, [profilePicture]);
 
   const avatar = (
@@ -60,7 +60,7 @@ export function UserAvatar({
         onLoadingStatusChange={(status) => {
           if (status === 'loaded' && profilePicture) {
             loadedImages.add(profilePicture);
-            setImageLoaded(true);
+            setLoadedProfilePicture(profilePicture);
           }
         }}
       />

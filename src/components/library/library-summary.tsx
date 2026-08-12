@@ -29,7 +29,7 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
   // Loading state
   if (statusLoading || statsLoading || artistsLoading) {
     return (
-      <div className="py-6 border-t border-border">
+      <div className="border-t border-border py-4 sm:py-6">
         <div className="flex items-center justify-center py-8">
           <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
         </div>
@@ -42,11 +42,11 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
     if (!isOwnProfile) return null;
 
     return (
-      <div className="py-6 border-t border-border">
+      <div className="border-t border-border py-4 sm:py-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Library</h2>
         </div>
-        <div className="text-center py-6 bg-muted/30 rounded-lg">
+        <div className="rounded-lg bg-muted/30 py-5 text-center sm:py-6">
           <Music className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
           <p className="text-sm text-muted-foreground mb-3">
             Connect your Spotify to show your library
@@ -70,17 +70,17 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
     if (!isOwnProfile) return null;
 
     return (
-      <div className="py-6 border-t border-border">
+      <div className="border-t border-border py-4 sm:py-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Library</h2>
-          <Link href="/library">
-            <Button variant="ghost" size="sm" className="text-primary">
+          <Button asChild variant="ghost" size="sm" className="text-primary">
+            <Link href="/library">
               View full
               <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
-        <div className="text-center py-6 bg-muted/30 rounded-lg">
+        <div className="rounded-lg bg-muted/30 py-5 text-center sm:py-6">
           <p className="text-sm text-muted-foreground">
             Sync your history to see your top artists
           </p>
@@ -90,22 +90,22 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
   }
 
   return (
-    <div className="py-6 border-t border-border">
+    <div className="border-t border-border py-4 sm:py-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <h2 className="text-lg font-semibold">Library</h2>
-          <span className="text-sm text-muted-foreground">
+          <span className="truncate text-xs text-muted-foreground sm:text-sm">
             {stats.total_scrobbles.toLocaleString()} scrobbles
           </span>
         </div>
         {isOwnProfile && (
-          <Link href="/library">
-            <Button variant="ghost" size="sm" className="text-primary">
+          <Button asChild variant="ghost" size="sm" className="text-primary">
+            <Link href="/library">
               View full
               <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         )}
       </div>
 
@@ -113,7 +113,7 @@ export function LibrarySummary({ username, isOwnProfile, isPublic }: LibrarySumm
       {artists.length > 0 && (
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-muted-foreground mb-3">Top Artists</h3>
-          <div className="flex gap-4">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4">
             {artists.slice(0, 3).map((artist, index) => (
               <div key={artist.name} className="flex items-center gap-3 flex-1 min-w-0">
                 <span className="text-lg font-bold text-muted-foreground/50">{index + 1}</span>

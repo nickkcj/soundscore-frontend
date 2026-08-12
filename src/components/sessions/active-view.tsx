@@ -130,9 +130,9 @@ export function ActiveView({ session, onlineUsers, onMutationSuccess }: ActiveVi
 
       {/* Current track card */}
       <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-        <div className="p-5 border-b border-border">
-          <div className="flex items-center gap-4">
-            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted shadow-sm">
+        <div className="border-b border-border p-4 sm:p-5">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted shadow-sm sm:h-16 sm:w-16">
               {session.album_cover_image ? (
                 <Image
                   src={session.album_cover_image}
@@ -150,14 +150,14 @@ export function ActiveView({ session, onlineUsers, onMutationSuccess }: ActiveVi
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                 Now Rating
               </p>
-              <h2 className="text-2xl font-bold leading-tight">{currentTrack?.name}</h2>
+              <h2 className="break-words text-xl font-bold leading-tight sm:text-2xl">{currentTrack?.name}</h2>
             </div>
           </div>
         </div>
 
         {!isRevealed ? (
           /* Voting phase */
-          <div className="p-5 space-y-5">
+          <div className="space-y-4 p-4 sm:space-y-5 sm:p-5">
             <div>
               <p className="text-sm font-medium text-center text-muted-foreground mb-3">
                 Your rating
@@ -248,11 +248,11 @@ export function ActiveView({ session, onlineUsers, onMutationSuccess }: ActiveVi
           </div>
         ) : (
           /* Reveal phase */
-          <div className="p-5 space-y-4">
+          <div className="space-y-4 p-4 sm:p-5">
             {/* Average highlight */}
             <div className="text-center py-4 bg-gradient-to-br from-wine-50 to-wine-100 dark:from-wine-950/30 dark:to-wine-900/20 rounded-xl border border-wine-200 dark:border-wine-800">
               <p className="text-sm text-muted-foreground mb-1">Average Rating</p>
-              <p className="text-5xl font-black text-wine-600 dark:text-wine-400">
+              <p className="text-4xl font-black text-wine-600 dark:text-wine-400 sm:text-5xl">
                 {currentTrack?.avg_rating?.toFixed(1) ?? '—'}
               </p>
             </div>
@@ -326,7 +326,7 @@ export function ActiveView({ session, onlineUsers, onMutationSuccess }: ActiveVi
         <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           <button
             type="button"
-            className="w-full flex items-center justify-between p-4 text-sm font-medium hover:bg-muted/50 transition-colors"
+            className="flex min-h-11 w-full items-center justify-between p-4 text-sm font-medium transition-colors hover:bg-muted/50"
             onClick={() => setRevealedExpanded((v) => !v)}
           >
             <span>Previous tracks ({revealedTracks.length})</span>

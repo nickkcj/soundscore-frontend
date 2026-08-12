@@ -224,21 +224,21 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto max-w-4xl px-4 py-12 md:py-20">
+      <main className="container mx-auto max-w-4xl px-4 py-6 md:py-12 lg:py-20">
         {/* Page Header */}
-        <header className="mb-10">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground flex items-center">
-            <Settings className="w-8 h-8 mr-3 text-wine-500" />
+        <header className="mb-6 md:mb-10">
+          <h1 className="flex items-center text-2xl font-bold text-foreground md:text-4xl">
+            <Settings className="mr-3 h-6 w-6 text-wine-500 md:h-8 md:w-8" />
             Account Settings
           </h1>
           <p className="text-muted-foreground mt-2">Manage your profile and security settings</p>
         </header>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:gap-8">
           {/* Sidebar Navigation */}
           <aside className="lg:w-64 flex-shrink-0">
-            <nav className="bg-card rounded-xl shadow-sm border border-border overflow-hidden sticky top-28">
-              <div className="p-4 border-b border-border">
+            <nav className="sticky top-[var(--app-header-total-height)] z-20 overflow-hidden rounded-xl border border-border bg-card/95 shadow-sm backdrop-blur lg:top-28">
+              <div className="hidden border-b border-border p-4 lg:block">
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-wine-200">
@@ -257,10 +257,10 @@ export default function AccountPage() {
                   </div>
                 </div>
               </div>
-              <div className="p-2">
+              <div className="flex gap-1 overflow-x-auto p-1.5 lg:block lg:p-2">
                 <button
                   onClick={() => setActiveSection('profile')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-left transition-colors lg:w-full lg:gap-3 lg:px-4 ${
                     activeSection === 'profile'
                       ? 'bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400'
                       : 'text-foreground hover:bg-muted'
@@ -271,7 +271,7 @@ export default function AccountPage() {
                 </button>
                 <button
                   onClick={() => setActiveSection('password')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-left transition-colors lg:w-full lg:gap-3 lg:px-4 ${
                     activeSection === 'password'
                       ? 'bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400'
                       : 'text-foreground hover:bg-muted'
@@ -282,7 +282,7 @@ export default function AccountPage() {
                 </button>
                 <button
                   onClick={() => setActiveSection('privacy')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-left transition-colors lg:w-full lg:gap-3 lg:px-4 ${
                     activeSection === 'privacy'
                       ? 'bg-wine-50 dark:bg-wine-950/30 text-wine-600 dark:text-wine-400'
                       : 'text-foreground hover:bg-muted'
@@ -293,14 +293,14 @@ export default function AccountPage() {
                 </button>
                 <button
                   onClick={() => setActiveSection('danger')}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-left transition-colors lg:w-full lg:gap-3 lg:px-4 ${
                     activeSection === 'danger'
                       ? 'bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400'
                       : 'text-foreground hover:bg-muted'
                   }`}
                 >
                   <AlertTriangle className="w-5 h-5" />
-                  <span className="font-medium">Danger Zone</span>
+                  <span className="font-medium"><span className="lg:hidden">Danger</span><span className="hidden lg:inline">Danger Zone</span></span>
                 </button>
               </div>
             </nav>
@@ -311,18 +311,18 @@ export default function AccountPage() {
             {/* Profile Section */}
             {activeSection === 'profile' && (
               <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-wine-50 to-wine-100 dark:from-wine-950/20 dark:to-wine-950/20">
+                <div className="border-b border-border bg-gradient-to-r from-wine-50 to-wine-100 px-4 py-4 dark:from-wine-950/20 dark:to-wine-950/20 sm:px-6 sm:py-5">
                   <h2 className="text-xl font-bold text-foreground flex items-center">
                     <User className="w-5 h-5 mr-2 text-wine-500" />
                     Profile Information
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">Update your public profile information</p>
                 </div>
-                <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="p-6 space-y-6">
+                <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-5 p-4 sm:space-y-6 sm:p-6">
                   {/* Profile Picture */}
-                  <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-4 sm:gap-6">
                     <div className="relative">
-                      <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-wine-100 shadow-lg">
+                      <div className="h-20 w-20 overflow-hidden rounded-full shadow-lg ring-4 ring-wine-100 sm:h-24 sm:w-24">
                         <Image
                           src={user.profile_picture || '/images/default.jpg'}
                           alt={user.username}
@@ -345,7 +345,7 @@ export default function AccountPage() {
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isUploadingPhoto}
-                        className="absolute bottom-0 right-0 p-2 bg-wine-500 text-white rounded-full shadow-md hover:bg-wine-600 transition-colors disabled:opacity-50"
+                        className="absolute -bottom-1 -right-1 flex h-11 w-11 items-center justify-center rounded-full bg-wine-500 text-white shadow-md transition-colors hover:bg-wine-600 disabled:opacity-50"
                         title="Change profile picture"
                       >
                         {isUploadingPhoto ? (
@@ -355,9 +355,9 @@ export default function AccountPage() {
                         )}
                       </button>
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <p className="font-medium text-foreground">{user.username}</p>
-                      <p className="text-sm text-muted-foreground">Click the camera icon to upload a new photo</p>
+                      <p className="text-sm text-muted-foreground">Tap the camera icon to upload a new photo</p>
                       <p className="text-xs text-muted-foreground/70 mt-1">JPG, PNG, GIF or WebP. Max 5MB.</p>
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export default function AccountPage() {
                       id="username"
                       {...profileForm.register('username')}
                       defaultValue={user.username}
-                      className="border-input focus:border-wine-400 focus:ring-wine-400"
+                      className="h-11 border-input focus:border-wine-400 focus:ring-wine-400"
                     />
                     {profileForm.formState.errors.username && (
                       <p className="text-sm text-red-500">
@@ -400,7 +400,7 @@ export default function AccountPage() {
                     <Button
                       type="submit"
                       disabled={isUpdating}
-                      className="bg-wine-600 hover:bg-wine-700 text-white px-6"
+                      className="h-11 w-full bg-wine-600 px-6 text-white hover:bg-wine-700 sm:w-auto"
                     >
                       {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Save Changes
@@ -413,21 +413,21 @@ export default function AccountPage() {
             {/* Password Section */}
             {activeSection === 'password' && (
               <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-wine-50 to-wine-100 dark:from-wine-950/20 dark:to-wine-950/20">
+                <div className="border-b border-border bg-gradient-to-r from-wine-50 to-wine-100 px-4 py-4 dark:from-wine-950/20 dark:to-wine-950/20 sm:px-6 sm:py-5">
                   <h2 className="text-xl font-bold text-foreground flex items-center">
                     <Lock className="w-5 h-5 mr-2 text-wine-500" />
                     Change Password
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">Keep your account secure with a strong password</p>
                 </div>
-                <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="p-6 space-y-6">
+                <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-5 p-4 sm:space-y-6 sm:p-6">
                   <div className="space-y-2">
                     <Label htmlFor="currentPassword" className="text-foreground font-medium">Current Password</Label>
                     <Input
                       id="currentPassword"
                       type="password"
                       {...passwordForm.register('currentPassword')}
-                      className="border-input focus:border-wine-400 focus:ring-wine-400"
+                      className="h-11 border-input focus:border-wine-400 focus:ring-wine-400"
                     />
                     {passwordForm.formState.errors.currentPassword && (
                       <p className="text-sm text-red-500">
@@ -442,7 +442,7 @@ export default function AccountPage() {
                       id="newPassword"
                       type="password"
                       {...passwordForm.register('newPassword')}
-                      className="border-input focus:border-wine-400 focus:ring-wine-400"
+                      className="h-11 border-input focus:border-wine-400 focus:ring-wine-400"
                     />
                     {passwordForm.formState.errors.newPassword && (
                       <p className="text-sm text-red-500">
@@ -457,7 +457,7 @@ export default function AccountPage() {
                       id="confirmPassword"
                       type="password"
                       {...passwordForm.register('confirmPassword')}
-                      className="border-input focus:border-wine-400 focus:ring-wine-400"
+                      className="h-11 border-input focus:border-wine-400 focus:ring-wine-400"
                     />
                     {passwordForm.formState.errors.confirmPassword && (
                       <p className="text-sm text-red-500">
@@ -470,7 +470,7 @@ export default function AccountPage() {
                     <Button
                       type="submit"
                       disabled={isChangingPassword}
-                      className="bg-wine-600 hover:bg-wine-700 text-white px-6"
+                      className="h-11 w-full bg-wine-600 px-6 text-white hover:bg-wine-700 sm:w-auto"
                     >
                       {isChangingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Change Password
@@ -483,15 +483,15 @@ export default function AccountPage() {
             {/* Privacy Section */}
             {activeSection === 'privacy' && (
               <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-                <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-wine-50 to-wine-100 dark:from-wine-950/20 dark:to-wine-950/20">
+                <div className="border-b border-border bg-gradient-to-r from-wine-50 to-wine-100 px-4 py-4 dark:from-wine-950/20 dark:to-wine-950/20 sm:px-6 sm:py-5">
                   <h2 className="text-xl font-bold text-foreground flex items-center">
                     <Eye className="w-5 h-5 mr-2 text-wine-500" />
                     Privacy Settings
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">Control what others can see on your profile</p>
                 </div>
-                <div className="p-6 space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                <div className="space-y-5 p-4 sm:space-y-6 sm:p-6">
+                  <div className="flex items-center justify-between gap-4 rounded-lg bg-muted/30 p-4">
                     <div className="space-y-1">
                       <Label htmlFor="library-public" className="text-foreground font-medium">
                         Public Library
@@ -505,7 +505,7 @@ export default function AccountPage() {
                       checked={libraryPublic}
                       onCheckedChange={handlePrivacyToggle}
                       disabled={isUpdatingPrivacy}
-                      className="data-[state=checked]:bg-wine-500"
+                      className="shrink-0 data-[state=checked]:bg-wine-500"
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -519,22 +519,22 @@ export default function AccountPage() {
             {/* Danger Zone Section */}
             {activeSection === 'danger' && (
               <section className="bg-card rounded-xl shadow-sm border border-red-200 dark:border-red-900 overflow-hidden">
-                <div className="px-6 py-5 border-b border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30">
+                <div className="border-b border-red-200 bg-red-50 px-4 py-4 dark:border-red-900 dark:bg-red-950/30 sm:px-6 sm:py-5">
                   <h2 className="text-xl font-bold text-red-700 dark:text-red-400 flex items-center">
                     <AlertTriangle className="w-5 h-5 mr-2" />
                     Danger Zone
                   </h2>
                   <p className="text-sm text-red-600 dark:text-red-400/80 mt-1">Irreversible and destructive actions</p>
                 </div>
-                <div className="p-6">
-                  <div className="border border-red-200 dark:border-red-900 rounded-lg p-5 bg-red-50/50 dark:bg-red-950/20">
+                <div className="p-4 sm:p-6">
+                  <div className="rounded-lg border border-red-200 bg-red-50/50 p-4 dark:border-red-900 dark:bg-red-950/20 sm:p-5">
                     <h3 className="font-semibold text-red-800 dark:text-red-300 mb-2">Delete Account</h3>
                     <p className="text-sm text-red-700 dark:text-red-400/80 mb-4">
                       Once you delete your account, there is no going back. All your reviews, comments, and data will be permanently deleted.
                     </p>
                     <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="destructive" className="bg-red-500 hover:bg-red-600">
+                        <Button variant="destructive" className="h-11 w-full bg-red-500 hover:bg-red-600 sm:w-auto">
                           <Trash2 className="w-4 h-4 mr-2" />
                           Delete Account
                         </Button>
@@ -583,9 +583,9 @@ export default function AccountPage() {
 function AccountSkeleton() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
-      <main className="container mx-auto max-w-4xl px-4 py-12 md:py-20">
-        <div className="h-10 w-64 bg-muted rounded mb-10 animate-pulse" />
-        <div className="flex flex-col lg:flex-row gap-8">
+      <main className="container mx-auto max-w-4xl px-4 py-6 md:py-12 lg:py-20">
+        <div className="mb-6 h-8 w-56 animate-pulse rounded bg-muted md:mb-10 md:h-10 md:w-64" />
+        <div className="flex flex-col gap-5 lg:flex-row lg:gap-8">
           <aside className="lg:w-64">
             <div className="bg-card rounded-xl shadow-sm border border-border p-4 space-y-4">
               <div className="flex items-center gap-3">
@@ -604,12 +604,12 @@ function AccountSkeleton() {
           </aside>
           <div className="flex-1">
             <div className="bg-card rounded-xl shadow-sm border border-border">
-              <div className="px-6 py-5 border-b border-border">
+              <div className="border-b border-border px-4 py-4 sm:px-6 sm:py-5">
                 <div className="h-6 w-48 bg-muted rounded animate-pulse" />
               </div>
-              <div className="p-6 space-y-6">
-                <div className="flex items-center gap-6">
-                  <div className="w-24 h-24 rounded-full bg-muted animate-pulse" />
+              <div className="space-y-5 p-4 sm:space-y-6 sm:p-6">
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <div className="h-20 w-20 rounded-full bg-muted animate-pulse sm:h-24 sm:w-24" />
                   <div className="space-y-2">
                     <div className="h-5 w-32 bg-muted rounded animate-pulse" />
                     <div className="h-4 w-48 bg-muted rounded animate-pulse" />

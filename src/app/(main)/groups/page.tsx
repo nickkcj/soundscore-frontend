@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { Plus, Search, Users, Lock, Globe, TrendingUp, Music, Loader2, MoreVertical, Settings, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -86,31 +86,7 @@ export default function GroupsPage() {
     setTrendingGroups(prev => prev.filter(g => g.uuid !== groupUuid));
   }, []);
 
-  // Debounce search input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  // Initial load
-  useEffect(() => {
-    if (!authLoading && !initialLoadDone.current) {
-      initialLoadDone.current = true;
-      fetchGroups();
-      fetchTrendingGroups();
-    }
-  }, [authLoading]);
-
-  // Search/filter changes (after initial load)
-  useEffect(() => {
-    if (initialLoadDone.current) {
-      fetchGroups();
-    }
-  }, [debouncedSearch, category]);
-
-  const fetchGroups = async () => {
+  const fetchGroups = useCallback(async () => {
     // Only show full skeleton on initial load
     if (!initialLoadDone.current) {
       setIsLoading(true);
@@ -131,62 +107,88 @@ export default function GroupsPage() {
       setIsLoading(false);
       setIsSearching(false);
     }
-  };
+  }, [category, debouncedSearch]);
 
-  const fetchTrendingGroups = async () => {
+  const fetchTrendingGroups = useCallback(async () => {
     try {
       const response = await api.get<GroupListResponse>('/groups?per_page=4&sort=members');
       setTrendingGroups(response.groups);
     } catch {
       setTrendingGroups([]);
     }
-  };
+  }, []);
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Initial load
+  useEffect(() => {
+    if (!authLoading && !initialLoadDone.current) {
+      initialLoadDone.current = true;
+      fetchGroups();
+      fetchTrendingGroups();
+    }
+  }, [authLoading, fetchGroups, fetchTrendingGroups]);
+
+  // Search/filter changes (after initial load)
+  useEffect(() => {
+    if (initialLoadDone.current) {
+      fetchGroups();
+    }
+  }, [category, debouncedSearch, fetchGroups]);
 
   if (authLoading) {
     return <GroupsPageSkeleton />;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
+    <div className="container mx-auto px-4 py-4 md:py-8">
+      <div className="mb-6 flex items-center justify-between gap-3 md:mb-8">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold">Groups</h1>
-          <p className="text-muted-foreground">
+          <p className="truncate text-sm text-muted-foreground sm:text-base">
             Join communities of music lovers
           </p>
         </div>
-        <Link href="/groups/create">
-          <Button className="gap-2">
+        <Button asChild className="h-11 flex-shrink-0 gap-2 px-3 sm:px-4">
+          <Link href="/groups/create">
             <Plus className="h-4 w-4" />
-            Create Group
-          </Button>
-        </Link>
+            <span className="hidden sm:inline">Create Group</span>
+            <span className="sm:hidden">Create</span>
+          </Link>
+        </Button>
       </div>
 
       {/* Trending Groups */}
       {trendingGroups.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <section className="mb-6 md:mb-8">
+          <h2 className="mb-3 flex items-center gap-2 text-base font-semibold md:mb-4 md:text-lg">
             <TrendingUp className="h-5 w-5 text-primary" />
             Trending Groups
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
             {trendingGroups.map((group) => (
-              <GroupCard
-                key={group.id}
-                group={group}
-                onJoinSuccess={handleJoinSuccess}
-                onUpdate={handleGroupUpdate}
-                onDelete={handleGroupDelete}
-                currentUserId={user?.id}
-              />
+              <div key={group.id} className="w-[min(78vw,18rem)] flex-none snap-start sm:w-auto">
+                <GroupCard
+                  group={group}
+                  onJoinSuccess={handleJoinSuccess}
+                  onUpdate={handleGroupUpdate}
+                  onDelete={handleGroupDelete}
+                  currentUserId={user?.id}
+                />
+              </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="mb-5 flex gap-3 sm:mb-6">
         <div className="relative flex-1">
           {isSearching ? (
             <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
@@ -197,11 +199,11 @@ export default function GroupsPage() {
             placeholder="Search groups..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className="h-11 pl-10"
           />
         </div>
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="h-11 w-[7.5rem] flex-shrink-0 sm:w-48">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -216,20 +218,20 @@ export default function GroupsPage() {
 
       {/* Groups List */}
       {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <GroupCardSkeleton key={i} />
           ))}
         </div>
       ) : groups.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center">
-            <Users className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+          <CardContent className="py-10 text-center md:py-12">
+            <Users className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50 md:mb-4 md:h-12 md:w-12" />
             <p className="text-muted-foreground">No groups found</p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {groups.map((group) => (
             <GroupCard
               key={group.id}
@@ -301,7 +303,7 @@ function GroupCard({ group, onJoinSuccess, onUpdate, onDelete, currentUserId }: 
     <>
       <Card className="overflow-hidden hover:shadow-md transition-shadow h-full p-0">
         {/* Cover Image - fills to top with rounded corners */}
-        <div className="relative h-28 bg-gradient-to-br from-primary/20 to-accent/20">
+        <div className="relative h-24 bg-gradient-to-br from-primary/20 to-accent/20 sm:h-28">
           {group.cover_image ? (
             <Image
               src={group.cover_image}
@@ -333,8 +335,9 @@ function GroupCard({ group, onJoinSuccess, onUpdate, onDelete, currentUserId }: 
                   <Button
                     size="icon"
                     variant="secondary"
-                    className="h-7 w-7 bg-background/80 hover:bg-background"
+                    className="h-11 w-11 bg-background/85 hover:bg-background sm:h-9 sm:w-9"
                     onClick={(e) => e.stopPropagation()}
+                    aria-label={`Manage ${group.name}`}
                   >
                     <MoreVertical className="h-4 w-4" />
                   </Button>
@@ -361,7 +364,7 @@ function GroupCard({ group, onJoinSuccess, onUpdate, onDelete, currentUserId }: 
             )}
           </div>
         </div>
-        <div className="p-4 flex flex-col h-[calc(100%-7rem)]">
+        <div className="flex min-h-[8.75rem] flex-col p-3 sm:min-h-[9rem] sm:p-4">
           <div className="flex-1 min-h-0">
             <h3 className="font-semibold truncate">{group.name}</h3>
             {group.description && (
@@ -370,14 +373,15 @@ function GroupCard({ group, onJoinSuccess, onUpdate, onDelete, currentUserId }: 
               </p>
             )}
           </div>
-          <div className="flex items-center justify-between mt-3 pt-2">
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
+          <div className="mt-3 flex min-w-0 items-center justify-between gap-2 pt-1">
+            <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground sm:text-sm">
+              <span className="flex flex-shrink-0 items-center gap-1">
                 <Users className="h-4 w-4" />
-                {group.member_count} members
+                {group.member_count}
+                <span className="hidden sm:inline">members</span>
               </span>
               {group.category && (
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="max-w-24 truncate text-xs">
                   {group.category}
                 </Badge>
               )}
@@ -387,7 +391,7 @@ function GroupCard({ group, onJoinSuccess, onUpdate, onDelete, currentUserId }: 
                 size="sm"
                 variant="outline"
                 onClick={handleOpen}
-                className="ml-2 cursor-pointer"
+                className="h-11 min-w-16 flex-shrink-0 cursor-pointer px-3 sm:h-9"
               >
                 Open
               </Button>
@@ -396,7 +400,7 @@ function GroupCard({ group, onJoinSuccess, onUpdate, onDelete, currentUserId }: 
                 size="sm"
                 onClick={handleJoin}
                 disabled={isJoining}
-                className="ml-2 cursor-pointer"
+                className="h-11 min-w-16 flex-shrink-0 cursor-pointer px-3 sm:h-9"
               >
                 {isJoining ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -429,8 +433,8 @@ function GroupCard({ group, onJoinSuccess, onUpdate, onDelete, currentUserId }: 
 function GroupCardSkeleton() {
   return (
     <Card className="overflow-hidden">
-      <Skeleton className="h-32" />
-      <CardContent className="p-4 space-y-2">
+      <Skeleton className="h-24 sm:h-28" />
+      <CardContent className="space-y-2 p-3 sm:p-4">
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-1/2" />
@@ -441,15 +445,15 @@ function GroupCardSkeleton() {
 
 function GroupsPageSkeleton() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="container mx-auto px-4 py-4 md:py-8">
+      <div className="mb-6 flex items-center justify-between md:mb-8">
         <div className="space-y-2">
           <Skeleton className="h-8 w-24" />
           <Skeleton className="h-4 w-48" />
         </div>
-        <Skeleton className="h-10 w-32" />
+        <Skeleton className="h-11 w-24 sm:w-32" />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <GroupCardSkeleton key={i} />
         ))}

@@ -40,10 +40,10 @@ export function BottomNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      aria-label="Primary navigation"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border/80 bg-background/95 pb-[var(--safe-area-bottom)] shadow-[0_-8px_24px_-18px_rgba(0,0,0,0.45)] backdrop-blur-md supports-[backdrop-filter]:bg-background/85 md:hidden"
     >
-      <div className="flex items-end justify-around h-16">
+      <div className="flex h-[var(--app-bottom-nav-height)] items-end justify-around px-[var(--safe-area-left)]">
         {items.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
@@ -54,12 +54,13 @@ export function BottomNav() {
                 key={item.href}
                 href={item.href}
                 aria-label={item.label}
-                className="flex flex-col items-center justify-center -mt-5 px-2"
+                aria-current={active ? 'page' : undefined}
+                className="flex min-h-11 min-w-11 flex-col items-center justify-center px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               >
-                <span className="flex items-center justify-center w-14 h-14 rounded-full bg-wine-700 shadow-lg active:bg-wine-800 transition-colors">
-                  <Icon className="h-7 w-7 text-white" />
+                <span className="-mt-4 flex h-13 w-13 items-center justify-center rounded-full border-4 border-background bg-wine-700 shadow-lg transition-transform active:scale-95 active:bg-wine-800">
+                  <Icon className="h-6 w-6 text-white" />
                 </span>
-                <span className="text-[10px] font-medium text-wine-700 mt-0.5">{item.label}</span>
+                <span className="mt-0.5 text-[10px] font-semibold text-wine-700 dark:text-wine-300">{item.label}</span>
               </Link>
             );
           }
@@ -69,11 +70,13 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               aria-label={item.label}
+              aria-current={active ? 'page' : undefined}
               className={cn(
-                'flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors',
+                'relative flex h-full min-h-11 flex-1 flex-col items-center justify-center gap-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:bg-muted/70',
                 active ? 'text-wine-700 dark:text-wine-300' : 'text-muted-foreground'
               )}
             >
+              {active && <span className="absolute top-1 h-0.5 w-5 rounded-full bg-current" />}
               <Icon className={cn('h-5 w-5', active && 'fill-wine-700/15 dark:fill-wine-300/15')} />
               <span className="text-[10px] font-medium">{item.label}</span>
             </Link>

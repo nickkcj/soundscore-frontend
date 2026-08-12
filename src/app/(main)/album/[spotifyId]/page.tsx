@@ -9,7 +9,6 @@ import {
   Play,
   ExternalLink,
   Music,
-  Clock,
   Star,
   Disc3,
   Calendar,
@@ -138,13 +137,13 @@ export default function AlbumPage({ params }: PageProps) {
 
   if (error || !album) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <Button variant="ghost" onClick={() => router.back()} className="mb-6">
+      <div className="container mx-auto max-w-4xl px-4 py-4 md:py-8">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-3 h-11 px-2 md:mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        <div className="text-center py-20">
-          <AlertCircle className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+        <div className="text-center py-12 md:py-20">
+          <AlertCircle className="h-12 w-12 md:h-16 md:w-16 mx-auto text-muted-foreground mb-4" />
           <h2 className="text-xl font-semibold mb-2">Album not found</h2>
           <p className="text-muted-foreground">{error || 'Could not load album details'}</p>
         </div>
@@ -154,18 +153,18 @@ export default function AlbumPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
-      <div className="container mx-auto max-w-5xl px-4 py-8">
+      <div className="container mx-auto max-w-5xl px-4 py-4 md:py-8">
         {/* Back Button */}
-        <Button variant="ghost" onClick={() => router.back()} className="mb-6">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-3 h-11 px-2 md:mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
 
         {/* Album Header */}
-        <div className="flex flex-col md:flex-row gap-8 mb-10">
+        <div className="mb-6 flex items-start gap-4 md:mb-10 md:gap-8">
           {/* Album Cover */}
           <div className="flex-shrink-0">
-            <div className="relative w-64 h-64 mx-auto md:mx-0 rounded-xl overflow-hidden shadow-2xl">
+            <div className="relative h-28 w-28 overflow-hidden rounded-xl shadow-xl sm:h-36 sm:w-36 md:h-64 md:w-64 md:shadow-2xl">
               {album.cover_image ? (
                 <Image
                   src={album.cover_image}
@@ -176,28 +175,28 @@ export default function AlbumPage({ params }: PageProps) {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-wine-500/20 to-wine-800/20">
-                  <Music className="h-24 w-24 text-muted-foreground/50" />
+                  <Music className="h-12 w-12 text-muted-foreground/50 md:h-24 md:w-24" />
                 </div>
               )}
             </div>
           </div>
 
           {/* Album Info */}
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">{album.title}</h1>
+          <div className="min-w-0 flex-1 text-left">
+            <h1 className="mb-1 line-clamp-2 text-xl font-bold leading-tight sm:text-2xl md:mb-2 md:text-4xl">{album.title}</h1>
             {album.artist_spotify_id ? (
               <Link
                 href={`/artist/${album.artist_spotify_id}`}
-                className="text-xl text-muted-foreground mb-4 block hover:text-foreground transition-colors hover:underline"
+                className="mb-2 block truncate text-sm text-muted-foreground transition-colors hover:text-foreground hover:underline sm:text-base md:mb-4 md:text-xl"
               >
                 {album.artist}
               </Link>
             ) : (
-              <p className="text-xl text-muted-foreground mb-4">{album.artist}</p>
+              <p className="mb-2 truncate text-sm text-muted-foreground sm:text-base md:mb-4 md:text-xl">{album.artist}</p>
             )}
 
             {/* Meta Info */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-muted-foreground mb-4">
+            <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground md:mb-4 md:text-sm">
               <span className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
                 {formatReleaseDate(album.release_date)}
@@ -210,7 +209,7 @@ export default function AlbumPage({ params }: PageProps) {
 
             {/* Rating */}
             {album.avg_rating && (
-              <div className="flex items-center justify-center md:justify-start gap-2 mb-4 text-muted-foreground">
+              <div className="mb-2 flex items-center gap-1.5 text-muted-foreground md:mb-4 md:gap-2">
                 <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                 <span className="font-semibold text-foreground">{album.avg_rating.toFixed(1)}</span>
                 <span className="text-sm">
@@ -220,14 +219,14 @@ export default function AlbumPage({ params }: PageProps) {
             )}
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-              <Button asChild className="bg-wine-600 hover:bg-wine-700 text-white">
+            <div className="-ml-32 mt-4 grid grid-cols-2 gap-2 sm:ml-0 sm:flex sm:flex-wrap md:gap-3">
+              <Button asChild className="h-11 bg-wine-600 px-3 text-white hover:bg-wine-700">
                 <a href={album.spotify_url} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   Open in Spotify
                 </a>
               </Button>
-              <Button asChild variant="outline">
+              <Button asChild variant="outline" className="h-11 px-3">
                 <Link href={`/my-reviews?album=${spotifyId}`}>
                   <Star className="mr-2 h-4 w-4" />
                   Write Review
@@ -239,8 +238,8 @@ export default function AlbumPage({ params }: PageProps) {
 
         {/* Summary */}
         {album.summary && (
-          <Card className="mb-10">
-            <CardContent className="pt-6">
+          <Card className="mb-6 md:mb-10">
+            <CardContent className="p-4 md:p-6">
               <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <Music className="h-5 w-5 text-wine-500" />
                 About this Album
@@ -253,8 +252,8 @@ export default function AlbumPage({ params }: PageProps) {
         )}
 
         {/* Tracklist */}
-        <Card className="mb-10">
-          <CardContent className="pt-6">
+        <Card className="mb-6 md:mb-10">
+          <CardContent className="p-4 md:p-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Disc3 className="h-5 w-5 text-wine-500" />
               Tracklist
@@ -263,9 +262,9 @@ export default function AlbumPage({ params }: PageProps) {
               {album.tracks.map((track) => (
                 <div
                   key={track.track_number}
-                  className="flex items-center gap-4 py-3 hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors group"
+                  className="group -mx-2 flex min-w-0 items-center gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-muted/50 sm:gap-4 sm:py-3"
                 >
-                  <span className="w-8 text-center text-muted-foreground text-sm">
+                  <span className="w-6 shrink-0 text-center text-xs text-muted-foreground sm:w-8 sm:text-sm">
                     {track.track_number}
                   </span>
                   <div className="flex-1 min-w-0">
@@ -281,20 +280,24 @@ export default function AlbumPage({ params }: PageProps) {
                       <p className="text-sm text-muted-foreground truncate">{track.artists}</p>
                     )}
                   </div>
-                  <span className="text-sm text-muted-foreground flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
+                  <span className="shrink-0 text-xs text-muted-foreground sm:text-sm">
                     {formatDuration(track.duration_ms)}
                   </span>
-                  <a
-                    href={track.spotify_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  <Button
+                    asChild
+                    size="icon"
+                    variant="ghost"
+                    className="h-11 w-11 shrink-0 text-wine-500 opacity-100 transition-opacity hover:text-wine-600 md:opacity-0 md:group-hover:opacity-100"
                   >
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-wine-500 hover:text-wine-600">
+                    <a
+                      href={track.spotify_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Play ${track.name} on Spotify`}
+                    >
                       <Play className="h-4 w-4 fill-current" />
-                    </Button>
-                  </a>
+                    </a>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -302,7 +305,7 @@ export default function AlbumPage({ params }: PageProps) {
         </Card>
 
         {/* Reviews Section */}
-        <div className="mb-10">
+        <div className="mb-6 md:mb-10">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Star className="h-5 w-5 text-wine-500" />
             Reviews ({totalReviews})
@@ -310,8 +313,8 @@ export default function AlbumPage({ params }: PageProps) {
 
           {totalReviews === 0 ? (
             <Card>
-              <CardContent className="py-12 text-center">
-                <Star className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+              <CardContent className="py-8 text-center md:py-12">
+                <Star className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3 md:h-12 md:w-12 md:mb-4" />
                 <p className="text-muted-foreground mb-4">No reviews yet. Be the first!</p>
                 <Button asChild variant="outline">
                   <Link href={`/my-reviews?album=${spotifyId}`}>Write a Review</Link>
@@ -366,10 +369,10 @@ export default function AlbumPage({ params }: PageProps) {
 function AlbumPageSkeleton() {
   return (
     <div className="container mx-auto max-w-5xl px-4 py-8">
-      <Skeleton className="h-10 w-24 mb-6" />
+      <Skeleton className="h-11 w-24 mb-3 md:mb-6" />
 
-      <div className="flex flex-col md:flex-row gap-8 mb-10">
-        <Skeleton className="w-64 h-64 rounded-xl mx-auto md:mx-0" />
+      <div className="flex gap-4 md:gap-8 mb-6 md:mb-10">
+        <Skeleton className="h-28 w-28 shrink-0 rounded-xl sm:h-36 sm:w-36 md:h-64 md:w-64" />
         <div className="flex-1 space-y-4">
           <Skeleton className="h-10 w-3/4 mx-auto md:mx-0" />
           <Skeleton className="h-6 w-1/2 mx-auto md:mx-0" />

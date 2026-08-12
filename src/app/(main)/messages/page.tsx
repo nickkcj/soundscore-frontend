@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageSquare, Search, Loader2 } from 'lucide-react';
+import { MessageSquare, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UserAvatar } from '@/components/common/user-avatar';
@@ -54,8 +54,8 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto border-x border-border min-h-screen">
+    <div className="min-h-[var(--app-usable-height)] bg-background">
+      <div className="mx-auto min-h-[var(--app-usable-height)] w-full max-w-2xl border-border sm:border-x">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
           <div className="flex items-center justify-between px-4 h-14">
@@ -70,7 +70,7 @@ export default function MessagesPage() {
                   placeholder="Search conversations..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9"
+                  className="h-11 pl-9"
                 />
               </div>
             </div>
@@ -79,7 +79,7 @@ export default function MessagesPage() {
 
         {/* Conversations List */}
         {filteredConversations.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="px-4 py-12 text-center sm:py-16">
             <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
             <p className="text-muted-foreground">
               {search ? 'No conversations found' : 'No messages yet'}
@@ -120,7 +120,7 @@ function ConversationItem({ conversation }: { conversation: ConversationType }) 
   return (
     <Link
       href={`/messages/${other_user.username}`}
-      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors border-b border-border"
+      className="flex min-h-16 items-center gap-3 border-b border-border px-4 py-3 transition-colors hover:bg-muted/50 active:bg-muted"
     >
       <UserAvatar
         username={other_user.username}
@@ -158,8 +158,8 @@ function ConversationItem({ conversation }: { conversation: ConversationType }) 
 
 function MessagesPageSkeleton() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto border-x border-border min-h-screen">
+    <div className="min-h-[var(--app-usable-height)] bg-background">
+      <div className="mx-auto min-h-[var(--app-usable-height)] w-full max-w-2xl border-border sm:border-x">
         <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
           <div className="flex items-center px-4 h-14">
             <Skeleton className="h-6 w-28" />

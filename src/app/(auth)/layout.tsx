@@ -36,7 +36,7 @@ export default function AuthLayout({
   }
 
   return (
-    <div className="min-h-dvh flex">
+    <div className="flex min-h-dvh min-w-0 overflow-x-hidden">
       {/* Left side */}
       <div
         className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-8 pb-24"
@@ -86,10 +86,10 @@ export default function AuthLayout({
       </div>
 
       {/* Right side - Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-8 bg-muted">
-        <div className="w-full max-w-md">
+      <div className="flex w-full min-w-0 items-center justify-center bg-muted px-4 py-6 sm:p-8 lg:w-1/2">
+        <div className="w-full min-w-0 max-w-md">
           {/* Mobile Logo */}
-          <Link href="/" className="flex items-center gap-2 mb-8 lg:hidden">
+          <Link href="/" className="mb-5 flex min-h-11 items-center gap-2 lg:hidden sm:mb-8">
             <Image
               src="/images/logo_soundscore.png"
               alt="SoundScore Logo"

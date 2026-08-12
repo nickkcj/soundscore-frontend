@@ -30,8 +30,8 @@ export function TopTracks({ tracks, isLoading }: TopTracksProps) {
 
   if (tracks.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <Music className="w-12 h-12 mx-auto mb-2 opacity-30" />
+      <div className="text-center py-6 text-muted-foreground">
+        <Music className="w-10 h-10 mx-auto mb-2 opacity-30" />
         <p>No top tracks yet</p>
       </div>
     );
@@ -69,7 +69,7 @@ export function TopTracks({ tracks, isLoading }: TopTracksProps) {
             <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
           </div>
 
-          <div className="text-xs text-muted-foreground">
+          <div className="shrink-0 text-xs text-muted-foreground">
             {track.scrobble_count} plays
           </div>
         </div>

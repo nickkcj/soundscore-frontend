@@ -60,13 +60,13 @@ export default function ArtistPage({ params }: PageProps) {
 
   if (error || !artist) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        <Button variant="ghost" onClick={() => router.back()} className="mb-6">
+      <div className="container mx-auto max-w-4xl px-4 py-4 md:py-8">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-3 h-11 px-2 md:mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        <div className="text-center py-20">
-          <AlertCircle className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+        <div className="text-center py-12 md:py-20">
+          <AlertCircle className="h-12 w-12 md:h-16 md:w-16 mx-auto text-muted-foreground mb-4" />
           <h2 className="text-xl font-semibold mb-2">Artist not found</h2>
           <p className="text-muted-foreground">{error || 'Could not load artist details'}</p>
         </div>
@@ -76,18 +76,18 @@ export default function ArtistPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
-      <div className="container mx-auto max-w-5xl px-4 py-8">
+      <div className="container mx-auto max-w-5xl px-4 py-4 md:py-8">
         {/* Back Button */}
-        <Button variant="ghost" onClick={() => router.back()} className="mb-6">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-3 h-11 px-2 md:mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
 
         {/* Artist Header */}
-        <div className="flex flex-col md:flex-row gap-8 mb-10">
+        <div className="mb-6 flex items-center gap-4 md:mb-10 md:items-start md:gap-8">
           {/* Artist Image */}
           <div className="flex-shrink-0">
-            <div className="relative w-64 h-64 mx-auto md:mx-0 rounded-full overflow-hidden shadow-2xl">
+            <div className="relative h-28 w-28 overflow-hidden rounded-full shadow-xl sm:h-36 sm:w-36 md:h-64 md:w-64 md:shadow-2xl">
               {artist.image_url ? (
                 <Image
                   src={artist.image_url}
@@ -98,19 +98,19 @@ export default function ArtistPage({ params }: PageProps) {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-wine-500/20 to-wine-800/20">
-                  <Music className="h-24 w-24 text-muted-foreground/50" />
+                  <Music className="h-12 w-12 text-muted-foreground/50 md:h-24 md:w-24" />
                 </div>
               )}
             </div>
           </div>
 
           {/* Artist Info */}
-          <div className="flex-1 text-center md:text-left flex flex-col justify-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">{artist.name}</h1>
+          <div className="flex min-w-0 flex-1 flex-col justify-center text-left">
+            <h1 className="mb-2 line-clamp-2 text-2xl font-bold leading-tight md:text-4xl">{artist.name}</h1>
 
             {/* Genres */}
             {artist.genres.length > 0 && (
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
+              <div className="mb-2 flex max-h-14 flex-wrap items-center gap-1.5 overflow-hidden md:mb-4 md:max-h-none md:gap-2">
                 {artist.genres.slice(0, 5).map((genre) => (
                   <Badge key={genre} variant="secondary" className="text-xs">
                     {genre}
@@ -120,7 +120,7 @@ export default function ArtistPage({ params }: PageProps) {
             )}
 
             {/* Stats */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-muted-foreground mb-4">
+            <div className="mb-2 flex flex-wrap items-center gap-4 text-xs text-muted-foreground md:mb-4 md:text-sm">
               <span className="flex items-center gap-1">
                 <Disc3 className="h-4 w-4" />
                 {artist.albums.length} albums
@@ -128,9 +128,9 @@ export default function ArtistPage({ params }: PageProps) {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {artist.spotify_url && (
-                <Button asChild className="bg-wine-600 hover:bg-wine-700 text-white">
+                <Button asChild className="h-11 bg-wine-600 px-3 text-white hover:bg-wine-700">
                   <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Open in Spotify
@@ -143,8 +143,8 @@ export default function ArtistPage({ params }: PageProps) {
 
         {/* Bio / Summary */}
         {artist.summary && (
-          <Card className="mb-10">
-            <CardContent className="pt-6">
+          <Card className="mb-6 md:mb-10">
+            <CardContent className="p-4 md:p-6">
               <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <Music className="h-5 w-5 text-wine-500" />
                 About {artist.name}
@@ -158,12 +158,12 @@ export default function ArtistPage({ params }: PageProps) {
 
         {/* Discography */}
         {artist.albums.length > 0 && (
-          <div className="mb-10">
+          <div className="mb-6 md:mb-10">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Disc3 className="h-5 w-5 text-wine-500" />
               Discography
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4">
               {artist.albums.map((album) => (
                 <Link
                   key={album.spotify_id}
@@ -185,12 +185,12 @@ export default function ArtistPage({ params }: PageProps) {
                         </div>
                       )}
                     </div>
-                    <CardContent className="p-3">
+                    <CardContent className="p-2.5 sm:p-3">
                       <p className="font-medium text-sm truncate">{album.title}</p>
                       <p className="text-xs text-muted-foreground">
                         {formatReleaseYear(album.release_date)}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="mt-1 flex min-w-0 items-center gap-1.5">
                         {album.avg_rating ? (
                           <span className="flex items-center gap-1 text-xs">
                             <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
@@ -200,7 +200,7 @@ export default function ArtistPage({ params }: PageProps) {
                           <span className="text-xs text-muted-foreground">No ratings</span>
                         )}
                         {album.review_count > 0 && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className="truncate text-[11px] text-muted-foreground sm:text-xs">
                             ({album.review_count} {album.review_count === 1 ? 'review' : 'reviews'})
                           </span>
                         )}
@@ -219,11 +219,11 @@ export default function ArtistPage({ params }: PageProps) {
 
 function ArtistPageSkeleton() {
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-8">
-      <Skeleton className="h-10 w-24 mb-6" />
+    <div className="container mx-auto max-w-5xl px-4 py-4 md:py-8">
+      <Skeleton className="h-11 w-24 mb-3 md:mb-6" />
 
-      <div className="flex flex-col md:flex-row gap-8 mb-10">
-        <Skeleton className="w-64 h-64 rounded-full mx-auto md:mx-0" />
+      <div className="flex gap-4 md:gap-8 mb-6 md:mb-10">
+        <Skeleton className="h-28 w-28 shrink-0 rounded-full sm:h-36 sm:w-36 md:h-64 md:w-64" />
         <div className="flex-1 space-y-4 flex flex-col justify-center">
           <Skeleton className="h-10 w-3/4 mx-auto md:mx-0" />
           <div className="flex gap-2 justify-center md:justify-start">

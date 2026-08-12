@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { Search, Loader2, X } from 'lucide-react';
+import { useState } from 'react';
+import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AlbumCard, AlbumCardSkeleton } from '@/components/common/album-card';
@@ -44,21 +44,22 @@ export function AlbumSearch({ onSelect, selectedAlbum }: AlbumSearchProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search for an album..."
           value={query}
           onChange={handleChange}
-          className="pl-10 pr-10"
+          className="h-11 pr-12 pl-10"
         />
         {query && (
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+            className="absolute right-0 top-1/2 h-11 w-11 -translate-y-1/2"
             onClick={handleClear}
+            aria-label="Clear album search"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -67,22 +68,25 @@ export function AlbumSearch({ onSelect, selectedAlbum }: AlbumSearchProps) {
 
       {/* Selected Album */}
       {selectedAlbum && !query && (
-        <div className="p-4 rounded-lg border bg-muted/50">
+        <div className="min-w-0 rounded-xl border bg-muted/50 p-3 sm:p-4">
           <p className="text-sm font-medium mb-2">Selected Album</p>
-          <div className="flex items-center gap-4">
-            <AlbumCard
-              spotifyId={selectedAlbum.spotify_id}
-              title={selectedAlbum.title}
-              artist={selectedAlbum.artist}
-              coverImage={selectedAlbum.cover_image}
-              releaseDate={selectedAlbum.release_date}
-              size="sm"
-              selected
-            />
+          <div className="flex min-w-0 flex-col items-start gap-3 min-[360px]:flex-row min-[360px]:items-center sm:gap-4 [&_[data-slot=card]]:w-28 sm:[&_[data-slot=card]]:w-32">
+            <div className="shrink-0">
+              <AlbumCard
+                spotifyId={selectedAlbum.spotify_id}
+                title={selectedAlbum.title}
+                artist={selectedAlbum.artist}
+                coverImage={selectedAlbum.cover_image}
+                releaseDate={selectedAlbum.release_date}
+                size="sm"
+                selected
+              />
+            </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => onSelect(null as unknown as SpotifyAlbumResult)}
+              className="min-h-11 min-w-0 max-w-full whitespace-normal"
             >
               Change album
             </Button>
@@ -94,13 +98,13 @@ export function AlbumSearch({ onSelect, selectedAlbum }: AlbumSearchProps) {
       {query && (
         <div className="space-y-3">
           {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 [&_[data-slot=card]]:w-full">
               {Array.from({ length: 8 }).map((_, i) => (
                 <AlbumCardSkeleton key={i} size="sm" />
               ))}
             </div>
           ) : error ? (
-            <div className="text-center py-8 text-destructive">
+            <div className="py-8 text-center text-destructive">
               {error}
             </div>
           ) : results.length === 0 ? (
@@ -108,7 +112,7 @@ export function AlbumSearch({ onSelect, selectedAlbum }: AlbumSearchProps) {
               No albums found. Try a different search term.
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 [&_[data-slot=card]]:w-full">
               {results.map((album) => (
                 <AlbumCard
                   key={album.spotify_id}

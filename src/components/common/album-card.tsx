@@ -40,11 +40,21 @@ export function AlbumCard({
   const content = (
     <Card
       className={cn(
-        'overflow-hidden transition-all duration-200 hover:shadow-lg group cursor-pointer',
+        'group overflow-hidden transition-all duration-200',
+        (onClick || !selected) && 'cursor-pointer active:scale-[0.98] md:hover:shadow-lg',
         selected && 'ring-2 ring-primary',
         sizeClasses[size]
       )}
       onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-pressed={onClick ? selected : undefined}
+      onKeyDown={onClick ? (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      } : undefined}
     >
       <div className="aspect-square relative bg-muted overflow-hidden">
         {coverImage ? (
@@ -52,7 +62,7 @@ export function AlbumCard({
             src={coverImage}
             alt={title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-200"
+            className="object-cover transition-transform duration-200 md:group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
@@ -60,7 +70,7 @@ export function AlbumCard({
           </div>
         )}
       </div>
-      <CardContent className="p-3">
+      <CardContent className="min-w-0 p-2.5 sm:p-3">
         <h3 className="font-medium text-sm truncate" title={title}>
           {title}
         </h3>
@@ -84,7 +94,7 @@ export function AlbumCard({
     </Card>
   );
 
-  if (onClick) {
+  if (onClick || selected) {
     return content;
   }
 

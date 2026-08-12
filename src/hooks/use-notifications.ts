@@ -40,7 +40,7 @@ export function useNotifications() {
 export function useNotificationStream() {
   const channelRef = useRef<RealtimeChannel | null>(null);
   const { fetchUnreadCount, fetchNotifications } = useNotificationStore();
-  const user = useAuthStore((s) => s.user);
+  const userId = useAuthStore((s) => s.user?.id);
 
   // Fetch initial data on mount
   useEffect(() => {
@@ -49,7 +49,7 @@ export function useNotificationStream() {
   }, [fetchUnreadCount, fetchNotifications]);
 
   const subscribe = useCallback(async () => {
-    if (!user?.id) return;
+    if (!userId) return;
 
     // Tear down any existing channel before creating a new one
     if (channelRef.current) {
@@ -67,14 +67,14 @@ export function useNotificationStream() {
     }
 
     const channel = supabase
-      .channel(`notifications:user:${user.id}`)
+      .channel(`notifications:user:${userId}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'notifications',
-          filter: `recipient_id=eq.${user.id}`,
+          filter: `recipient_id=eq.${userId}`,
         },
         () => {
           // Payload is raw row — refetch instead of injecting partial data
@@ -86,7 +86,7 @@ export function useNotificationStream() {
       .subscribe();
 
     channelRef.current = channel;
-  }, [user?.id, fetchUnreadCount, fetchNotifications]);
+  }, [userId, fetchUnreadCount, fetchNotifications]);
 
   const unsubscribe = useCallback(() => {
     if (channelRef.current) {

@@ -16,7 +16,7 @@ import { useDMWebSocket } from '@/hooks/use-dm-websocket';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { ReviewShareCard, tryParseReviewShare } from '@/components/reviews/review-share-card';
-import type { DirectMessageType, DMMessageListResponse, ConversationType } from '@/types';
+import type { DirectMessageType, DMMessageListResponse } from '@/types';
 
 interface OtherUser {
   id: number;
@@ -256,14 +256,15 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
   }
 
   return (
-    <div className="h-[calc(100vh-73px)] bg-background">
-      <div className="max-w-2xl mx-auto border-x border-border h-full flex flex-col">
+    <div className="h-[var(--app-usable-height)] min-h-0 bg-background">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-2xl flex-col border-border sm:border-x">
         {/* Header */}
         <div className="bg-background/80 backdrop-blur-md border-b border-border flex-shrink-0">
           <div className="flex items-center gap-3 px-4 h-14">
             <Link
               href="/messages"
-              className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors"
+              className="-ml-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-muted active:bg-muted"
+              aria-label="Back to conversations"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
@@ -296,7 +297,7 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
           className="flex-1 overflow-y-auto min-h-0"
           onScroll={handleMessagesScroll}
         >
-          <div className="space-y-4 px-4 py-4">
+          <div className="space-y-3 px-4 py-4 sm:space-y-4">
             {messages.length === 0 && (
               <div className="text-center py-12 text-muted-foreground text-sm">
                 Send a message to start the conversation
@@ -327,19 +328,20 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
 
         {/* Image Preview */}
         {imagePreview && (
-          <div className="px-4 py-2 border-t bg-muted/30 flex-shrink-0">
+          <div className="max-h-32 flex-shrink-0 overflow-y-auto border-t bg-muted/30 px-4 py-2">
             <div className="relative inline-block">
               <Image
                 src={imagePreview}
                 alt="Preview"
                 width={120}
                 height={120}
-                className="rounded-lg object-cover"
+                className="h-24 w-24 rounded-lg object-cover sm:h-[120px] sm:w-[120px]"
               />
               <button
                 type="button"
                 onClick={clearSelectedImage}
-                className="absolute -top-2 -right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                className="absolute -right-3 -top-3 flex h-11 w-11 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90"
+                aria-label="Remove selected image"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -348,7 +350,7 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
         )}
 
         {/* Input */}
-        <form onSubmit={handleSendMessage} className="flex gap-2 p-3 border-t bg-muted/30 flex-shrink-0">
+        <form onSubmit={handleSendMessage} className="flex flex-shrink-0 items-center gap-2 border-t bg-background/95 px-3 py-2 backdrop-blur sm:py-3">
           <input
             ref={fileInputRef}
             type="file"
@@ -362,7 +364,8 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             disabled={!isConnected || isUploading}
-            className="h-10 w-10 flex-shrink-0"
+            className="h-11 w-11 flex-shrink-0"
+            aria-label="Attach an image"
           >
             <ImageIcon className="h-5 w-5" />
           </Button>
@@ -380,11 +383,14 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
               }, 500);
             }}
             disabled={!isConnected || isUploading}
-            className="h-10"
+            className="h-11 min-w-0"
           />
           <Button
             type="submit"
             disabled={!isConnected || isUploading || (!messageInput.trim() && !selectedImage)}
+            size="icon"
+            className="h-11 w-11 shrink-0"
+            aria-label="Send message"
           >
             {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
@@ -398,14 +404,8 @@ function MessageItem({ message, isOwn }: { message: DirectMessageType; isOwn: bo
   const [isImageLoading, setIsImageLoading] = useState(true);
   const reviewShare = message.content ? tryParseReviewShare(message.content) : null;
 
-  useEffect(() => {
-    if (message.image_url) {
-      setIsImageLoading(true);
-    }
-  }, [message.image_url]);
-
   return (
-    <div className={cn('flex gap-3', isOwn && 'flex-row-reverse')}>
+    <div className={cn('flex min-w-0 gap-2 sm:gap-3', isOwn && 'flex-row-reverse')}>
       <div className="flex-shrink-0">
         <UserAvatar
           username={message.sender_username}
@@ -414,12 +414,12 @@ function MessageItem({ message, isOwn }: { message: DirectMessageType; isOwn: bo
           showLink={!isOwn}
         />
       </div>
-      <div className={cn('max-w-[70%]', isOwn && 'text-right')}>
-        <div className="flex items-center gap-2 mb-1">
-          <span className={cn('text-sm font-medium', isOwn && 'order-2')}>
+      <div className={cn('min-w-0 max-w-[calc(100%-2.5rem)] sm:max-w-[70%]', isOwn && 'text-right')}>
+        <div className="mb-1 flex min-w-0 items-center gap-2">
+          <span className={cn('min-w-0 truncate text-sm font-medium', isOwn && 'order-2')}>
             {message.sender_username}
           </span>
-          <span className="text-xs text-muted-foreground">
+          <span className="shrink-0 text-[11px] text-muted-foreground sm:text-xs">
             {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
           </span>
         </div>
@@ -436,22 +436,28 @@ function MessageItem({ message, isOwn }: { message: DirectMessageType; isOwn: bo
             {message.image_url && (
               <div className="relative mb-2 last:mb-0">
                 {isImageLoading && (
-                  <div className="w-[250px] h-[200px] bg-muted-foreground/20 animate-pulse rounded-lg flex items-center justify-center">
+                  <div className="flex h-44 w-[min(250px,65vw)] items-center justify-center rounded-lg bg-muted-foreground/20 animate-pulse sm:h-[200px]">
                     <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                   </div>
                 )}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={message.image_url}
-                  alt="Message image"
+                <button
+                  type="button"
+                  aria-label="Open message image in a new tab"
+                  onClick={() => window.open(message.image_url!, '_blank', 'noopener,noreferrer')}
                   className={cn(
-                    'max-w-[250px] max-h-[300px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity',
+                    'block max-w-full overflow-hidden rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     isImageLoading && 'hidden'
                   )}
-                  onLoad={() => setIsImageLoading(false)}
-                  onError={() => setIsImageLoading(false)}
-                  onClick={() => window.open(message.image_url!, '_blank')}
-                />
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={message.image_url}
+                    alt="Message image"
+                    className="h-auto max-h-[min(300px,42dvh)] w-auto max-w-full object-cover"
+                    onLoad={() => setIsImageLoading(false)}
+                    onError={() => setIsImageLoading(false)}
+                  />
+                </button>
               </div>
             )}
             {message.content && (
@@ -466,8 +472,8 @@ function MessageItem({ message, isOwn }: { message: DirectMessageType; isOwn: bo
 
 function DMChatSkeleton() {
   return (
-    <div className="h-[calc(100vh-73px)] bg-background">
-      <div className="max-w-2xl mx-auto border-x border-border h-full flex flex-col">
+    <div className="h-[var(--app-usable-height)] min-h-0 bg-background">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-2xl flex-col border-border sm:border-x">
         <div className="bg-background/80 backdrop-blur-md border-b border-border flex-shrink-0">
           <div className="flex items-center gap-3 px-4 h-14">
             <Skeleton className="h-9 w-9 rounded-full" />

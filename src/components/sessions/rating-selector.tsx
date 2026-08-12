@@ -10,7 +10,7 @@ interface RatingSelectorProps {
 
 export function RatingSelector({ value, onChange, disabled }: RatingSelectorProps) {
   return (
-    <div className="flex flex-wrap gap-2 justify-center" role="group" aria-label="Rating from 0 to 10">
+    <div className="grid grid-cols-6 gap-2 sm:flex sm:flex-wrap sm:justify-center" role="group" aria-label="Rating from 0 to 10">
       {Array.from({ length: 11 }, (_, i) => i).map((n) => {
         const isSelected = value === n;
         return (
@@ -22,7 +22,7 @@ export function RatingSelector({ value, onChange, disabled }: RatingSelectorProp
             aria-label={`Rate ${n}`}
             aria-pressed={isSelected}
             className={cn(
-              'min-w-[44px] h-11 rounded-lg text-base font-bold transition-all duration-150',
+              'h-11 min-w-0 rounded-lg text-base font-bold transition-all duration-150 sm:min-w-[44px]',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-wine-500 focus-visible:ring-offset-2',
               'disabled:opacity-50 disabled:pointer-events-none',
               isSelected

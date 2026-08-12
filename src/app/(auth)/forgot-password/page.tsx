@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
           <div className="space-y-2">
             <h1 className="text-2xl font-bold tracking-tight">Check your email</h1>
             <p className="text-muted-foreground">
-              If an account with that email exists, we've sent a link to reset your password.
+              If an account with that email exists, we&apos;ve sent a link to reset your password.
               The link expires in 15 minutes.
             </p>
           </div>
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
         <div className="space-y-4">
           <Button
             variant="outline"
-            className="w-full"
+            className="h-11 w-full"
             onClick={() => setIsSubmitted(false)}
           >
             Try another email
@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Forgot your password?</h1>
         <p className="text-muted-foreground">
-          Enter your email and we'll send you a link to reset your password.
+          Enter your email and we&apos;ll send you a link to reset your password.
         </p>
       </div>
 
@@ -98,13 +98,14 @@ export default function ForgotPasswordPage() {
             placeholder="Enter your email"
             {...register('email')}
             disabled={isLoading}
+            className="h-11"
           />
           {errors.email && (
             <p className="text-sm text-destructive">{errors.email.message}</p>
           )}
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="h-11 w-full" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Send recovery link
         </Button>

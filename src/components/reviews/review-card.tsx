@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
@@ -23,37 +23,20 @@ import type { Review } from '@/types';
 
 // Componente de animação de coração flutuante
 function FloatingHearts({ show }: { show: boolean }) {
-  const [hearts, setHearts] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (show) {
-      // Cria 5 corações com IDs únicos
-      const newHearts = Array.from({ length: 5 }, (_, i) => Date.now() + i);
-      setHearts(newHearts);
-
-      // Remove os corações após a animação terminar
-      const timer = setTimeout(() => {
-        setHearts([]);
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [show]);
-
-  if (hearts.length === 0) return null;
+  if (!show) return null;
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-visible">
-      {hearts.map((id, index) => (
+      {Array.from({ length: 5 }, (_, index) => (
         <Heart
-          key={id}
+          key={index}
           className="absolute text-red-500 fill-red-500 animate-float-heart"
           style={{
             left: `${45 + (index - 2) * 5}%`,
             bottom: '0',
             animationDelay: `${index * 0.08}s`,
-            width: `${12 + Math.random() * 8}px`,
-            height: `${12 + Math.random() * 8}px`,
+            width: `${12 + ((index * 3) % 8)}px`,
+            height: `${12 + ((index * 3) % 8)}px`,
           }}
         />
       ))}
@@ -118,7 +101,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
     if (!review.is_liked) {
       setAnimationKey(prev => prev + 1);
       setShowHearts(true);
-      setTimeout(() => setShowHearts(false), 100);
+      setTimeout(() => setShowHearts(false), 1000);
     }
 
     setIsLiking(true);
@@ -127,7 +110,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
   };
 
   return (
-    <article className="flex gap-3 px-4 py-3 transition-colors hover:bg-muted/30">
+    <article className="flex min-w-0 gap-3 px-4 py-3 transition-colors md:hover:bg-muted/30">
       <Link href={`/profile/${review.username}`} className="shrink-0 self-start">
         <UserAvatar
           username={review.username}
@@ -138,7 +121,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
 
       <div className="min-w-0 flex-1">
         {/* Header inline: nome · tempo + menu do dono */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex min-w-0 items-center gap-1.5">
           <Link
             href={`/profile/${review.username}`}
             className="truncate text-sm font-semibold hover:underline"
@@ -146,13 +129,13 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
             {review.username}
           </Link>
           <span className="text-sm text-muted-foreground">·</span>
-          <span className="shrink-0 text-sm text-muted-foreground">
+          <span className="min-w-0 truncate text-sm text-muted-foreground">
             {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
           </span>
           {isOwner && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="ml-auto h-7 w-7 text-muted-foreground">
+                <Button aria-label="Review actions" variant="ghost" size="icon" className="ml-auto h-11 w-11 shrink-0 text-muted-foreground sm:h-9 sm:w-9">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -185,7 +168,7 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
         {/* Álbum como anexo compacto (link-card) */}
         <Link
           href={`/album/${review.album.spotify_id}`}
-          className="mt-2 flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-2 transition-colors hover:bg-muted/60"
+          className="mt-2 flex min-w-0 items-center gap-3 rounded-xl border border-border bg-muted/30 p-2 transition-colors active:bg-muted/60 md:hover:bg-muted/60"
         >
           <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted">
             {review.album.cover_image ? (
@@ -214,14 +197,14 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
         </Link>
 
         {/* Ações compactas inline */}
-        <div className="-ml-2 mt-1 flex items-center gap-4 text-muted-foreground">
+        <div className="-ml-2 mt-1 flex items-center gap-1 text-muted-foreground sm:gap-4">
           <div className="relative">
             <FloatingHearts key={animationKey} show={showHearts} />
             <Button
               variant="ghost"
               size="sm"
               className={cn(
-                'h-8 gap-1.5 px-2 text-xs transition-transform active:scale-95',
+                'h-11 min-w-11 gap-1.5 px-2 text-xs transition-transform active:scale-95 sm:h-9',
                 review.is_liked && 'text-red-500 hover:text-red-600'
               )}
               onClick={handleLike}
@@ -238,16 +221,16 @@ export function ReviewCard({ review, onLike, onDelete, showComments = true, show
           </div>
 
           {showComments && (
-            <Link href={`/reviews/${review.uuid}`}>
-              <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2 text-xs">
+            <Button asChild variant="ghost" size="sm" className="h-11 min-w-11 gap-1.5 px-2 text-xs sm:h-9">
+              <Link href={`/reviews/${review.uuid}`} aria-label={`${review.comment_count} comments`}>
                 <MessageCircle className="h-4 w-4" />
                 <span>{review.comment_count}</span>
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           )}
 
           <ShareModal reviewUuid={review.uuid}>
-            <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2 text-xs">
+            <Button aria-label="Share review" variant="ghost" size="sm" className="h-11 min-w-11 gap-1.5 px-2 text-xs sm:h-9">
               <Share2 className="h-4 w-4" />
             </Button>
           </ShareModal>

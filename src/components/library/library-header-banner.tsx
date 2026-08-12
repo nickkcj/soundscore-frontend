@@ -14,7 +14,7 @@ interface LibraryHeaderBannerProps {
 export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryHeaderBannerProps) {
   if (isLoading) {
     return (
-      <div className="relative h-36 lg:h-48 rounded-xl overflow-hidden bg-muted animate-pulse">
+      <div className="relative h-28 sm:h-36 lg:h-48 rounded-xl overflow-hidden bg-muted animate-pulse">
         <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-background/40" />
       </div>
     );
@@ -23,7 +23,7 @@ export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryH
   const bannerImage = topArtist?.image;
 
   return (
-    <div className="relative h-36 lg:h-48 rounded-xl overflow-hidden">
+    <div className="relative min-h-28 sm:h-36 lg:h-48 rounded-xl overflow-hidden">
       {/* Background Image - blurred for ambient effect */}
       {bannerImage ? (
         <Image
@@ -41,7 +41,7 @@ export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryH
       <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
 
       {/* Content */}
-      <div className="relative h-full flex items-center justify-between px-4 lg:px-6">
+      <div className="relative flex min-h-28 items-center justify-between gap-3 px-4 py-4 sm:h-full lg:px-6">
         {/* Left: Title */}
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold">Library</h1>
@@ -80,7 +80,7 @@ export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryH
               <Button
                 size="icon"
                 variant="ghost"
-                className="rounded-full flex-shrink-0"
+                className="h-11 w-11 rounded-full flex-shrink-0"
                 onClick={() => window.open(`https://open.spotify.com/track/${topTrack.track_id}`, '_blank')}
               >
                 <Play className="w-4 h-4" />

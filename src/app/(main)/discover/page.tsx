@@ -118,10 +118,10 @@ export default function DiscoverPage() {
   const showReviews = tab === 'all' || tab === 'reviews';
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto max-w-6xl px-4 py-8 md:py-12">
+    <div className="app-usable-viewport min-w-0 bg-background">
+      <main className="container mx-auto max-w-6xl px-4 py-3 sm:py-6 md:py-12">
         {/* Search Section */}
-        <section className="mb-6">
+        <section className="mb-3 sm:mb-6">
           <div className="max-w-3xl mx-auto">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -131,43 +131,43 @@ export default function DiscoverPage() {
                 placeholder="Search albums, users, or reviews..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 text-lg border-2 border-border rounded-full focus:border-wine-400 focus:ring-wine-400 transition-all bg-background shadow-sm"
+                className="h-12 w-full rounded-full border-2 border-border bg-background py-3 pl-12 pr-4 text-base shadow-sm transition-all focus:border-wine-400 focus:ring-wine-400 sm:text-lg"
               />
             </div>
           </div>
         </section>
 
         {/* Category Tabs */}
-        <Tabs value={tab} onValueChange={setTab} className="mb-8">
+        <Tabs value={tab} onValueChange={setTab} className="mb-5 sm:mb-8">
           <div className="flex justify-center">
-            <TabsList className="bg-card shadow-sm border border-border rounded-full p-1.5">
+            <TabsList className="grid h-auto w-full max-w-xl grid-cols-4 rounded-full border border-border bg-card p-1 shadow-sm sm:p-1.5">
               <TabsTrigger
                 value="all"
-                className="rounded-full px-4 sm:px-6 py-2.5 data-[state=active]:bg-wine-600 data-[state=active]:text-white transition-all"
+                className="min-h-11 rounded-full px-1 py-2 text-xs transition-all data-[state=active]:bg-wine-600 data-[state=active]:text-white sm:px-4 sm:text-sm"
               >
-                <Sparkles className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">All</span>
+                <Sparkles className="mr-1 h-4 w-4 sm:mr-2" />
+                <span>All</span>
               </TabsTrigger>
               <TabsTrigger
                 value="albums"
-                className="rounded-full px-4 sm:px-6 py-2.5 data-[state=active]:bg-wine-600 data-[state=active]:text-white transition-all"
+                className="min-h-11 rounded-full px-1 py-2 text-xs transition-all data-[state=active]:bg-wine-600 data-[state=active]:text-white sm:px-4 sm:text-sm"
               >
-                <Disc3 className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Albums</span>
+                <Disc3 className="mr-1 h-4 w-4 sm:mr-2" />
+                <span>Albums</span>
               </TabsTrigger>
               <TabsTrigger
                 value="users"
-                className="rounded-full px-4 sm:px-6 py-2.5 data-[state=active]:bg-wine-600 data-[state=active]:text-white transition-all"
+                className="min-h-11 rounded-full px-1 py-2 text-xs transition-all data-[state=active]:bg-wine-600 data-[state=active]:text-white sm:px-4 sm:text-sm"
               >
-                <Users className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Users</span>
+                <Users className="mr-1 h-4 w-4 sm:mr-2" />
+                <span>Users</span>
               </TabsTrigger>
               <TabsTrigger
                 value="reviews"
-                className="rounded-full px-4 sm:px-6 py-2.5 data-[state=active]:bg-wine-600 data-[state=active]:text-white transition-all"
+                className="min-h-11 rounded-full px-1 py-2 text-xs transition-all data-[state=active]:bg-wine-600 data-[state=active]:text-white sm:px-4 sm:text-sm"
               >
-                <MessageSquareText className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Reviews</span>
+                <MessageSquareText className="mr-1 h-4 w-4 sm:mr-2" />
+                <span>Reviews</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -182,9 +182,9 @@ export default function DiscoverPage() {
             isLoading={exploreLoading}
           />
         ) : isLoading ? (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {showAlbums && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 lg:grid-cols-5 lg:gap-6">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <AlbumCardSkeleton key={i} size="md" />
                 ))}
@@ -199,9 +199,9 @@ export default function DiscoverPage() {
             )}
           </div>
         ) : !hasResults ? (
-          <div className="text-center py-20 bg-card/50 backdrop-blur-sm rounded-2xl border border-border shadow-sm">
-            <div className="bg-muted w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6">
-              <Music className="h-12 w-12 text-muted-foreground" />
+          <div className="rounded-2xl border border-border bg-card/50 px-4 py-10 text-center shadow-sm backdrop-blur-sm sm:py-20">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted sm:mb-6 sm:h-24 sm:w-24">
+              <Music className="h-8 w-8 text-muted-foreground sm:h-12 sm:w-12" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">No Results Found</h3>
             <p className="text-muted-foreground max-w-md mx-auto">
@@ -209,11 +209,11 @@ export default function DiscoverPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-10">
+          <div className="space-y-7 sm:space-y-10">
             {/* Albums */}
             {showAlbums && results.albums.length > 0 && (
               <SectionBlock icon={Disc3} title="Albums" count={results.albums.length}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 lg:grid-cols-5 lg:gap-6">
                   {results.albums.map((album) => (
                     <AlbumCard
                       key={album.spotify_id}
@@ -272,11 +272,11 @@ function SectionBlock({
 }) {
   return (
     <div>
-      <h2 className="text-xl font-bold text-foreground mb-4 flex items-center">
+      <h2 className="mb-3 flex min-w-0 items-center text-lg font-bold text-foreground sm:mb-4 sm:text-xl">
         <Icon className="h-5 w-5 text-wine-500 mr-2" />
         {title}
         {count !== undefined && (
-          <span className="ml-3 text-sm font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full">
+          <span className="ml-2 shrink-0 rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground sm:ml-3 sm:px-3 sm:text-sm">
             {count} {count === 1 ? 'result' : 'results'}
           </span>
         )}
@@ -291,14 +291,14 @@ function ReviewHitRow({ review }: { review: ReviewHit }) {
   return (
     <Link
       href={`/reviews/${review.uuid}`}
-      className="flex gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
+      className="flex min-w-0 gap-2.5 px-3 py-3 transition-colors hover:bg-muted/30 sm:gap-3 sm:px-4"
     >
       <UserAvatar username={review.username} profilePicture={review.user_profile_picture} size="md" />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 text-sm">
+        <div className="flex min-w-0 items-center gap-1.5 text-sm">
           <span className="font-semibold truncate">{review.username}</span>
           <span className="text-muted-foreground">·</span>
-          <span className="shrink-0 text-muted-foreground">
+          <span className="min-w-0 truncate text-xs text-muted-foreground sm:shrink-0 sm:text-sm">
             {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
           </span>
         </div>
@@ -347,10 +347,10 @@ function ExploreContent({
 }) {
   if (isLoading) {
     return (
-      <div className="space-y-10">
+      <div className="space-y-7 sm:space-y-10">
         <div>
           <Skeleton className="h-6 w-44 mb-4" />
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 lg:grid-cols-5 lg:gap-6">
             {Array.from({ length: 5 }).map((_, i) => (
               <AlbumCardSkeleton key={i} size="md" />
             ))}
@@ -371,9 +371,9 @@ function ExploreContent({
   const isEmpty = trending.length === 0 && recentReviews.length === 0 && suggestedUsers.length === 0;
   if (isEmpty) {
     return (
-      <div className="text-center py-20 bg-card/50 backdrop-blur-sm rounded-2xl border border-border shadow-sm">
-        <div className="bg-wine-50 dark:bg-wine-950/30 w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6">
-          <Search className="h-12 w-12 text-wine-400" />
+      <div className="rounded-2xl border border-border bg-card/50 px-4 py-10 text-center shadow-sm backdrop-blur-sm sm:py-20">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-wine-50 dark:bg-wine-950/30 sm:mb-6 sm:h-24 sm:w-24">
+          <Search className="h-8 w-8 text-wine-400 sm:h-12 sm:w-12" />
         </div>
         <h3 className="text-xl font-bold text-foreground mb-2">Ready to Explore?</h3>
         <p className="text-muted-foreground max-w-md mx-auto">
@@ -384,11 +384,11 @@ function ExploreContent({
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-7 sm:space-y-10">
       {/* Trending da semana */}
       {trending.length > 0 && (
         <SectionBlock icon={TrendingUp} title="Trending This Week">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 lg:grid-cols-5 lg:gap-6">
             {trending.map((album) => (
               <AlbumCard
                 key={album.spotify_id}
@@ -409,7 +409,7 @@ function ExploreContent({
       {/* Quem seguir */}
       {suggestedUsers.length > 0 && (
         <SectionBlock icon={Users} title="Who to Follow">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {suggestedUsers.map((user) => (
               <UserCard key={user.id} user={user} />
             ))}
@@ -425,7 +425,7 @@ function ExploreContent({
               <Link
                 key={review.id}
                 href={`/album/${review.album_spotify_id}`}
-                className="flex gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
+                className="flex min-w-0 gap-2.5 px-3 py-3 transition-colors hover:bg-muted/30 sm:gap-3 sm:px-4"
               >
                 <UserAvatar
                   username={review.username}
@@ -433,10 +433,10 @@ function ExploreContent({
                   size="md"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5 text-sm">
+                  <div className="flex min-w-0 items-center gap-1.5 text-sm">
                     <span className="font-semibold truncate">{review.username}</span>
                     <span className="text-muted-foreground">·</span>
-                    <span className="shrink-0 text-muted-foreground">
+                    <span className="min-w-0 truncate text-xs text-muted-foreground sm:shrink-0 sm:text-sm">
                       {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
                     </span>
                   </div>
@@ -445,11 +445,11 @@ function ExploreContent({
                       {review.text}
                     </p>
                   )}
-                  <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                    <span className="truncate">
+                  <div className="mt-1 flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+                    <span className="min-w-0 flex-1 truncate">
                       {review.album_title} — {review.album_artist}
                     </span>
-                    <StarRating rating={review.rating} size="sm" />
+                    <span className="shrink-0"><StarRating rating={review.rating} size="sm" /></span>
                   </div>
                 </div>
               </Link>
@@ -463,11 +463,11 @@ function ExploreContent({
 
 function UserCard({ user }: { user: UserListItem }) {
   return (
-    <Link href={`/profile/${user.username}`}>
-      <div className="bg-card rounded-xl shadow-sm border border-border p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-        <div className="flex items-center gap-4">
+    <Link href={`/profile/${user.username}`} className="block min-h-11 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wine-500">
+      <div className="rounded-xl border border-border bg-card p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg sm:p-5">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-wine-100">
+            <div className="h-12 w-12 overflow-hidden rounded-full ring-2 ring-wine-100 sm:h-16 sm:w-16">
               <Image
                 src={user.profile_picture || '/images/default.jpg'}
                 alt={user.username}
@@ -478,14 +478,14 @@ function UserCard({ user }: { user: UserListItem }) {
             </div>
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-foreground truncate text-lg">{user.username}</h3>
+            <h3 className="truncate font-bold text-foreground sm:text-lg">{user.username}</h3>
             {user.bio && (
               <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{user.bio}</p>
             )}
           </div>
-          <button className="px-4 py-2 bg-wine-600 hover:bg-wine-700 text-white text-sm font-medium rounded-full transition-all shadow-sm">
+          <span className="flex min-h-11 shrink-0 items-center rounded-full bg-wine-600 px-3 py-2 text-xs font-medium text-white shadow-sm transition-all sm:px-4 sm:text-sm">
             View
-          </button>
+          </span>
         </div>
       </div>
     </Link>
@@ -494,14 +494,14 @@ function UserCard({ user }: { user: UserListItem }) {
 
 function UserCardSkeleton() {
   return (
-    <div className="bg-card rounded-xl shadow-sm border border-border p-5">
-      <div className="flex items-center gap-4">
-        <Skeleton className="h-16 w-16 rounded-full" />
+    <div className="rounded-xl border border-border bg-card p-3 shadow-sm sm:p-5">
+      <div className="flex items-center gap-3 sm:gap-4">
+        <Skeleton className="h-12 w-12 rounded-full sm:h-16 sm:w-16" />
         <div className="flex-1 space-y-2">
           <Skeleton className="h-5 w-32" />
           <Skeleton className="h-4 w-full" />
         </div>
-        <Skeleton className="h-9 w-16 rounded-full" />
+        <Skeleton className="h-11 w-16 rounded-full" />
       </div>
     </div>
   );

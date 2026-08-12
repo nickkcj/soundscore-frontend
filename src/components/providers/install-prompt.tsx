@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Download, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/stores/auth-store';
+import { cn } from '@/lib/utils';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -20,6 +22,7 @@ const DISMISSED_KEY = 'soundscore-install-dismissed';
 export function InstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
     // Já instalado (rodando standalone) ou dispensado antes: não mostra
@@ -54,14 +57,20 @@ export function InstallPrompt() {
 
   return (
     <div
-      className="fixed left-4 right-4 z-[60] md:left-auto md:right-6 md:max-w-sm rounded-2xl border border-border bg-card shadow-lg p-4 flex items-center gap-3"
-      style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}
+      role="region"
+      aria-label="Install SoundScore"
+      className={cn(
+        'fixed left-4 right-4 z-[60] flex items-center gap-3 rounded-2xl border border-border/80 bg-card/95 p-3 shadow-xl backdrop-blur-md md:bottom-6 md:left-auto md:right-6 md:max-w-sm md:p-4',
+        isAuthenticated
+          ? 'bottom-[calc(var(--app-bottom-nav-height)+var(--safe-area-bottom)+0.75rem)]'
+          : 'bottom-[calc(var(--safe-area-bottom)+0.75rem)]'
+      )}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/icons/icon-maskable-192.png"
         alt="SoundScore"
-        className="h-12 w-12 rounded-xl shrink-0"
+        className="h-10 w-10 shrink-0 rounded-xl sm:h-12 sm:w-12"
       />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-foreground">Install SoundScore</p>
@@ -72,15 +81,16 @@ export function InstallPrompt() {
       <Button
         size="sm"
         onClick={install}
-        className="bg-wine-600 hover:bg-wine-700 text-white rounded-full shrink-0"
+        aria-label="Install SoundScore"
+        className="h-11 min-w-11 shrink-0 rounded-full bg-wine-600 px-0 text-white hover:bg-wine-700 sm:px-4"
       >
-        <Download className="h-4 w-4 mr-1" />
-        Install
+        <Download className="h-4 w-4 sm:mr-1" />
+        <span className="hidden sm:inline">Install</span>
       </Button>
       <button
         onClick={dismiss}
         aria-label="Dismiss"
-        className="shrink-0 text-muted-foreground hover:text-foreground"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <X className="h-4 w-4" />
       </button>

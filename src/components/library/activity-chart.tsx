@@ -20,7 +20,7 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
         </div>
         <div className="space-y-1">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 animate-pulse">
+            <div key={i} className="flex items-center gap-2 sm:gap-3 animate-pulse">
               <div className="w-14 h-4 bg-muted rounded" />
               <div className="flex-1 h-5 bg-muted rounded" />
               <div className="w-8 h-4 bg-muted rounded" />
@@ -33,7 +33,7 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
 
   if (!data || data.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground text-sm">
+      <div className="text-center py-6 text-muted-foreground text-sm">
         <p>No activity data</p>
       </div>
     );
@@ -83,8 +83,8 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
           const count = dataMap.get(dateStr) || 0;
 
           return (
-            <div key={dateStr} className="flex items-center gap-3 group">
-              <span className="w-14 text-xs text-muted-foreground shrink-0">
+            <div key={dateStr} className="group flex min-w-0 items-center gap-2 sm:gap-3">
+              <span className="w-12 shrink-0 text-[11px] text-muted-foreground sm:w-14 sm:text-xs">
                 {format(day, 'd MMM')}
               </span>
               <div className="flex-1 h-5 bg-muted/30 rounded overflow-hidden">
@@ -96,7 +96,7 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
                   style={{ width: `${getBarWidth(count)}%` }}
                 />
               </div>
-              <span className="w-8 text-xs text-muted-foreground text-right">
+              <span className="w-6 shrink-0 text-right text-xs text-muted-foreground sm:w-8">
                 {count}
               </span>
             </div>

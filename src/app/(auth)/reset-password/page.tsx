@@ -80,7 +80,7 @@ function ResetPasswordContent() {
           </div>
         </div>
 
-        <Button asChild className="w-full">
+        <Button asChild className="h-11 w-full">
           <Link href="/login">Go to login</Link>
         </Button>
       </div>
@@ -101,7 +101,7 @@ function ResetPasswordContent() {
         </div>
 
         <div className="space-y-4">
-          <Button asChild className="w-full">
+          <Button asChild className="h-11 w-full">
             <Link href="/forgot-password">Request a new link</Link>
           </Button>
           <p className="text-center text-sm text-muted-foreground">
@@ -132,6 +132,7 @@ function ResetPasswordContent() {
             placeholder="Enter your new password"
             {...register('password')}
             disabled={isLoading}
+            className="h-11"
           />
           {errors.password && (
             <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -146,13 +147,14 @@ function ResetPasswordContent() {
             placeholder="Confirm your new password"
             {...register('confirmPassword')}
             disabled={isLoading}
+            className="h-11"
           />
           {errors.confirmPassword && (
             <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
           )}
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="h-11 w-full" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Reset password
         </Button>

@@ -27,7 +27,7 @@ const DATE_RANGE_OPTIONS = [
 export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="w-auto min-w-[180px]">
+      <SelectTrigger className="h-11 w-full min-w-0 sm:w-auto sm:min-w-[180px]">
         <Calendar className="w-4 h-4 mr-2" />
         <SelectValue />
       </SelectTrigger>

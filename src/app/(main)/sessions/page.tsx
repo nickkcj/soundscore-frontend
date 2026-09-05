@@ -97,7 +97,7 @@ function SessionCard({ session }: { session: SessionListItem }) {
         <p className="truncate text-xs text-muted-foreground sm:text-sm">{session.album_artist}</p>
         <div className="mt-auto flex items-end justify-between gap-3 pt-2">
           <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Users className="h-3.5 w-3.5" />{session.participants_count} {session.participants_count === 1 ? 'pessoa' : 'pessoas'} · {formatDistanceToNow(new Date(session.created_at), { addSuffix: true, locale: ptBR })}</span>
-          {finished && session.album_avg !== null ? <span className="shrink-0 text-right"><strong className="block text-xl font-black leading-none text-wine-700">{session.album_avg.toFixed(1)}</strong><small className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">média</small></span> : <ArrowRight className="h-4 w-4 shrink-0 text-wine-700 transition-transform group-hover:translate-x-0.5" />}
+          {finished && session.album_avg != null ? <span className="shrink-0 text-right"><strong className="block text-xl font-black leading-none text-wine-700">{session.album_avg.toFixed(1)}</strong><small className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">média</small></span> : <ArrowRight className="h-4 w-4 shrink-0 text-wine-700 transition-transform group-hover:translate-x-0.5" />}
         </div>
       </div>
     </Link>

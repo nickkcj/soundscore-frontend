@@ -10,11 +10,13 @@ export interface User {
   created_at: string;
 }
 
+// `GET /users/profile/{username}` responde com `response_model_exclude_none`,
+// então todo campo nulo chega ausente — nunca compare esses campos com `null`.
 export interface UserProfile extends User {
   review_count: number;
   followers_count: number;
   following_count: number;
-  avg_rating: number | null;
+  avg_rating?: number | null;
   is_following?: boolean;
 }
 

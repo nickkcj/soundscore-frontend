@@ -236,7 +236,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     );
   }
 
-  const avgRating = profile.avg_rating !== null ? profile.avg_rating.toFixed(1) : null;
+  const avgRating = typeof profile.avg_rating === 'number' ? profile.avg_rating.toFixed(1) : null;
   const recentReviews = Array.from(
     new Map(reviews.map((review) => [review.album.spotify_id, review])).values()
   ).slice(0, 4);

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Play, Music } from 'lucide-react';
+import { Play, Music, Radio } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { TopArtist } from '@/types';
 
@@ -14,74 +14,77 @@ interface LibraryHeaderBannerProps {
 export function LibraryHeaderBanner({ topArtist, topTrack, isLoading }: LibraryHeaderBannerProps) {
   if (isLoading) {
     return (
-      <div className="relative h-28 sm:h-36 lg:h-48 rounded-xl overflow-hidden bg-muted animate-pulse">
+      <div className="relative h-52 overflow-hidden rounded-[1.75rem] bg-muted animate-pulse sm:h-60">
         <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-background/40" />
       </div>
     );
   }
 
   const bannerImage = topArtist?.image;
+  const featured = topTrack
+    ? { name: topTrack.name, artist: topTrack.artist, image: topTrack.image, trackId: topTrack.track_id }
+    : null;
 
   return (
-    <div className="relative min-h-28 sm:h-36 lg:h-48 rounded-xl overflow-hidden">
+    <div className="relative min-h-52 overflow-hidden rounded-[1.75rem] bg-wine-900 text-white shadow-[0_22px_65px_rgba(69,30,37,0.18)] sm:h-60">
       {/* Background Image - blurred for ambient effect */}
       {bannerImage ? (
         <Image
           src={bannerImage}
-          alt="Banner"
+          alt={topArtist?.name || 'Biblioteca musical'}
           fill
-          className="object-cover scale-110 blur-md"
+          sizes="(max-width: 1152px) 100vw, 1152px"
+          className="scale-[1.02] object-cover object-center"
           priority
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/5" />
+        <div className="absolute inset-0 bg-[linear-gradient(115deg,#451c26_0%,#722f37_58%,#a34851_100%)]" />
       )}
 
       {/* Gradient Overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#32151c]/95 via-wine-900/65 to-black/15" />
 
       {/* Content */}
-      <div className="relative flex min-h-28 items-center justify-between gap-3 px-4 py-4 sm:h-full lg:px-6">
+      <div className="relative flex min-h-52 flex-col justify-between gap-5 p-5 sm:h-full sm:flex-row sm:items-center sm:px-7 sm:py-6 lg:px-9">
         {/* Left: Title */}
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Library</h1>
+        <div className="max-w-lg">
+          <h1 className="text-3xl font-black tracking-[-0.045em] sm:text-4xl lg:text-5xl">Seu mês em música.</h1>
           {topArtist && (
-            <p className="text-sm text-muted-foreground mt-1">
-              Favorite artist: <span className="text-foreground font-medium">{topArtist.name}</span>
+            <p className="mt-2 text-sm text-white/70 sm:text-base">
+              Artista em destaque: <span className="font-bold text-white">{topArtist.name}</span>
             </p>
           )}
         </div>
 
         {/* Right: Top Track Card */}
-        {topTrack && (
-          <div className="hidden sm:flex items-center gap-3 bg-card/80 backdrop-blur-sm rounded-lg p-3 border max-w-xs">
-            <div className="relative w-12 h-12 lg:w-16 lg:h-16 rounded overflow-hidden flex-shrink-0">
-              {topTrack.image ? (
+        {featured && (
+          <div className="flex w-full items-center gap-3 rounded-[1.25rem] border border-white/15 bg-black/25 p-3 backdrop-blur-md sm:max-w-xs">
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[0.8rem] bg-white/10 lg:h-16 lg:w-16">
+              {featured.image ? (
                 <Image
-                  src={topTrack.image}
-                  alt={topTrack.name}
+                  src={featured.image}
+                  alt={featured.name}
                   fill
+                  sizes="64px"
                   className="object-cover"
                 />
               ) : (
                 <div className="w-full h-full bg-muted flex items-center justify-center">
-                  <Music className="w-6 h-6 text-muted-foreground" />
+                  <Music className="h-6 w-6 text-white/60" />
                 </div>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                Top Track
-              </p>
-              <p className="font-medium text-sm truncate">{topTrack.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{topTrack.artist}</p>
+              <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.13em] text-[#f2ad52]"><Radio className="h-3 w-3" /> Faixa mais ouvida</p>
+              <p className="truncate text-sm font-bold">{featured.name}</p>
+              <p className="truncate text-xs text-white/65">{featured.artist}</p>
             </div>
-            {topTrack.track_id && (
+            {featured.trackId && (
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-11 w-11 rounded-full flex-shrink-0"
-                onClick={() => window.open(`https://open.spotify.com/track/${topTrack.track_id}`, '_blank')}
+                className="h-11 w-11 shrink-0 rounded-full bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                onClick={() => window.open(`https://open.spotify.com/track/${featured.trackId}`, '_blank')}
               >
                 <Play className="w-4 h-4" />
               </Button>

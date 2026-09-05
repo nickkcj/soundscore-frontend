@@ -75,11 +75,11 @@ export function InviteMemberModal({ groupUuid }: InviteMemberModalProps) {
       await api.post<GroupInviteResponse>(`/groups/${groupUuid}/invites`, {
         invitee_username: username,
       });
-      toast.success(`Invite sent to ${username}`);
+      toast.success(`Convite enviado para ${username}`);
       // Mark user as invited
       setInvitedUsers((prev) => new Set([...prev, userId]));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to send invite');
+      toast.error(err instanceof Error ? err.message : 'Não foi possível enviar o convite');
     } finally {
       setInvitingUser(null);
     }
@@ -90,18 +90,18 @@ export function InviteMemberModal({ groupUuid }: InviteMemberModalProps) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="h-11 w-full lg:h-9">
           <Send className="h-4 w-4 mr-2" />
-          Invite Members
+          Convidar pessoas
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Invite Members</DialogTitle>
+          <DialogTitle>Convidar pessoas</DialogTitle>
         </DialogHeader>
 
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by username..."
+            placeholder="Buscar por usuário..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-11 pl-9"
@@ -116,8 +116,8 @@ export function InviteMemberModal({ groupUuid }: InviteMemberModalProps) {
           ) : users.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               {search.length < 2
-                ? 'Type at least 2 characters to search'
-                : 'No users found'}
+                ? 'Digite pelo menos 2 caracteres para buscar'
+                : 'Nenhum usuário encontrado'}
             </div>
           ) : (
             <div className="space-y-2">
@@ -152,9 +152,9 @@ export function InviteMemberModal({ groupUuid }: InviteMemberModalProps) {
                     {invitingUser === user.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : invitedUsers.has(user.id) ? (
-                      'Invited'
+                      'Convidado'
                     ) : (
-                      'Invite'
+                      'Convidar'
                     )}
                   </Button>
                 </div>

@@ -113,11 +113,10 @@ export function NotificationDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          {/* size-5 (e não h-5 w-5): o Button força svg sem classe size-* para 16px */}
-          <Bell className="size-5" />
+        <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full p-0 text-foreground/70 transition-colors hover:bg-wine-700/8 hover:text-wine-700" aria-label="Notificações">
+          <Bell className="size-5 stroke-[1.9]" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-wine-600 text-[10px] font-bold text-white">
+            <span className="absolute right-0 top-0 flex h-[17px] min-w-[17px] -translate-y-px translate-x-px items-center justify-center rounded-full border-2 border-background bg-wine-700 px-1 text-[9px] font-black leading-none text-white">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}

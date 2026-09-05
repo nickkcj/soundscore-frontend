@@ -10,15 +10,15 @@ interface SessionStatusBadgeProps {
 
 const STATUS_CONFIG = {
   lobby: {
-    label: 'Lobby',
+    label: 'Aguardando',
     className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800',
   },
   active: {
-    label: 'Live',
+    label: 'Ao vivo',
     className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800',
   },
   finished: {
-    label: 'Finished',
+    label: 'Finalizada',
     className: 'bg-muted text-muted-foreground border-border',
   },
 } as const;
@@ -28,7 +28,7 @@ export function SessionStatusBadge({ status, className }: SessionStatusBadgeProp
   return (
     <Badge
       variant="outline"
-      className={cn(config.className, className)}
+      className={cn('rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.08em]', config.className, className)}
     >
       {status === 'active' && (
         <span className="relative flex h-1.5 w-1.5 mr-1">

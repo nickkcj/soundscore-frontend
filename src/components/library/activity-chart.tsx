@@ -1,6 +1,7 @@
 'use client';
 
 import { format, eachDayOfInterval, subDays } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import type { ScrobblesByDay } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -34,7 +35,7 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
   if (!data || data.length === 0) {
     return (
       <div className="text-center py-6 text-muted-foreground text-sm">
-        <p>No activity data</p>
+        <p>Sem atividade neste período</p>
       </div>
     );
   }
@@ -69,13 +70,6 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-muted-foreground">Activity</h3>
-        <span className="text-xs text-muted-foreground">
-          Last {days} days
-        </span>
-      </div>
-
       {/* Horizontal bar chart */}
       <div className="space-y-1">
         {displayDays.map((day) => {
@@ -85,12 +79,12 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
           return (
             <div key={dateStr} className="group flex min-w-0 items-center gap-2 sm:gap-3">
               <span className="w-12 shrink-0 text-[11px] text-muted-foreground sm:w-14 sm:text-xs">
-                {format(day, 'd MMM')}
+                {format(day, 'd MMM', { locale: ptBR })}
               </span>
               <div className="flex-1 h-5 bg-muted/30 rounded overflow-hidden">
                 <div
                   className={cn(
-                    'h-full rounded transition-all duration-300 group-hover:opacity-80',
+                    'h-full rounded bg-wine-700 transition-all duration-300 group-hover:opacity-80',
                     getIntensityClass(count)
                   )}
                   style={{ width: `${getBarWidth(count)}%` }}
@@ -106,13 +100,13 @@ export function ActivityChart({ data, isLoading, days = 30 }: ActivityChartProps
 
       {/* Legend */}
       <div className="flex items-center justify-end gap-1 text-xs text-muted-foreground pt-2">
-        <span>Less</span>
+        <span>Menos</span>
         <div className="w-3 h-3 rounded-sm bg-muted/30" />
         <div className="w-3 h-3 rounded-sm bg-primary/20" />
         <div className="w-3 h-3 rounded-sm bg-primary/40" />
         <div className="w-3 h-3 rounded-sm bg-primary/70" />
         <div className="w-3 h-3 rounded-sm bg-primary" />
-        <span>More</span>
+        <span>Mais</span>
       </div>
     </div>
   );

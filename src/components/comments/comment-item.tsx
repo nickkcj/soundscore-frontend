@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { MessageCircle, Trash2, ChevronDown, ChevronUp, Heart, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/common/user-avatar';
@@ -53,14 +54,14 @@ export function CommentItem({
       className={cn(
         'relative',
         depth === 0 ? 'py-4' : 'pt-3',
-        depth > 0 && 'ml-3 pl-3 border-l-2 border-border/40 md:ml-5 md:pl-4'
+        depth > 0 && 'ml-3 border-l-2 border-wine-700/15 pl-3 md:ml-5 md:pl-4'
       )}
     >
       <div className="flex gap-3">
         <UserAvatar
           username={comment.username}
           profilePicture={comment.user_profile_picture}
-          size="md"
+          size={depth > 0 ? 'sm' : 'md'}
         />
         <div className="flex-1 min-w-0">
           {/* Header */}
@@ -72,15 +73,12 @@ export function CommentItem({
               >
                 {comment.username}
               </Link>
-              <span className="text-muted-foreground text-[15px] truncate">
-                @{comment.username}
-              </span>
-              <span className="text-muted-foreground text-[15px]">·</span>
-              <span className="text-muted-foreground text-[15px] hover:underline cursor-pointer">
-                {formatDistanceToNow(new Date(comment.created_at), { addSuffix: false })}
+              <span className="text-sm text-muted-foreground">·</span>
+              <span className="cursor-pointer text-sm text-muted-foreground hover:underline">
+                {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: ptBR })}
               </span>
               {comment.id === -1 && (
-                <span className="text-muted-foreground text-sm italic ml-1">Sending...</span>
+                <span className="ml-1 text-sm italic text-muted-foreground">Enviando...</span>
               )}
             </div>
             {isOwner && (
@@ -101,7 +99,7 @@ export function CommentItem({
                     className="text-destructive focus:text-destructive cursor-pointer"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    Excluir
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -118,11 +116,12 @@ export function CommentItem({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-3 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 gap-2"
+              className="h-8 gap-1.5 rounded-full px-2 text-muted-foreground hover:bg-wine-50 hover:text-wine-700"
               onClick={() => onReply(comment.id)}
               disabled={comment.id === -1}
             >
               <MessageCircle className="h-4 w-4" />
+              <span className="text-xs">Responder</span>
               {comment.replies.length > 0 && (
                 <span className="text-[13px]">{comment.replies.length}</span>
               )}
@@ -152,9 +151,9 @@ export function CommentItem({
               <CommentForm
                 onSubmit={handleReply}
                 onCancel={onCancelReply}
-                placeholder={`Reply to @${comment.username}`}
+                placeholder={`Responder a @${comment.username}`}
                 autoFocus
-                buttonText="Reply"
+                buttonText="Responder"
               />
             </div>
           )}
@@ -172,7 +171,7 @@ export function CommentItem({
               onClick={() => setIsCollapsed(false)}
             >
               <ChevronDown className="h-4 w-4 mr-1" />
-              Show {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
+              Mostrar {comment.replies.length} {comment.replies.length === 1 ? 'resposta' : 'respostas'}
             </Button>
           ) : (
             <>
@@ -184,7 +183,7 @@ export function CommentItem({
                   onClick={() => setIsCollapsed(true)}
                 >
                   <ChevronUp className="h-4 w-4 mr-1" />
-                  Hide replies
+                  Ocultar respostas
                 </Button>
               )}
               <div>

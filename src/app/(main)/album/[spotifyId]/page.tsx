@@ -13,6 +13,8 @@ import {
   Disc3,
   Calendar,
   AlertCircle,
+  BookOpenText,
+  ListMusic,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,6 +24,7 @@ import { ReviewCard, ReviewCardSkeleton } from '@/components/reviews/review-card
 import { useReview } from '@/hooks/use-reviews';
 import { api } from '@/lib/api';
 import type { AlbumDetail, Review, ReviewListResponse } from '@/types';
+import { MarkdownContent } from '@/components/common/markdown-content';
 
 // Helper function to format duration from ms to mm:ss
 function formatDuration(ms: number): string {
@@ -32,11 +35,12 @@ function formatDuration(ms: number): string {
 
 // Helper function to format release date
 function formatReleaseDate(date: string | null): string {
-  if (!date) return 'Unknown';
+  if (!date) return 'Data desconhecida';
   const parts = date.split('-');
   if (parts.length === 1) return parts[0]; // Just year
   if (parts.length === 2) return `${parts[1]}/${parts[0]}`; // Month/Year
-  return new Date(date).toLocaleDateString('pt-BR', {
+  const [year, month, day] = parts.map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString('pt-BR', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -71,7 +75,7 @@ export default function AlbumPage({ params }: PageProps) {
         setAlbum(data);
         setTotalReviews(data.review_count);
       } catch (err) {
-        setError('Failed to load album details');
+        setError('Não foi possível carregar os detalhes do álbum');
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -122,7 +126,7 @@ export default function AlbumPage({ params }: PageProps) {
   };
 
   const handleDelete = async (reviewUuid: string) => {
-    if (confirm('Are you sure you want to delete this review?')) {
+    if (confirm('Tem certeza de que deseja excluir esta review?')) {
       const success = await deleteReview(reviewUuid);
       if (success) {
         setReviews((prev) => prev.filter((r) => r.uuid !== reviewUuid));
@@ -140,31 +144,31 @@ export default function AlbumPage({ params }: PageProps) {
       <div className="container mx-auto max-w-4xl px-4 py-4 md:py-8">
         <Button variant="ghost" onClick={() => router.back()} className="mb-3 h-11 px-2 md:mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          Voltar
         </Button>
         <div className="text-center py-12 md:py-20">
           <AlertCircle className="h-12 w-12 md:h-16 md:w-16 mx-auto text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Album not found</h2>
-          <p className="text-muted-foreground">{error || 'Could not load album details'}</p>
+          <h2 className="text-xl font-semibold mb-2">Álbum não encontrado</h2>
+          <p className="text-muted-foreground">{error || 'Não foi possível carregar os detalhes do álbum'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
-      <div className="container mx-auto max-w-5xl px-4 py-4 md:py-8">
+    <div className="min-h-screen bg-[#f4f0e8] text-[#1b1919] dark:bg-background dark:text-foreground">
+      <div className="container mx-auto max-w-6xl px-4 pb-14 pt-4 md:pb-20 md:pt-7">
         {/* Back Button */}
         <Button variant="ghost" onClick={() => router.back()} className="mb-3 h-11 px-2 md:mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          Voltar
         </Button>
 
         {/* Album Header */}
-        <div className="mb-6 flex items-start gap-4 md:mb-10 md:gap-8">
+        <section className="mb-7 grid grid-cols-[7.5rem_minmax(0,1fr)] gap-4 rounded-[1.75rem] border border-[#dcd4ca] bg-white p-4 shadow-[0_18px_55px_rgba(50,38,30,0.07)] dark:border-border dark:bg-card sm:grid-cols-[9rem_minmax(0,1fr)] md:mb-9 md:grid-cols-[15rem_minmax(0,1fr)] md:gap-8 md:p-7">
           {/* Album Cover */}
           <div className="flex-shrink-0">
-            <div className="relative h-28 w-28 overflow-hidden rounded-xl shadow-xl sm:h-36 sm:w-36 md:h-64 md:w-64 md:shadow-2xl">
+            <div className="relative aspect-square w-full overflow-hidden rounded-[1.15rem] bg-[#eee9e1] shadow-[0_16px_35px_rgba(42,31,24,0.2)]">
               {album.cover_image ? (
                 <Image
                   src={album.cover_image}
@@ -183,11 +187,12 @@ export default function AlbumPage({ params }: PageProps) {
 
           {/* Album Info */}
           <div className="min-w-0 flex-1 text-left">
-            <h1 className="mb-1 line-clamp-2 text-xl font-bold leading-tight sm:text-2xl md:mb-2 md:text-4xl">{album.title}</h1>
+            <p className="mb-1.5 hidden text-[11px] font-black uppercase tracking-[0.16em] text-wine-700 sm:block">Álbum</p>
+            <h1 className="mb-1 line-clamp-2 text-xl font-black leading-[1.05] tracking-[-0.045em] sm:text-3xl md:mb-2 md:text-5xl">{album.title}</h1>
             {album.artist_spotify_id ? (
               <Link
                 href={`/artist/${album.artist_spotify_id}`}
-                className="mb-2 block truncate text-sm text-muted-foreground transition-colors hover:text-foreground hover:underline sm:text-base md:mb-4 md:text-xl"
+                className="mb-2 block truncate text-sm font-medium text-muted-foreground transition-colors hover:text-wine-700 hover:underline sm:text-base md:mb-4 md:text-xl"
               >
                 {album.artist}
               </Link>
@@ -203,7 +208,7 @@ export default function AlbumPage({ params }: PageProps) {
               </span>
               <span className="flex items-center gap-1">
                 <Disc3 className="h-4 w-4" />
-                {album.total_tracks} tracks
+                {album.total_tracks} faixas
               </span>
             </div>
 
@@ -213,50 +218,48 @@ export default function AlbumPage({ params }: PageProps) {
                 <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                 <span className="font-semibold text-foreground">{album.avg_rating.toFixed(1)}</span>
                 <span className="text-sm">
-                  ({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})
+                  ({totalReviews} {totalReviews === 1 ? 'avaliação' : 'avaliações'})
                 </span>
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="-ml-32 mt-4 grid grid-cols-2 gap-2 sm:ml-0 sm:flex sm:flex-wrap md:gap-3">
-              <Button asChild className="h-11 bg-wine-600 px-3 text-white hover:bg-wine-700">
-                <a href={album.spotify_url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  Open in Spotify
-                </a>
-              </Button>
-              <Button asChild variant="outline" className="h-11 px-3">
-                <Link href={`/my-reviews?album=${spotifyId}`}>
-                  <Star className="mr-2 h-4 w-4" />
-                  Write Review
-                </Link>
-              </Button>
-            </div>
           </div>
-        </div>
+          {/* Action Buttons */}
+          <div className="col-span-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap md:col-start-2 md:col-span-1 md:-mt-16 md:self-end">
+            <Button asChild className="h-11 rounded-full bg-wine-700 px-3 text-white hover:bg-wine-800 sm:px-4">
+              <a href={album.spotify_url} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-1.5 h-4 w-4 sm:mr-2" />
+                <span className="sm:hidden">Spotify</span><span className="hidden sm:inline">Ouvir no Spotify</span>
+              </a>
+            </Button>
+            <Button asChild variant="outline" className="h-11 rounded-full border-[#d5ccc1] px-3 hover:bg-[#f4f0e8] dark:border-border sm:px-4">
+                <Link href={`/reviews/create?album=${spotifyId}`}>
+                <Star className="mr-1.5 h-4 w-4 sm:mr-2" />
+                <span className="sm:hidden">Avaliar</span><span className="hidden sm:inline">Avaliar álbum</span>
+              </Link>
+            </Button>
+          </div>
+        </section>
 
         {/* Summary */}
         {album.summary && (
-          <Card className="mb-6 md:mb-10">
-            <CardContent className="p-4 md:p-6">
-              <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Music className="h-5 w-5 text-wine-500" />
-                About this Album
+          <Card className="mb-7 rounded-[1.75rem] border-[#dcd4ca] bg-white shadow-none dark:border-border dark:bg-card md:mb-9">
+            <CardContent className="p-5 md:p-8">
+              <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-[-0.025em]">
+                <BookOpenText className="h-5 w-5 text-[#dc8749]" />
+                Sobre este álbum
               </h2>
-              <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                {album.summary}
-              </p>
+              <MarkdownContent content={album.summary} />
             </CardContent>
           </Card>
         )}
 
         {/* Tracklist */}
-        <Card className="mb-6 md:mb-10">
-          <CardContent className="p-4 md:p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Disc3 className="h-5 w-5 text-wine-500" />
-              Tracklist
+        <Card className="mb-7 rounded-[1.75rem] border-[#dcd4ca] bg-white shadow-none dark:border-border dark:bg-card md:mb-9">
+          <CardContent className="p-4 md:p-7">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-[-0.025em]">
+              <ListMusic className="h-5 w-5 text-wine-700" />
+              Faixas
             </h2>
             <div className="divide-y">
               {album.tracks.map((track) => (
@@ -293,7 +296,7 @@ export default function AlbumPage({ params }: PageProps) {
                       href={track.spotify_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={`Play ${track.name} on Spotify`}
+                      aria-label={`Ouvir ${track.name} no Spotify`}
                     >
                       <Play className="h-4 w-4 fill-current" />
                     </a>
@@ -306,23 +309,23 @@ export default function AlbumPage({ params }: PageProps) {
 
         {/* Reviews Section */}
         <div className="mb-6 md:mb-10">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Star className="h-5 w-5 text-wine-500" />
-            Reviews ({totalReviews})
+          <h2 className="mb-4 flex items-center gap-2 text-xl font-black tracking-[-0.025em]">
+            <Star className="h-5 w-5 fill-[#f0a36b] text-[#f0a36b]" />
+            Avaliações da comunidade <span className="text-sm font-medium text-muted-foreground">({totalReviews})</span>
           </h2>
 
           {totalReviews === 0 ? (
             <Card>
               <CardContent className="py-8 text-center md:py-12">
                 <Star className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3 md:h-12 md:w-12 md:mb-4" />
-                <p className="text-muted-foreground mb-4">No reviews yet. Be the first!</p>
+                <p className="text-muted-foreground mb-4">Ainda não há avaliações. Seja a primeira pessoa!</p>
                 <Button asChild variant="outline">
-                  <Link href={`/my-reviews?album=${spotifyId}`}>Write a Review</Link>
+                  <Link href={`/reviews/create?album=${spotifyId}`}>Avaliar álbum</Link>
                 </Button>
               </CardContent>
             </Card>
           ) : (
-            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden divide-y divide-border">
+            <div className="space-y-4">
               {reviews.map((review) => (
                 <ReviewCard
                   key={review.id}
@@ -345,7 +348,7 @@ export default function AlbumPage({ params }: PageProps) {
                     variant="outline"
                     onClick={() => setReviewsPage((p) => p + 1)}
                   >
-                    Load More Reviews
+                    Carregar mais avaliações
                   </Button>
                 </div>
               )}

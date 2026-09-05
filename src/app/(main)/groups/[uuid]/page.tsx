@@ -2,17 +2,16 @@
 
 import { useState, useEffect, useRef, use, useCallback } from 'react';
 import Image from 'next/image';
-import { ArrowLeft, Send, Users, Music, Loader2, ImageIcon, X, Settings } from 'lucide-react';
+import { ArrowLeft, Send, Users, Music2, Loader2, ImageIcon, X, Settings, Lock, Globe, MessageCircleMore, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -88,7 +87,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
         setMembers(data.members);
         setMessages(data.recent_messages);
       } catch {
-        toast.error('Failed to load group');
+        toast.error('Não foi possível carregar o grupo');
       } finally {
         setIsLoading(false);
       }
@@ -259,13 +258,13 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Invalid file type. Use JPG, PNG, WebP or GIF.');
+      toast.error('Formato inválido. Use JPG, PNG, WebP ou GIF.');
       return;
     }
 
     // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File too large. Maximum: 5MB');
+      toast.error('Imagem muito grande. O máximo é 5 MB.');
       return;
     }
 
@@ -286,7 +285,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!messageInput.trim() && !selectedImage) || !isConnected || !user) return;
+    if ((!messageInput.trim() && !selectedImage) || !user) return;
 
     const content = messageInput.trim();
     let imagePath: string | undefined;
@@ -306,7 +305,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
         imagePath = response.image_path;
         imagePreviewUrl = response.image_url;
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to upload image');
+        toast.error(err instanceof Error ? err.message : 'Não foi possível enviar a imagem');
         setIsUploading(false);
         return;
       }
@@ -347,7 +346,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
     } catch (err) {
       // Reverte o optimistic em caso de falha
       setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
-      toast.error(err instanceof Error ? err.message : 'Failed to send message');
+      toast.error(err instanceof Error ? err.message : 'Não foi possível enviar a mensagem');
     }
   };
 
@@ -375,9 +374,9 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
       setMembers(data.members);
       setMessages(data.recent_messages);
 
-      toast.success('Joined group!');
+      toast.success('Você entrou no grupo!');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to join group');
+      toast.error(err instanceof Error ? err.message : 'Não foi possível entrar no grupo');
     }
   };
 
@@ -404,15 +403,12 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
 
   if (!group) {
     return (
-      <div className="container mx-auto max-w-2xl px-4 py-4 md:py-8">
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">Group not found</p>
-            <Button asChild className="mt-4">
-              <Link href="/groups">Back to groups</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="app-usable-viewport bg-[#f4f0e8] px-4 py-14 dark:bg-background">
+        <div className="mx-auto max-w-xl rounded-[1.75rem] border border-dashed border-[#cfc4b7] bg-white/60 px-6 py-14 text-center dark:border-border dark:bg-card/50">
+          <Users className="mx-auto mb-4 h-10 w-10 text-wine-700/45" />
+          <h1 className="text-xl font-black">Grupo não encontrado</h1>
+          <Button asChild className="mt-5 h-11 rounded-full bg-wine-700 px-5 text-white hover:bg-wine-800"><Link href="/groups">Voltar aos grupos</Link></Button>
+        </div>
       </div>
     );
   }
@@ -420,67 +416,53 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
   // Not a member
   if (!group.is_member) {
     return (
-      <div className="container mx-auto max-w-2xl px-4 py-4 md:py-8">
-        <Link href="/groups" className="mb-3 inline-flex min-h-11 items-center gap-2 text-muted-foreground hover:text-foreground md:mb-6">
-          <ArrowLeft className="h-4 w-4" />
-          Back to groups
-        </Link>
-        <Card className="overflow-hidden">
-          {/* Cover Image Banner */}
-          <div className="relative h-32 bg-gradient-to-br from-primary/20 to-accent/20 md:h-48">
-            {group.cover_image ? (
-              <Image src={group.cover_image} alt={group.name} fill className="object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Music className="h-12 w-12 text-muted-foreground/30 md:h-16 md:w-16" />
+      <div className="app-usable-viewport bg-[#f4f0e8] text-[#1b1919] dark:bg-background dark:text-foreground">
+        <main className="container mx-auto max-w-4xl px-4 py-5 md:py-10">
+          <Link href="/groups" className="mb-4 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:mb-6"><ArrowLeft className="h-4 w-4" />Voltar aos grupos</Link>
+          <section className="overflow-hidden rounded-[1.9rem] border border-[#dcd4ca] bg-white shadow-[0_22px_65px_rgba(50,38,30,0.1)] dark:border-border dark:bg-card">
+            <GroupHeroCover group={group} className="h-56 sm:h-72 md:h-80" />
+            <div className="px-5 pb-7 pt-6 text-center sm:px-8 sm:pb-9">
+              <div className="mb-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-wine-700"><Sparkles className="h-3.5 w-3.5 text-[#d98524]" />Comunidade SoundScore</div>
+              <h1 className="text-3xl font-black tracking-[-0.045em] sm:text-4xl">{group.name}</h1>
+              {group.description && <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">{group.description}</p>}
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground sm:text-sm">
+                <span className="flex items-center gap-1.5 rounded-full bg-[#f4f0e8] px-3 py-1.5 dark:bg-muted"><Users className="h-4 w-4" />{group.member_count} membros</span>
+                <span className="flex items-center gap-1.5 rounded-full bg-[#f4f0e8] px-3 py-1.5 dark:bg-muted">{group.privacy === 'private' ? <Lock className="h-4 w-4" /> : <Globe className="h-4 w-4" />}{group.privacy === 'private' ? 'Grupo privado' : 'Grupo público'}</span>
+                {group.category && <span className="rounded-full bg-[#f2ad52]/20 px-3 py-1.5 font-bold text-[#b96713]">{group.category}</span>}
               </div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-          </div>
-          <CardContent className="px-4 pb-6 pt-4 text-center md:px-6 md:pb-8 md:pt-6">
-            <h2 className="mb-2 text-xl font-bold md:text-2xl">{group.name}</h2>
-            {group.description && (
-              <p className="mx-auto mb-4 max-w-md text-sm text-muted-foreground md:text-base">{group.description}</p>
-            )}
-            <div className="flex items-center justify-center gap-4 mb-6 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                {group.member_count} members
-              </span>
-              {group.category && (
-                <Badge variant="secondary">{group.category}</Badge>
-              )}
+              <Button className="mt-6 h-12 min-w-40 rounded-full bg-wine-700 px-6 text-white hover:bg-wine-800" onClick={handleJoinGroup}>Participar do grupo</Button>
             </div>
-            <Button className="h-11 min-w-32" onClick={handleJoinGroup}>Join Group</Button>
-          </CardContent>
-        </Card>
+          </section>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-x-0 top-[var(--app-header-total-height,calc(var(--app-header-height,4rem)+env(safe-area-inset-top)))] bottom-[var(--app-bottom-nav-total-height,calc(var(--app-bottom-nav-height,4rem)+env(safe-area-inset-bottom)))] z-40 flex justify-center overflow-hidden bg-background md:static md:z-auto md:h-[min(52rem,calc(100dvh-var(--app-header-height,4rem)-2rem))] md:min-h-[36rem] md:bg-transparent md:py-4">
+    <div className="fixed inset-x-0 top-[var(--app-header-total-height,calc(var(--app-header-height,4rem)+env(safe-area-inset-top)))] bottom-[var(--app-bottom-nav-total-height,calc(var(--app-bottom-nav-height,4rem)+env(safe-area-inset-bottom)))] z-40 flex justify-center overflow-hidden bg-[#f4f0e8] md:static md:z-auto md:h-[min(52rem,calc(100dvh-var(--app-header-height,4rem)-2rem))] md:min-h-[36rem] md:py-4 dark:bg-background">
       <div className="h-full w-full max-w-6xl md:px-4">
-        <div className="flex h-full min-h-0 flex-col gap-3 lg:flex-row">
+        <div className="flex h-full min-h-0 flex-col gap-4 lg:flex-row">
           {/* Members Sidebar - Left */}
-          <Card className="hidden lg:flex lg:flex-col w-56 flex-shrink-0">
-            <CardHeader className="py-3 px-4 pb-0">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Members ({members.length})
-              </CardTitle>
-              {/* Invite button for private groups - admin only */}
+          <aside className="hidden w-64 shrink-0 overflow-hidden rounded-[1.65rem] border border-[#dcd4ca] bg-white shadow-[0_14px_40px_rgba(50,38,30,0.06)] dark:border-border dark:bg-card lg:flex lg:flex-col">
+            <div className="relative h-28 shrink-0">
+              <GroupHeroCover group={group} className="h-full" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-4 text-white">
+                <h1 className="truncate text-lg font-black tracking-[-0.025em]">{group.name}</h1>
+                <p className="mt-0.5 flex items-center gap-1 text-[11px] text-white/75"><Users className="h-3 w-3" />{group.member_count} membros</p>
+              </div>
+            </div>
+            <div className="border-b border-[#eee8e0] px-4 py-3 dark:border-border">
+              <div className="flex items-center justify-between"><h2 className="text-sm font-black">Membros</h2><span className="text-xs text-muted-foreground">{onlineUsers.size} online</span></div>
               {group.privacy === 'private' && group.role === 'admin' && (
-                <div className="pt-2">
-                  <InviteMemberModal groupUuid={groupUuid} />
-                </div>
+                <div className="pt-2"><InviteMemberModal groupUuid={groupUuid} /></div>
               )}
-            </CardHeader>
-            <CardContent className="flex-1 overflow-hidden p-0">
+            </div>
+            <div className="min-h-0 flex-1 overflow-hidden">
               <ScrollArea className="h-full">
-                <div className="space-y-3 px-4 pt-2 pb-3">
+                <div className="space-y-1 px-2 py-2">
                   {members.map((member, index) => (
-                    <div key={member.id || `member-${index}`} className="flex items-center gap-2">
+                    <div key={member.id || `member-${index}`} className="flex items-center gap-2.5 rounded-xl px-2 py-2 transition-colors hover:bg-[#f7f3ed] dark:hover:bg-muted/50">
                       <div className="relative">
                         <UserAvatar
                           username={member.username}
@@ -488,44 +470,36 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
                           size="sm"
                         />
                         {onlineUsers.has(member.user_id) && (
-                          <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-green-500 border-2 border-background" />
+                          <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500 dark:border-card" />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">{member.username}</p>
-                        <p className="text-xs text-muted-foreground capitalize">{member.role}</p>
+                        <p className="truncate text-sm font-bold">{member.username}</p>
+                        <p className="text-[11px] text-muted-foreground">{member.role === 'admin' ? 'Administrador' : member.role === 'moderator' ? 'Moderador' : 'Membro'}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </ScrollArea>
-            </CardContent>
-          </Card>
+            </div>
+          </aside>
 
           {/* Chat Area */}
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-y bg-background md:rounded-lg md:border">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-y border-[#dcd4ca] bg-white shadow-[0_18px_55px_rgba(50,38,30,0.08)] md:rounded-[1.65rem] md:border dark:border-border dark:bg-card">
             {/* Compact group app bar */}
-            <div className="relative h-16 flex-shrink-0 bg-gradient-to-br from-primary/20 to-accent/20 md:h-20">
-              {group.cover_image ? (
-                <Image src={group.cover_image} alt={group.name} fill className="object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Music className="h-8 w-8 text-muted-foreground/30" />
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-              <div className="absolute inset-0 flex items-center justify-between gap-2 px-2.5 md:px-3">
+            <div className="relative h-[4.75rem] shrink-0 md:h-24">
+              <GroupHeroCover group={group} className="h-full" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/25" />
+              <div className="absolute inset-0 flex items-center justify-between gap-2 px-2.5 md:px-4">
                 <div className="flex min-w-0 items-center gap-2">
-                  <Button variant="secondary" size="icon" className="h-11 w-11 flex-shrink-0 bg-background/85 hover:bg-background" asChild>
-                    <Link href="/groups" aria-label="Back to groups">
+                  <Button variant="secondary" size="icon" className="h-11 w-11 shrink-0 rounded-full border border-white/15 bg-black/35 text-white backdrop-blur-md hover:bg-black/55 hover:text-white" asChild>
+                    <Link href="/groups" aria-label="Voltar aos grupos">
                       <ArrowLeft className="h-4 w-4" />
                     </Link>
                   </Button>
                   <div className="min-w-0">
-                    <h1 className="truncate text-sm font-semibold text-foreground sm:text-base">{group.name}</h1>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {onlineUsers.size} online
-                    </p>
+                    <h1 className="truncate text-base font-black tracking-[-0.02em] text-white sm:text-lg">{group.name}</h1>
+                    <p className="flex items-center gap-1.5 truncate text-xs text-white/70"><span className={cn('h-1.5 w-1.5 rounded-full', isConnected ? 'bg-emerald-400' : 'animate-pulse bg-amber-400')} />{isConnected ? `${onlineUsers.size} online` : 'Conectando…'}</p>
                   </div>
                 </div>
                 <div className="flex flex-shrink-0 items-center gap-1">
@@ -539,22 +513,13 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
                     <Button
                       variant="secondary"
                       size="icon"
-                      className="h-11 w-11 bg-background/85 hover:bg-background"
+                      className="h-11 w-11 rounded-full border border-white/15 bg-black/35 text-white backdrop-blur-md hover:bg-black/55 hover:text-white"
                       onClick={() => setShowSettings(true)}
-                      aria-label="Group settings"
+                      aria-label="Configurações do grupo"
                     >
                       <Settings className="h-4 w-4" />
                     </Button>
                   )}
-                  <span
-                    className={cn(
-                      'h-2.5 w-2.5 rounded-full ring-2 ring-background',
-                      isConnected ? 'bg-emerald-500' : 'animate-pulse bg-amber-500'
-                    )}
-                    role="status"
-                    aria-label={isConnected ? 'Connected' : 'Connecting'}
-                    title={isConnected ? 'Connected' : 'Connecting'}
-                  />
                 </div>
               </div>
             </div>
@@ -576,10 +541,13 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
             {/* Messages */}
             <div
               ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto"
+              className="flex-1 overflow-y-auto bg-[#f8f5f0] dark:bg-background/55"
               onScroll={handleMessagesScroll}
             >
-              <div className="space-y-3 px-3 py-3 sm:px-4 md:space-y-4 md:px-6 md:py-4">
+              <div className="space-y-4 px-3 py-4 sm:px-4 md:px-6 md:py-5">
+                {messages.length === 0 && (
+                  <div className="mx-auto max-w-sm py-16 text-center"><span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-wine-700/10 text-wine-700"><MessageCircleMore className="h-6 w-6" /></span><h2 className="font-black">A conversa começa aqui</h2><p className="mt-1 text-sm text-muted-foreground">Compartilhe uma música, uma review ou diga o que você está ouvindo.</p></div>
+                )}
                 {messages.map((message, index) => (
                   <MessageItem
                     key={message.id || `msg-${index}`}
@@ -596,11 +564,11 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
 
             {/* Image Preview */}
             {imagePreview && (
-              <div className="flex-shrink-0 border-t bg-muted/30 px-3 py-2">
+              <div className="shrink-0 border-t border-[#e6ded4] bg-white px-3 py-2 dark:border-border dark:bg-card">
                 <div className="relative inline-block">
                   <Image
                     src={imagePreview}
-                    alt="Preview"
+                    alt="Prévia"
                     width={88}
                     height={88}
                     className="h-[88px] w-[88px] rounded-lg object-cover"
@@ -609,7 +577,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
                     type="button"
                     onClick={clearSelectedImage}
                     className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    aria-label="Remove selected image"
+                    aria-label="Remover imagem selecionada"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -618,7 +586,7 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
             )}
 
             {/* Input */}
-            <form onSubmit={handleSendMessage} className="flex flex-shrink-0 gap-2 border-t bg-muted/30 p-2.5 md:p-3">
+            <form onSubmit={handleSendMessage} className="flex shrink-0 items-center gap-2 border-t border-[#e6ded4] bg-white p-2.5 dark:border-border dark:bg-card md:p-3">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -631,15 +599,15 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
                 variant="ghost"
                 size="icon"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={!isConnected || isUploading}
-                className="h-11 w-11 flex-shrink-0"
-                aria-label="Attach an image"
+                disabled={isUploading}
+                className="h-11 w-11 shrink-0 rounded-full text-wine-700 hover:bg-wine-700/10 hover:text-wine-700"
+                aria-label="Anexar imagem"
               >
                 <ImageIcon className="h-5 w-5" />
               </Button>
               <Input
                 ref={inputRef}
-                placeholder="Type a message..."
+                placeholder="Escreva uma mensagem..."
                 value={messageInput}
                 onChange={(e) => {
                   setMessageInput(e.target.value);
@@ -652,15 +620,15 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
                     sendTyping();
                   }, 500);
                 }}
-                disabled={!isConnected || isUploading}
-                className="h-11 min-w-0"
+                disabled={isUploading}
+                className="h-11 min-w-0 rounded-full border-[#ded6cc] bg-[#f7f3ed] px-4 shadow-none dark:border-border dark:bg-muted/50"
               />
               <Button
                 type="submit"
-                disabled={!isConnected || isUploading || (!messageInput.trim() && !selectedImage)}
+                disabled={isUploading || (!messageInput.trim() && !selectedImage)}
                 size="icon"
-                className="h-11 w-11 flex-shrink-0"
-                aria-label="Send message"
+                className="h-11 w-11 shrink-0 rounded-full bg-wine-700 text-white hover:bg-wine-800"
+                aria-label="Enviar mensagem"
               >
                 {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </Button>
@@ -668,6 +636,22 @@ export default function GroupChatPage({ params }: { params: Promise<{ uuid: stri
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function GroupHeroCover({ group, className }: { group: Group; className: string }) {
+  return (
+    <div className={`relative w-full overflow-hidden bg-gradient-to-br from-[#4d2028] via-[#722f37] to-[#d98524] ${className}`}>
+      {group.cover_image ? (
+        <Image src={group.cover_image} alt={group.name} fill sizes="(max-width: 768px) 100vw, 900px" className="object-cover" />
+      ) : (
+        <div className="relative flex h-full w-full items-center justify-center text-white">
+          <div className="absolute -right-10 -top-14 h-44 w-44 rounded-full border-[24px] border-white/10" />
+          <div className="absolute -bottom-16 -left-10 h-52 w-52 rounded-full bg-[#f2ad52]/20 blur-2xl" />
+          <Music2 className="relative h-12 w-12 text-white/80" />
+        </div>
+      )}
     </div>
   );
 }
@@ -689,15 +673,15 @@ function MembersDialog({
         <Button
           variant="secondary"
           size="icon"
-          className="h-11 w-11 bg-background/85 hover:bg-background lg:hidden"
-          aria-label={`View ${members.length} members`}
+          className="h-11 w-11 rounded-full border border-white/15 bg-black/35 text-white backdrop-blur-md hover:bg-black/55 hover:text-white lg:hidden"
+          aria-label={`Ver ${members.length} membros`}
         >
           <Users className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[min(80dvh,36rem)] max-w-[calc(100%-2rem)] overflow-hidden p-0 sm:max-w-sm">
         <DialogHeader className="border-b px-4 py-4 text-left">
-          <DialogTitle>Members ({members.length})</DialogTitle>
+          <DialogTitle>Membros ({members.length})</DialogTitle>
           <DialogDescription className="line-clamp-1">{group.name}</DialogDescription>
         </DialogHeader>
         <div className="max-h-[60dvh] overflow-y-auto px-4 py-3">
@@ -724,7 +708,7 @@ function MembersDialog({
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{member.username}</p>
-                  <p className="text-xs capitalize text-muted-foreground">{member.role}</p>
+                  <p className="text-xs text-muted-foreground">{member.role === 'admin' ? 'Administrador' : member.role === 'moderator' ? 'Moderador' : 'Membro'}</p>
                 </div>
               </div>
             ))}
@@ -739,7 +723,7 @@ function MessageItem({ message, isOwn }: { message: GroupMessage; isOwn: boolean
   const reviewShare = message.content ? tryParseReviewShare(message.content) : null;
 
   return (
-    <div className={cn('flex min-w-0 gap-2 md:gap-3', isOwn && 'flex-row-reverse')}>
+    <div className={cn('flex min-w-0 gap-2.5 md:gap-3', isOwn && 'flex-row-reverse')}>
       <div className="flex-shrink-0">
         <UserAvatar
           username={message.username}
@@ -748,13 +732,13 @@ function MessageItem({ message, isOwn }: { message: GroupMessage; isOwn: boolean
           showLink={!isOwn}
         />
       </div>
-      <div className={cn('min-w-0 max-w-[82%] md:max-w-[70%]', isOwn && 'text-right')}>
+      <div className={cn('min-w-0 max-w-[84%] md:max-w-[72%]', isOwn && 'text-right')}>
         <div className={cn('mb-1 flex min-w-0 items-center gap-1.5', isOwn && 'justify-end')}>
           <span className={cn('max-w-[9rem] truncate text-xs font-medium sm:max-w-[14rem] sm:text-sm', isOwn && 'order-2')}>
             {message.username}
           </span>
           <span className="flex-shrink-0 text-[10px] text-muted-foreground sm:text-xs">
-            {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+            {formatDistanceToNow(new Date(message.created_at), { addSuffix: true, locale: ptBR })}
           </span>
         </div>
         {reviewShare ? (
@@ -762,16 +746,16 @@ function MessageItem({ message, isOwn }: { message: GroupMessage; isOwn: boolean
         ) : (
           <div
             className={cn(
-              'rounded-lg inline-block overflow-hidden',
-              message.content ? 'px-3 py-2' : 'p-1',
-              isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'
+              'inline-block overflow-hidden rounded-[1.15rem] text-left shadow-sm',
+              message.content ? 'px-3.5 py-2.5' : 'p-1',
+              isOwn ? 'rounded-tr-md bg-wine-700 text-white' : 'rounded-tl-md border border-[#e5ddd3] bg-white text-foreground dark:border-border dark:bg-card'
             )}
           >
             {message.image_url && (
               <MessageImage key={message.image_url} imageUrl={message.image_url} />
             )}
             {message.content && (
-              <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+              <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">{message.content}</p>
             )}
           </div>
         )}
@@ -819,11 +803,11 @@ function TypingIndicator({ typingUsers }: { typingUsers: Map<number, { username:
 
   let text = '';
   if (users.length === 1) {
-    text = `${users[0].username} is typing`;
+    text = `${users[0].username} está digitando`;
   } else if (users.length === 2) {
-    text = `${users[0].username} and ${users[1].username} are typing`;
+    text = `${users[0].username} e ${users[1].username} estão digitando`;
   } else {
-    text = 'Several people are typing';
+    text = 'Várias pessoas estão digitando';
   }
 
   return (
@@ -840,15 +824,14 @@ function TypingIndicator({ typingUsers }: { typingUsers: Map<number, { username:
 
 function GroupChatSkeleton() {
   return (
-    <div className="fixed inset-x-0 top-[var(--app-header-total-height,calc(var(--app-header-height,4rem)+env(safe-area-inset-top)))] bottom-[var(--app-bottom-nav-total-height,calc(var(--app-bottom-nav-height,4rem)+env(safe-area-inset-bottom)))] z-40 flex justify-center overflow-hidden bg-background md:static md:z-auto md:h-[min(52rem,calc(100dvh-var(--app-header-height,4rem)-2rem))] md:min-h-[36rem] md:bg-transparent md:py-4">
+    <div className="fixed inset-x-0 top-[var(--app-header-total-height,calc(var(--app-header-height,4rem)+env(safe-area-inset-top)))] bottom-[var(--app-bottom-nav-total-height,calc(var(--app-bottom-nav-height,4rem)+env(safe-area-inset-bottom)))] z-40 flex justify-center overflow-hidden bg-[#f4f0e8] md:static md:z-auto md:h-[min(52rem,calc(100dvh-var(--app-header-height,4rem)-2rem))] md:min-h-[36rem] md:py-4 dark:bg-background">
       <div className="h-full w-full max-w-6xl md:px-4">
-        <div className="flex h-full min-h-0 gap-3">
+        <div className="flex h-full min-h-0 gap-4">
           {/* Members Sidebar Skeleton */}
-          <Card className="hidden lg:block w-64 flex-shrink-0">
-            <CardHeader className="pb-3">
-              <Skeleton className="h-5 w-28" />
-            </CardHeader>
-            <CardContent>
+          <div className="hidden w-64 shrink-0 overflow-hidden rounded-[1.65rem] border border-[#dcd4ca] bg-white dark:border-border dark:bg-card lg:block">
+            <Skeleton className="h-28 w-full" />
+            <div className="p-4">
+              <Skeleton className="mb-4 h-5 w-28" />
               <div className="space-y-3">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-2">
@@ -860,12 +843,12 @@ function GroupChatSkeleton() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Chat Area Skeleton */}
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-y md:rounded-lg md:border">
-            <div className="flex h-16 flex-shrink-0 items-center gap-3 border-b px-3 md:h-20">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-y border-[#dcd4ca] bg-white md:rounded-[1.65rem] md:border dark:border-border dark:bg-card">
+            <div className="flex h-[4.75rem] shrink-0 items-center gap-3 bg-wine-900 px-3 md:h-24">
               <Skeleton className="h-10 w-10 rounded-full" />
               <div className="space-y-2">
                 <Skeleton className="h-5 w-32" />

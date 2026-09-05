@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Music } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import type { Scrobble } from '@/types';
 
 interface ScrobbleListProps {
@@ -25,14 +26,14 @@ export function ScrobbleList({ scrobbles, isLoading }: ScrobbleListProps) {
     return (
       <div className="text-center py-6 text-muted-foreground">
         <Music className="w-10 h-10 mx-auto mb-2 opacity-30" />
-        <p>No scrobbles yet</p>
-        <p className="text-sm">Connect Spotify and sync to see your listening history</p>
+        <p className="font-semibold text-foreground">Nenhuma reprodução ainda</p>
+        <p className="text-sm">Sincronize o Spotify para ver seu histórico.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       {scrobbles.map((scrobble) => (
         <ScrobbleItem key={`${scrobble.id}-${scrobble.played_at}`} scrobble={scrobble} />
       ))}
@@ -42,14 +43,15 @@ export function ScrobbleList({ scrobbles, isLoading }: ScrobbleListProps) {
 
 function ScrobbleItem({ scrobble }: { scrobble: Scrobble }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50">
+    <div className="group flex min-w-0 items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f7f3ed] dark:hover:bg-muted/50">
       {/* Album Art */}
-      <div className="relative w-10 h-10 rounded overflow-hidden bg-muted flex-shrink-0">
+      <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[0.7rem] bg-muted shadow-sm">
         {scrobble.album_image_url ? (
           <Image
             src={scrobble.album_image_url}
             alt={scrobble.album_name || 'Album'}
             fill
+            sizes="44px"
             className="object-cover"
           />
         ) : (
@@ -61,13 +63,13 @@ function ScrobbleItem({ scrobble }: { scrobble: Scrobble }) {
 
       {/* Track Info */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm truncate">{scrobble.track_name}</p>
+        <p className="truncate text-sm font-bold tracking-[-0.01em]">{scrobble.track_name}</p>
         <p className="text-xs text-muted-foreground truncate">{scrobble.artist_name}</p>
       </div>
 
       {/* Time */}
       <div className="max-w-20 flex-shrink-0 text-right text-[11px] leading-tight text-muted-foreground sm:max-w-none sm:text-xs">
-        {formatDistanceToNow(new Date(scrobble.played_at), { addSuffix: true })}
+        {formatDistanceToNow(new Date(scrobble.played_at), { addSuffix: true, locale: ptBR })}
       </div>
     </div>
   );

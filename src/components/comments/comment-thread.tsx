@@ -91,7 +91,7 @@ export function CommentThread({ reviewUuid, onCommentCountChange }: CommentThrea
   if (isInitialLoad) {
     return (
       <div className="space-y-0">
-        <CommentForm onSubmit={handleAddComment} placeholder="Post your reply" />
+        <CommentForm onSubmit={handleAddComment} placeholder="Escreva um comentário..." />
         <CommentListSkeleton count={3} />
       </div>
     );
@@ -100,16 +100,16 @@ export function CommentThread({ reviewUuid, onCommentCountChange }: CommentThrea
   return (
     <div className="space-y-0">
       {/* New Comment Form */}
-      <CommentForm onSubmit={handleAddComment} placeholder="Post your reply" />
+      <CommentForm onSubmit={handleAddComment} placeholder="Escreva um comentário..." />
 
       {/* Comments List */}
       {comments.length === 0 ? (
         <div className="py-10 text-center">
           <p className="text-muted-foreground text-[15px]">
-            No comments yet
+            Nenhum comentário ainda
           </p>
           <p className="text-muted-foreground/70 text-sm mt-1">
-            Be the first to share your thoughts!
+            Seja a primeira pessoa a continuar essa conversa.
           </p>
         </div>
       ) : (
@@ -143,10 +143,10 @@ export function CommentThread({ reviewUuid, onCommentCountChange }: CommentThrea
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Loading...
+                Carregando...
               </>
             ) : (
-              'Show more replies'
+              'Mostrar mais comentários'
             )}
           </Button>
         </div>

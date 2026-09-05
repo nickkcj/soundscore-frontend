@@ -53,9 +53,9 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
       try {
         await sessionsApi.join(session.code);
         await onMutationSuccess();
-        toast.success('You joined the session!');
+        toast.success('Você entrou na sessão!');
       } catch {
-        toast.error('Could not join the session');
+        toast.error('Não foi possível entrar na sessão.');
       }
     };
     autoJoin();
@@ -69,7 +69,7 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
       await sessionsApi.start(session.code);
       await onMutationSuccess();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to start');
+      toast.error(err instanceof Error ? err.message : 'Não foi possível iniciar a sessão.');
     } finally {
       setIsStarting(false);
     }
@@ -78,16 +78,16 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied! Share it with your friends 🎧');
+      toast.success('Link copiado! Agora é só enviar para a turma 🎧');
     } catch {
-      toast.error('Could not copy the link');
+      toast.error('Não foi possível copiar o link.');
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-3xl px-4 py-6 md:py-12">
+      <div className="app-usable-viewport bg-[#f4f0e8] dark:bg-background">
+        <main className="container mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-10">
           <div className="flex flex-col items-center gap-4">
             <Skeleton className="h-32 w-32 rounded-xl md:h-48 md:w-48" />
             <Skeleton className="h-6 w-56" />
@@ -101,14 +101,14 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
 
   if (error || !session) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="app-usable-viewport bg-[#f4f0e8] dark:bg-background">
         <main className="container mx-auto max-w-3xl px-4 py-12 text-center md:py-20">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Session not found</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Sessão não encontrada</h1>
           <p className="text-muted-foreground mb-6">
-            Double-check that the code <span className="font-mono font-semibold">{code.toUpperCase()}</span> is correct.
+            Confira se o código <span className="font-mono font-semibold">{code.toUpperCase()}</span> está correto.
           </p>
           <Button asChild className="bg-wine-600 hover:bg-wine-700 text-white rounded-xl">
-            <Link href="/sessions">Back to Listening Parties</Link>
+            <Link href="/sessions">Voltar para Listening Parties</Link>
           </Button>
         </main>
       </div>
@@ -116,8 +116,8 @@ export default function SessionPage({ params }: { params: Promise<{ code: string
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto max-w-3xl px-4 py-4 md:py-10">
+    <div className="app-usable-viewport bg-[#f4f0e8] text-[#1b1919] dark:bg-background dark:text-foreground">
+      <main className={session.status === 'lobby' ? 'container mx-auto max-w-6xl px-4 pb-20 pt-4 md:px-8 md:pb-24 md:pt-7' : session.status === 'active' ? 'container mx-auto max-w-5xl px-4 pb-20 pt-4 md:px-8 md:pb-24 md:pt-7' : 'container mx-auto max-w-6xl px-4 pb-20 pt-4 md:px-8 md:pb-24 md:pt-7'}>
         {session.status === 'lobby' && (
           <LobbyView
             session={session}

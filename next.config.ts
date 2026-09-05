@@ -21,7 +21,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'soundscore-2.s3.us-east-2.amazonaws.com', // AWS S3 storage
+        hostname: 'soundscore-2.s3.us-east-2.amazonaws.com', // AWS S3 storage (URLs assinadas: DM e chat de grupo)
+      },
+      {
+        protocol: 'https',
+        hostname: 'd31pkib2twg2cm.cloudfront.net', // CloudFront: assets publicos (avatar, banner, capa)
       },
     ],
   },

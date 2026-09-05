@@ -111,7 +111,7 @@ export function NotificationDropdown() {
   } = useNotificationStore();
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full p-0 text-foreground/70 transition-colors hover:bg-wine-700/8 hover:text-wine-700" aria-label="Notificações">
           <Bell className="size-5 stroke-[1.9]" />

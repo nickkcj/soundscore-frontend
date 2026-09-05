@@ -36,24 +36,44 @@ export default function MessagesPage() {
   }, []);
 
   useEffect(() => {
-    if (!authLoading) fetchConversations();
-  }, [authLoading, fetchConversations]);
+    if (authLoading) return;
+
+    let active = true;
+    const loadInitialConversations = async () => {
+      let isRedirecting = false;
+
+      try {
+        const data = await api.get<ConversationListResponse>('/dm/conversations');
+        if (!active) return;
+
+        const desktop = window.matchMedia('(min-width: 768px)').matches;
+        const mostRecent = [...data.conversations].sort(
+          (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        )[0];
+
+        if (desktop && mostRecent) {
+          isRedirecting = true;
+          router.replace(`/messages/${mostRecent.other_user.username}`);
+          return;
+        }
+
+        setConversations(data.conversations);
+      } catch {
+        // A página vazia continua disponível para iniciar uma conversa.
+      } finally {
+        if (active && !isRedirecting) setIsLoading(false);
+      }
+    };
+
+    loadInitialConversations();
+    return () => { active = false; };
+  }, [authLoading, router]);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || isLoading) return;
     const interval = setInterval(fetchConversations, 30_000);
     return () => clearInterval(interval);
-  }, [authLoading, fetchConversations]);
-
-  // No desktop, a caixa de mensagens já abre com a conversa mais recente.
-  // No mobile, preservamos o fluxo lista → conversa.
-  useEffect(() => {
-    if (authLoading || isLoading || conversations.length === 0) return;
-    const desktop = window.matchMedia('(min-width: 768px)').matches;
-    if (!desktop) return;
-    const mostRecent = [...conversations].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())[0];
-    router.replace(`/messages/${mostRecent.other_user.username}`);
-  }, [authLoading, conversations, isLoading, router]);
+  }, [authLoading, fetchConversations, isLoading]);
 
   const normalizedSearch = search.trim().toLocaleLowerCase('pt-BR');
   const filteredConversations = normalizedSearch

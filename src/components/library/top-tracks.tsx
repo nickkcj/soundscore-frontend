@@ -32,29 +32,30 @@ export function TopTracks({ tracks, isLoading }: TopTracksProps) {
     return (
       <div className="text-center py-6 text-muted-foreground">
         <Music className="w-10 h-10 mx-auto mb-2 opacity-30" />
-        <p>No top tracks yet</p>
+        <p>Nenhuma faixa encontrada</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       {tracks.map((track, index) => (
         <div
           key={`${track.name}-${track.artist}`}
-          className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg transition-colors"
+          className="flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f7f3ed] dark:hover:bg-muted/50"
         >
-          <div className="w-6 text-center text-muted-foreground font-medium">
+          <div className={`w-7 text-center text-lg font-black ${index === 0 ? 'text-[#d98524]' : 'text-muted-foreground/60'}`}>
             {index + 1}
           </div>
 
           {/* Album Art */}
-          <div className="relative w-10 h-10 rounded overflow-hidden bg-muted flex-shrink-0">
+          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[0.7rem] bg-muted shadow-sm">
             {track.image ? (
               <Image
                 src={track.image}
                 alt={track.album || 'Album'}
                 fill
+                sizes="44px"
                 className="object-cover"
               />
             ) : (
@@ -65,12 +66,12 @@ export function TopTracks({ tracks, isLoading }: TopTracksProps) {
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm truncate">{track.name}</p>
+            <p className="truncate text-sm font-bold">{track.name}</p>
             <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
           </div>
 
           <div className="shrink-0 text-xs text-muted-foreground">
-            {track.scrobble_count} plays
+            {track.scrobble_count} reproduções
           </div>
         </div>
       ))}

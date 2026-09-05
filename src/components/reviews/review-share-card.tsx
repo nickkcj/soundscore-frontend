@@ -34,7 +34,7 @@ export function ReviewShareCard({ data }: { data: ReviewShareData }) {
   return (
     <Link
       href={`/reviews/${data.review_uuid}`}
-      className="block rounded-xl border border-border overflow-hidden hover:bg-muted/50 transition-colors bg-background/80 w-[380px] max-w-full"
+      className="block w-[380px] max-w-full overflow-hidden rounded-[1.2rem] border border-[#ded6cc] bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-border dark:bg-card"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex">
@@ -48,7 +48,7 @@ export function ReviewShareCard({ data }: { data: ReviewShareData }) {
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-wine-700/20 to-[#d98524]/25">
               <Music className="h-8 w-8 text-muted-foreground/50" />
             </div>
           )}
@@ -56,7 +56,7 @@ export function ReviewShareCard({ data }: { data: ReviewShareData }) {
         {/* Info */}
         <div className="flex-1 p-2.5 min-w-0 text-left">
           <p className="text-xs text-muted-foreground">
-            Review by <span className="font-medium text-foreground">@{data.username}</span>
+            Review de <span className="font-medium text-foreground">@{data.username}</span>
           </p>
           <p className="font-semibold text-sm truncate mt-0.5">{data.album_title}</p>
           <p className="text-xs text-muted-foreground truncate">{data.album_artist}</p>

@@ -18,9 +18,9 @@ interface CommentFormProps {
 export function CommentForm({
   onSubmit,
   onCancel,
-  placeholder = 'Post your reply',
+  placeholder = 'Escreva um comentário...',
   autoFocus = false,
-  buttonText = 'Reply',
+  buttonText = 'Publicar',
 }: CommentFormProps) {
   const { user } = useAuthStore();
   const [text, setText] = useState('');
@@ -66,8 +66,8 @@ export function CommentForm({
 
   return (
     <form onSubmit={handleSubmit} className={cn(
-      "flex gap-3 py-3",
-      !onCancel && "border-b border-border"
+      "flex gap-3 rounded-[1.2rem] py-3",
+      !onCancel && "bg-[#f7f3ed] px-3 dark:bg-muted/40"
     )}>
       <UserAvatar
         username={user.username}
@@ -86,7 +86,7 @@ export function CommentForm({
           placeholder={placeholder}
           autoFocus={autoFocus}
           className={cn(
-            "w-full bg-transparent text-[17px] placeholder:text-muted-foreground/70",
+            "w-full bg-transparent text-[15px] placeholder:text-muted-foreground/70",
             "resize-none outline-none border-none leading-relaxed",
             "min-h-[28px] max-h-[300px] overflow-hidden"
           )}
@@ -116,16 +116,16 @@ export function CommentForm({
                   size="sm"
                   onClick={onCancel}
                   disabled={isSubmitting}
-                  className="rounded-full px-4"
-                >
-                  Cancel
+                className="rounded-full px-4"
+              >
+                  Cancelar
                 </Button>
               )}
               <Button
                 type="submit"
                 size="sm"
                 disabled={!text.trim() || isSubmitting}
-                className="rounded-full px-4 font-bold"
+                className="rounded-full bg-wine-700 px-4 font-bold text-white hover:bg-wine-800"
               >
                 {isSubmitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

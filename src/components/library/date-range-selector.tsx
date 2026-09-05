@@ -17,17 +17,17 @@ interface DateRangeSelectorProps {
 }
 
 const DATE_RANGE_OPTIONS = [
-  { value: '7', label: 'Last 7 days' },
-  { value: '30', label: 'Last 30 days' },
-  { value: '90', label: 'Last 90 days' },
-  { value: '180', label: 'Last 6 months' },
-  { value: '365', label: 'Last year' },
+  { value: '7', label: 'Últimos 7 dias' },
+  { value: '30', label: 'Últimos 30 dias' },
+  { value: '90', label: 'Últimos 90 dias' },
+  { value: '180', label: 'Últimos 6 meses' },
+  { value: '365', label: 'Último ano' },
 ] as const;
 
 export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="h-11 w-full min-w-0 sm:w-auto sm:min-w-[180px]">
+      <SelectTrigger className="h-11 w-full min-w-0 rounded-full border-[#d8cfc4] bg-[#f8f5ef] sm:w-auto sm:min-w-[190px] dark:border-border dark:bg-muted/40">
         <Calendar className="w-4 h-4 mr-2" />
         <SelectValue />
       </SelectTrigger>

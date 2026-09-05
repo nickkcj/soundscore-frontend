@@ -1,454 +1,236 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
+import {
+  ArrowRight,
+  Disc3,
+  Headphones,
+  MessageCircle,
+  Star,
+  Users,
+} from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { homeApi } from '@/lib/api';
 import type { TopAlbum, RecentReview } from '@/types';
 
+const PREVIEW_REVIEWS = [
+  {
+    id: -1,
+    album_spotify_id: 'preview-brighter-days',
+    album_cover_image: '/images/brighterdays.jpeg',
+    album_title: 'Brighter Days',
+    album_artist: 'Uma descoberta da comunidade',
+    username: 'anaescuta',
+    rating: 5,
+    text: 'Daqueles discos que ficam melhores a cada nova audição.',
+  },
+  {
+    id: -2,
+    album_spotify_id: 'preview-the-album',
+    album_cover_image: '/images/thealbum.jpg',
+    album_title: 'The Album',
+    album_artist: 'Em rotação agora',
+    username: 'vinilnoturno',
+    rating: 4,
+    text: 'Produção cuidadosa, refrões enormes e muita personalidade.',
+  },
+  {
+    id: -3,
+    album_spotify_id: 'preview-happiness',
+    album_cover_image: '/images/hapiness.jpeg',
+    album_title: 'Happiness',
+    album_artist: 'Favorito da semana',
+    username: 'lado_b',
+    rating: 5,
+    text: 'Uma estreia que já chegou com cara de clássico moderno.',
+  },
+];
+
+const PREVIEW_ALBUMS = [
+  { spotify_id: 'preview-1', title: 'Brighter Days', artist: 'Mais ouvido hoje', cover_image: '/images/brighterdays.jpeg', avg_rating: 4.9 },
+  { spotify_id: 'preview-2', title: 'The Album', artist: 'Subindo no ranking', cover_image: '/images/thealbum.jpg', avg_rating: 4.7 },
+  { spotify_id: 'preview-3', title: 'Happiness', artist: 'Novo favorito', cover_image: '/images/hapiness.jpeg', avg_rating: 4.6 },
+];
+
+const MARQUEE_ITEMS = [
+  { icon: Headphones, title: 'Descubra', text: 'curadoria feita por pessoas' },
+  { icon: Star, title: 'Dê sua nota', text: 'registre tudo o que ouviu' },
+  { icon: MessageCircle, title: 'Compartilhe', text: 'reviews que puxam conversa' },
+  { icon: Users, title: 'Encontre sua turma', text: 'gente que escuta como você' },
+  { icon: Disc3, title: 'Monte sua coleção', text: 'seu gosto em um só lugar' },
+];
+
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div className="flex">
-      {[1, 2, 3, 4, 5].map((star) => {
-        const filled = rating >= star;
-        const halfFilled = !filled && rating >= star - 0.5;
-
-        return (
-          <span key={star} className="text-sm relative">
-            {halfFilled ? (
-              <>
-                <span className="text-gray-600">★</span>
-                <span
-                  className="text-yellow-400 absolute left-0 top-0 overflow-hidden"
-                  style={{ width: '50%' }}
-                >
-                  ★
-                </span>
-              </>
-            ) : (
-              <span className={filled ? 'text-yellow-400' : 'text-gray-600'}>
-                ★
-              </span>
-            )}
-          </span>
-        );
-      })}
+    <div className="flex gap-0.5" aria-label={`${rating.toFixed(1)} de 5 estrelas`}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`size-3.5 ${rating >= star ? 'fill-[#f0a36b] text-[#f0a36b]' : 'fill-transparent text-white/20'}`}
+        />
+      ))}
     </div>
   );
 }
 
-function ReviewCardSkeleton() {
-  return (
-    <div className="bg-card/80 dark:bg-[#1A1A1A] rounded-lg overflow-hidden shadow-xl border border-wine-600/20 animate-pulse">
-      <div className="aspect-square bg-muted dark:bg-gray-800" />
-      <div className="p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-muted dark:bg-gray-700" />
-          <div className="h-5 w-20 bg-muted dark:bg-gray-700 rounded" />
-        </div>
-        <div className="h-4 w-24 bg-muted dark:bg-gray-700 rounded mb-2" />
-        <div className="h-3 w-full bg-muted dark:bg-gray-700 rounded" />
-      </div>
+function AlbumCover({ src, alt }: { src?: string | null; alt: string }) {
+  return src ? (
+    // Album artwork is supplied dynamically by the API.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} className="h-full w-full object-cover" />
+  ) : (
+    <div className="flex h-full w-full items-center justify-center bg-[#272526]">
+      <Disc3 className="size-10 text-white/30" />
     </div>
   );
 }
 
-function AlbumCardSkeleton() {
-  return (
-    <div className="bg-card/80 dark:bg-[#1A1A1A] rounded-lg overflow-hidden shadow-xl border-2 border-wine-600/50 animate-pulse">
-      <div className="aspect-square bg-muted dark:bg-gray-800" />
-      <div className="p-4">
-        <div className="h-5 w-32 bg-muted dark:bg-gray-700 rounded mb-2" />
-        <div className="h-4 w-24 bg-muted dark:bg-gray-700 rounded mb-2" />
-        <div className="h-4 w-20 bg-muted dark:bg-gray-700 rounded mb-2" />
-        <div className="h-3 w-full bg-muted dark:bg-gray-700 rounded" />
-      </div>
-    </div>
-  );
+function ReviewSkeleton() {
+  return <div className="h-[390px] animate-pulse rounded-[1.75rem] bg-black/5" />;
 }
 
 export default function HomePage() {
   const { isAuthenticated } = useAuthStore();
   const [topAlbums, setTopAlbums] = useState<TopAlbum[]>([]);
   const [recentReviews, setRecentReviews] = useState<RecentReview[]>([]);
-  const [loadingAlbums, setLoadingAlbums] = useState(true);
-  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [apiUnavailable, setApiUnavailable] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const [albumsRes, reviewsRes] = await Promise.all([
-          homeApi.getTopAlbums(6),
-          homeApi.getRecentReviews(3),
-        ]);
-        setTopAlbums(albumsRes.albums);
-        setRecentReviews(reviewsRes.reviews);
-      } catch (error) {
+    Promise.all([homeApi.getTopAlbums(6), homeApi.getRecentReviews(3)])
+      .then(([albums, reviews]) => {
+        setTopAlbums(albums.albums);
+        setRecentReviews(reviews.reviews);
+      })
+      .catch((error) => {
         console.error('Failed to fetch home data:', error);
-      } finally {
-        setLoadingAlbums(false);
-        setLoadingReviews(false);
-      }
-    }
-
-    fetchData();
+        setApiUnavailable(true);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
+  const primaryHref = isAuthenticated ? '/feed' : '/register';
+  const visibleReviews = apiUnavailable ? PREVIEW_REVIEWS : recentReviews;
+  const visibleAlbums = apiUnavailable ? PREVIEW_ALBUMS : topAlbums;
+
   return (
-    <div className="flex flex-col">
-      {/* Hero Section with Animations */}
-      <section
-        className="w-full"
-        style={{
-          background: `linear-gradient(to bottom,
-            #722F37 0%,
-            #5E2530 40%,
-            #2d1218 70%,
-            #121212 100%)`,
-        }}
-      >
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-4 py-8 animate-[fadeIn_1s_ease-in-out] max-md:flex-col md:p-10 md:pl-32">
-          {/* Text section */}
-          <div className="w-full px-0 text-center animate-[slideInLeft_1.2s_ease-out] sm:px-4 md:w-1/2 md:text-left">
-            <h1 className="mb-4 text-3xl font-bold tracking-[-1px] text-white animate-[fadeUp_1.4s_ease-out] sm:text-4xl md:mb-5 md:text-6xl">
-              Rank your taste in music
+    <div className="overflow-hidden bg-[#f4f0e8] text-[#1b1919]">
+      <section className="relative px-4 pb-16 pt-14 sm:px-6 sm:pt-16 lg:px-8 lg:pb-24 lg:pt-20">
+        <div className="absolute -left-24 top-8 h-72 w-72 rounded-full bg-[#b74755]/10 blur-3xl" />
+        <div className="relative mx-auto grid max-w-7xl items-start gap-11 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
+          <div>
+            <h1 className="max-w-2xl text-[clamp(3rem,7vw,6.6rem)] font-black leading-[0.9] tracking-[-0.065em]">
+              Música fica melhor quando vira
+              <span className="text-[#963a4a]"> conversa.</span>
             </h1>
-            <p className="mb-6 text-base text-white/90 animate-[fadeUp_1.6s_ease-out] sm:text-lg md:mb-8 md:text-xl">
-              SoundScore allows you to rank every album that has ever launched. You
-              can discuss and review other people&apos;s score.
+            <p className="mt-7 max-w-xl text-lg leading-8 text-[#5c5654] sm:text-xl">
+              Descubra álbuns, publique suas notas e encontre pessoas que escutam
+              música com a mesma intensidade que você.
             </p>
-            {isAuthenticated ? (
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
-                href={`/my-reviews`}
-                className="mx-auto flex min-h-11 w-full max-w-sm cursor-pointer items-center justify-center rounded-full bg-white px-7 py-3 text-center text-base font-semibold text-wine-700 shadow-md transition-all duration-200 animate-[fadeUp_1.8s_ease-out] hover:bg-wine-50 hover:shadow-lg md:mx-0 md:inline-flex md:w-auto"
+                href={primaryHref}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1b1919] px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#963a4a]"
               >
-                Start Ranking
+                {isAuthenticated ? 'Ir para o feed' : 'Criar meu perfil'}
+                <ArrowRight className="size-4" />
               </Link>
-            ) : (
-              <Link
-                href="/register"
-                className="mx-auto flex min-h-11 w-full max-w-sm cursor-pointer items-center justify-center rounded-full bg-white px-7 py-3 text-center text-base font-semibold text-wine-700 shadow-md transition-all duration-200 animate-[fadeUp_1.8s_ease-out] hover:bg-wine-50 hover:shadow-lg md:mx-0 md:inline-flex md:w-auto"
+              <a
+                href="#comunidade"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#1b1919]/20 px-6 py-3 font-semibold transition hover:bg-white/70"
               >
-                Start Ranking
-              </Link>
-            )}
+                Explorar a comunidade
+              </a>
+            </div>
           </div>
 
-          {/* Image section with float animation */}
-          <div className="relative flex w-full justify-center px-4 animate-[slideInRight_1.2s_ease-out] md:w-1/2">
-            <div className="absolute inset-0 bg-white/10 rounded-full blur-3xl scale-75" />
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/27032dba77e68e55a80db39bdfcbc3e2ccb4b98f"
-              className="relative mt-5 h-56 w-56 object-contain opacity-90 brightness-0 invert contrast-200 animate-[float_6s_ease-in-out_infinite] sm:h-72 sm:w-72 md:mt-0 md:h-[550px] md:w-[550px]"
-              alt="Music illustration"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Combined Content Section - Seamless Flow */}
-      <section className="relative bg-[#121212] overflow-hidden">
-        <div className="container mx-auto px-4 md:px-10">
-          {/* Albums Showcase */}
-          <div className="py-10 text-center md:py-16">
-            <h2 className="mb-6 text-2xl font-bold tracking-tight text-white md:mb-8 md:text-4xl">
-              All albums you have ever imagined
-            </h2>
-            <figure className="relative">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/d578524dc05ef0a1d102bcaca03c78c5f6dc8b21"
-                className="w-full max-w-[800px] h-auto rounded-xl mx-auto max-md:w-full shadow-2xl shadow-wine-900/20"
-                alt="Album grid"
-                loading="lazy"
+          <div className="relative lg:mt-0">
+            <div className="absolute -inset-2 rotate-1 rounded-[2rem] bg-[#963a4a]/15" />
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-[#963a4a]/15 bg-[#1b1919] shadow-2xl shadow-[#4b1b22]/15">
+              <Image
+                src="/images/landing/album-covers-collage.png"
+                alt="Colagem com capas de álbuns de diferentes artistas e estilos"
+                width={1270}
+                height={714}
+                priority
+                className="aspect-[16/10] h-auto w-full object-cover"
               />
-            </figure>
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center justify-center gap-4 py-5 md:py-8">
-            <div className="h-px w-24 bg-gradient-to-r from-transparent to-wine-600/50" />
-            <div className="w-2 h-2 rounded-full bg-wine-600/50" />
-            <div className="h-px w-24 bg-gradient-to-l from-transparent to-wine-600/50" />
-          </div>
-
-          {/* Latest Reviews */}
-          <div id="reviews" className="py-8 md:py-12">
-            <div className="mb-6 text-center md:mb-10">
-              <span className="text-wine-500 text-sm font-medium tracking-wider uppercase">Community</span>
-              <h2 className="text-white text-3xl md:text-4xl font-bold tracking-tight mt-2">
-                Latest Reviews
-              </h2>
-            </div>
-
-            <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
-              {loadingReviews ? (
-                <>
-                  <ReviewCardSkeleton />
-                  <ReviewCardSkeleton />
-                  <ReviewCardSkeleton />
-                </>
-              ) : recentReviews.length > 0 ? (
-                recentReviews.map((review) => (
-                  <Link
-                    key={review.id}
-                    href={`/album/${review.album_spotify_id}`}
-                    className="bg-[#1c1c1e] backdrop-blur-sm rounded-xl overflow-hidden hover:transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 shadow-xl border border-white/5 hover:border-wine-600/30 group"
-                  >
-                    <div className="aspect-square overflow-hidden relative">
-                      {review.album_cover_image ? (
-                        <img
-                          src={review.album_cover_image}
-                          alt={`${review.album_title} cover`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                          <span className="text-gray-500 text-4xl">♪</span>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    </div>
-                    <div className="p-3 sm:p-4">
-                      <div className="flex items-center gap-3 mb-3">
-                        {review.user_profile_picture ? (
-                          <img
-                            src={review.user_profile_picture}
-                            alt={review.username}
-                            className="w-8 h-8 rounded-full object-cover ring-2 ring-wine-600/30"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-wine-600 flex items-center justify-center ring-2 ring-wine-600/30">
-                            <span className="text-white text-sm font-medium">
-                              {review.username.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        )}
-                        <span className="min-w-0 truncate text-sm font-semibold text-white sm:text-base">{review.username}</span>
-                      </div>
-                      <StarRating rating={review.rating} />
-                      {review.text && (
-                        <p className="text-gray-400 text-sm mt-2 line-clamp-2">
-                          {review.text}
-                        </p>
-                      )}
-                      <p className="text-wine-500/70 text-xs mt-3 font-medium">
-                        {review.album_title} - {review.album_artist}
-                      </p>
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <div className="col-span-full py-10 text-center text-gray-400">
-                  No reviews yet. Be the first to review an album!
-                </div>
-              )}
-            </div>
-
-            <div className="text-center mt-8">
-              <Link
-                href={isAuthenticated ? '/feed' : '/register'}
-                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-wine-600/50 bg-transparent px-6 py-2.5 text-sm font-medium text-wine-500 transition-all duration-300 hover:bg-wine-600/10 hover:text-wine-400"
-              >
-                View All Reviews
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center justify-center gap-4 py-5 md:py-8">
-            <div className="h-px w-32 bg-gradient-to-r from-transparent via-yellow-500/30 to-transparent" />
-            <div className="w-3 h-3 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/30" />
-            <div className="h-px w-32 bg-gradient-to-r from-transparent via-yellow-500/30 to-transparent" />
-          </div>
-
-          {/* Weekly Top Albums - Podium Style */}
-          <div id="top-albums" className="pb-14 pt-8 md:py-12 md:pb-20">
-            <div className="mb-8 text-center md:mb-12">
-              <span className="text-yellow-500 text-sm font-medium tracking-wider uppercase">This Week</span>
-              <h2 className="text-white text-3xl md:text-5xl font-bold tracking-tight mt-2">
-                Top Albums
-              </h2>
-              <p className="text-gray-500 mt-3 text-sm">Based on community ratings</p>
-            </div>
-
-            {loadingAlbums ? (
-              <div className="mx-auto grid max-w-4xl grid-cols-2 items-end gap-3 md:flex md:justify-center md:gap-8">
-                <div className="order-2 max-w-[200px] md:flex-1"><AlbumCardSkeleton /></div>
-                <div className="order-1 col-span-2 mx-auto w-full max-w-[240px] md:order-none md:flex-1 md:max-w-[280px]"><AlbumCardSkeleton /></div>
-                <div className="order-3 max-w-[180px] md:flex-1"><AlbumCardSkeleton /></div>
-              </div>
-            ) : topAlbums.length > 0 ? (
-              <div className="mx-auto grid max-w-5xl grid-cols-2 items-end justify-items-center gap-3 px-2 md:flex md:justify-center md:gap-6">
-                {/* 2nd Place - Left */}
-                {topAlbums[1] && (
-                  <Link
-                    href={`/album/${topAlbums[1].spotify_id}`}
-                    className="group relative order-2 w-full max-w-[180px] overflow-hidden rounded-xl border border-gray-400/20 bg-[#1c1c1e] shadow-xl backdrop-blur-sm transition-all duration-300 hover:scale-105 md:order-none md:flex-1 md:max-w-[220px]"
-                  >
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-gray-400/10 to-transparent opacity-50 pointer-events-none"></div>
-                    <div className="relative">
-                      <div className="absolute top-2 left-2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center shadow-lg z-10">
-                        <span className="text-gray-800 text-lg md:text-xl font-bold">2</span>
-                      </div>
-                      {topAlbums[1].cover_image ? (
-                        <img
-                          src={topAlbums[1].cover_image}
-                          alt={`${topAlbums[1].title} cover`}
-                          className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full aspect-square bg-gray-800 flex items-center justify-center">
-                          <span className="text-gray-500 text-4xl">♪</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-3 md:p-4">
-                      <h3 className="text-white text-sm md:text-base font-bold mb-1 truncate">{topAlbums[1].title}</h3>
-                      <p className="text-gray-400 text-xs md:text-sm mb-1 font-medium truncate">{topAlbums[1].artist}</p>
-                      <div className="flex items-center gap-1 mb-1">
-                        <StarRating rating={topAlbums[1].avg_rating} />
-                        <span className="text-gray-400 text-xs">
-                          ({topAlbums[1].avg_rating.toFixed(1)})
-                        </span>
-                      </div>
-                      <p className="text-gray-500 text-xs">
-                        {topAlbums[1].review_count} {topAlbums[1].review_count === 1 ? 'review' : 'reviews'}
-                      </p>
-                    </div>
-                  </Link>
-                )}
-
-                {/* 1st Place - Center (Larger) */}
-                {topAlbums[0] && (
-                  <Link
-                    href={`/album/${topAlbums[0].spotify_id}`}
-                    className="group relative order-1 col-span-2 w-full max-w-[240px] overflow-hidden rounded-xl border border-yellow-500/30 bg-[#1c1c1e] shadow-2xl shadow-yellow-500/10 backdrop-blur-sm transition-all duration-300 hover:scale-105 md:order-none md:-mt-8 md:flex-1 md:max-w-[300px]"
-                  >
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-yellow-500/20 to-transparent opacity-60 pointer-events-none"></div>
-                    <div className="relative">
-                      <div className="absolute top-3 left-3 w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-600 flex items-center justify-center shadow-lg z-10 ring-2 ring-yellow-400/50">
-                        <span className="text-yellow-900 text-xl md:text-2xl font-bold">1</span>
-                      </div>
-                      {topAlbums[0].cover_image ? (
-                        <img
-                          src={topAlbums[0].cover_image}
-                          alt={`${topAlbums[0].title} cover`}
-                          className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full aspect-square bg-gray-800 flex items-center justify-center">
-                          <span className="text-gray-500 text-6xl">♪</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4 md:p-5">
-                      <h3 className="text-white text-lg md:text-xl font-bold mb-1 truncate">{topAlbums[0].title}</h3>
-                      <p className="text-yellow-500 text-sm md:text-base mb-2 font-medium truncate">{topAlbums[0].artist}</p>
-                      <div className="flex items-center gap-2 mb-2">
-                        <StarRating rating={topAlbums[0].avg_rating} />
-                        <span className="text-gray-400 text-sm">
-                          ({topAlbums[0].avg_rating.toFixed(1)})
-                        </span>
-                      </div>
-                      <p className="text-gray-500 text-xs">
-                        {topAlbums[0].review_count} {topAlbums[0].review_count === 1 ? 'review' : 'reviews'}
-                      </p>
-                    </div>
-                  </Link>
-                )}
-
-                {/* 3rd Place - Right */}
-                {topAlbums[2] && (
-                  <Link
-                    href={`/album/${topAlbums[2].spotify_id}`}
-                    className="group relative order-3 w-full max-w-[160px] overflow-hidden rounded-xl border border-amber-700/20 bg-[#1c1c1e] shadow-xl backdrop-blur-sm transition-all duration-300 hover:scale-105 md:order-none md:flex-1 md:max-w-[200px]"
-                  >
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-amber-700/10 to-transparent opacity-50 pointer-events-none"></div>
-                    <div className="relative">
-                      <div className="absolute top-2 left-2 w-9 h-9 md:w-11 md:h-11 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 flex items-center justify-center shadow-lg z-10">
-                        <span className="text-amber-200 text-base md:text-lg font-bold">3</span>
-                      </div>
-                      {topAlbums[2].cover_image ? (
-                        <img
-                          src={topAlbums[2].cover_image}
-                          alt={`${topAlbums[2].title} cover`}
-                          className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full aspect-square bg-gray-800 flex items-center justify-center">
-                          <span className="text-gray-500 text-3xl">♪</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-2 md:p-3">
-                      <h3 className="text-white text-xs md:text-sm font-bold mb-1 truncate">{topAlbums[2].title}</h3>
-                      <p className="text-amber-600 text-xs mb-1 font-medium truncate">{topAlbums[2].artist}</p>
-                      <div className="flex items-center gap-1 mb-1">
-                        <StarRating rating={topAlbums[2].avg_rating} />
-                        <span className="text-gray-400 text-[10px]">
-                          ({topAlbums[2].avg_rating.toFixed(1)})
-                        </span>
-                      </div>
-                      <p className="text-gray-500 text-[10px]">
-                        {topAlbums[2].review_count} {topAlbums[2].review_count === 1 ? 'review' : 'reviews'}
-                      </p>
-                    </div>
-                  </Link>
-                )}
-              </div>
-            ) : (
-              <div className="text-center text-gray-400 py-10">
-                No top albums yet. Start reviewing to see the rankings!
-              </div>
-            )}
-
-            <div className="flex justify-center mt-12 max-w-5xl mx-auto px-2">
-              <Link
-                href="/discover"
-                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-wine-600 px-8 py-3 text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-wine-700 hover:shadow-lg"
-              >
-                Discover More Albums
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
             </div>
           </div>
         </div>
-
-        {/* Bottom gradient fade to footer */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#121212] to-transparent pointer-events-none" />
       </section>
 
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+      <section className="relative overflow-hidden border-y border-[#1b1919]/10 bg-[#ebe5db] py-5">
+        <div className="flex w-max animate-[landing-marquee_28s_linear_infinite] items-center will-change-transform hover:[animation-play-state:paused]">
+          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map(({ icon: Icon, title, text }, index) => (
+            <div key={`${title}-${index}`} className="mx-2 flex shrink-0 items-center gap-3 rounded-full border border-[#1b1919]/10 bg-[#f8f4ed] py-2.5 pl-2.5 pr-5 shadow-sm">
+              <span className="flex size-9 items-center justify-center rounded-full bg-[#963a4a] text-white"><Icon className="size-4" /></span>
+              <p className="whitespace-nowrap text-sm"><strong>{title}</strong><span className="mx-2 text-[#963a4a]">•</span><span className="text-[#6c6562]">{text}</span></p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="comunidade" className="px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#963a4a]">Agora na comunidade</p>
+              <h2 className="mt-3 max-w-xl text-4xl font-black tracking-[-0.045em] sm:text-6xl">Opiniões que puxam assunto.</h2>
+            </div>
+            <Link href={isAuthenticated ? '/feed' : '/register'} className="flex items-center gap-2 font-bold text-[#963a4a] hover:underline">
+              Ver todas as reviews <ArrowRight className="size-4" />
+            </Link>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-3">
+            {loading ? [1, 2, 3].map((item) => <ReviewSkeleton key={item} />) : visibleReviews.length ? visibleReviews.map((review) => (
+              <Link key={review.id} href={`/album/${review.album_spotify_id}`} className="group overflow-hidden rounded-[1.75rem] bg-white shadow-sm ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-xl">
+                <div className="aspect-[4/3] overflow-hidden"><div className="h-full transition duration-500 group-hover:scale-105"><AlbumCover src={review.album_cover_image} alt={`Capa de ${review.album_title}`} /></div></div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between gap-3"><span className="truncate font-bold">@{review.username}</span><div className="rounded-full bg-[#1b1919] px-2.5 py-1.5"><StarRating rating={review.rating} /></div></div>
+                  <p className="mt-5 line-clamp-2 min-h-12 text-base leading-6 text-[#5c5654]">{review.text || 'Uma nova nota entrou para a coleção.'}</p>
+                  <p className="mt-5 truncate text-xs font-bold uppercase tracking-[0.12em] text-[#963a4a]">{review.album_title} · {review.album_artist}</p>
+                </div>
+              </Link>
+            )) : <p className="md:col-span-3 text-[#6c6562]">As primeiras reviews estão chegando. Que tal publicar a sua?</p>}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#1b1919] px-4 py-20 text-white sm:px-6 lg:px-8 lg:py-28">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-12 lg:grid-cols-[0.65fr_1.35fr] lg:items-end">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#f0a36b]">Ranking da semana</p>
+              <h2 className="mt-3 text-5xl font-black leading-none tracking-[-0.05em] sm:text-6xl">Os discos que não saem da conversa.</h2>
+              <p className="mt-6 max-w-md leading-7 text-white/55">O ranking nasce das notas da comunidade e muda junto com o que todo mundo está ouvindo.</p>
+              <Link href={isAuthenticated ? '/feed' : '/register'} className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#f0a36b] px-6 py-3 font-bold text-[#1b1919] transition hover:scale-[1.02]">Entrar na conversa <ArrowRight className="size-4" /></Link>
+            </div>
+            <div className="grid grid-cols-3 gap-3 sm:gap-5">
+              {loading ? [1, 2, 3].map((item) => <div key={item} className="aspect-[3/4] animate-pulse rounded-2xl bg-white/5" />) : visibleAlbums.slice(0, 3).map((album, index) => (
+                <Link key={album.spotify_id} href={`/album/${album.spotify_id}`} className={`group ${index === 0 ? '-translate-y-5' : ''}`}>
+                  <div className="relative aspect-square overflow-hidden rounded-2xl bg-white/5"><AlbumCover src={album.cover_image} alt={`Capa de ${album.title}`} /><span className="absolute left-3 top-3 flex size-9 items-center justify-center rounded-full bg-[#f0a36b] font-black text-[#1b1919]">{index + 1}</span></div>
+                  <h3 className="mt-4 truncate font-bold sm:text-lg">{album.title}</h3>
+                  <p className="mt-1 truncate text-sm text-white/45">{album.artist}</p>
+                  <div className="mt-3 flex items-center gap-2"><StarRating rating={album.avg_rating} /><span className="text-xs text-white/40">{album.avg_rating.toFixed(1)}</span></div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <style jsx global>{`
+        @keyframes landing-marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
         }
 
-        @keyframes slideInLeft {
-          from { transform: translateX(-10%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes slideInRight {
-          from { transform: translateX(10%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes fadeUp {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
-          100% { transform: translateY(0px); }
+        @media (prefers-reduced-motion: reduce) {
+          [class*='landing-marquee'] { animation-play-state: paused !important; }
         }
       `}</style>
     </div>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Rss, Compass, PlusCircle, Users, User } from 'lucide-react';
+import { Rss, Library, PlusCircle, Users, User } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { cn } from '@/lib/utils';
 
@@ -15,9 +15,9 @@ interface NavItem {
 
 const BASE_ITEMS: NavItem[] = [
   { label: 'Feed', href: '/feed', icon: Rss },
-  { label: 'Discover', href: '/discover', icon: Compass },
-  { label: 'Review', href: '/reviews/create', icon: PlusCircle, isCta: true },
-  { label: 'Groups', href: '/groups', icon: Users },
+  { label: 'Biblioteca', href: '/library', icon: Library },
+  { label: 'Resenha', href: '/reviews/create', icon: PlusCircle, isCta: true },
+  { label: 'Grupos', href: '/groups', icon: Users },
 ];
 
 export function BottomNav() {
@@ -25,10 +25,10 @@ export function BottomNav() {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  if (!isAuthenticated || !user) return null;
+  if (!isAuthenticated || !user || pathname === '/reviews/create') return null;
 
   const profileItem: NavItem = {
-    label: 'Profile',
+    label: 'Perfil',
     href: `/profile/${user.username}`,
     icon: User,
   };

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { setTokens } from '@/lib/api';
 import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 export default function OAuthCallbackPage() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function OAuthCallbackPage() {
   const refreshToken = searchParams.get('refresh_token');
   const errorMsg = searchParams.get('error');
   const [error, setError] = useState<string | null>(
-    errorMsg || (!accessToken || !refreshToken ? 'Missing authentication tokens' : null)
+    errorMsg || (!accessToken || !refreshToken ? 'Os dados de autenticação não foram recebidos' : null)
   );
 
   useEffect(() => {
@@ -35,12 +35,12 @@ export default function OAuthCallbackPage() {
 
       fetchUser()
         .then(() => {
-          toast.success('Successfully logged in!');
+      toast.success('Login concluído!');
           router.push('/feed');
         })
         .catch(() => {
-          setError('Failed to load user data');
-          toast.error('Failed to load user data');
+          setError('Não foi possível carregar os dados da sua conta');
+          toast.error('Não foi possível carregar os dados da sua conta');
           setTimeout(() => router.push('/login'), 2000);
         });
     } else {
@@ -49,19 +49,22 @@ export default function OAuthCallbackPage() {
   }, [accessToken, refreshToken, errorMsg, router, fetchUser]);
 
   return (
-    <div className="flex min-h-[min(400px,60dvh)] items-center justify-center px-4">
-      <div className="max-w-sm break-words text-center">
+    <div className="flex min-h-[24rem] items-center justify-center">
+      <div className="w-full max-w-sm break-words text-center">
         {error ? (
-          <div className="text-destructive">
-            <p className="text-lg font-medium">{error}</p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Redirecting to login...
-            </p>
+          <div>
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 text-red-700"><AlertCircle className="h-6 w-6" /></span>
+            <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-[#963a4a]">Não deu certo</p>
+            <h1 className="mt-3 text-3xl font-black tracking-[-0.05em] text-[#1b1919]">Não conseguimos entrar.</h1>
+            <p className="mt-3 text-sm leading-6 text-[#6c6562]">{error}</p>
+            <p className="mt-2 text-xs text-[#8a817d]">Voltando para o login...</p>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-muted-foreground">Completing sign in...</p>
+          <div className="flex flex-col items-center">
+            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#963a4a]/10 text-[#963a4a]"><Loader2 className="h-7 w-7 animate-spin" /></span>
+            <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-[#963a4a]">Conectando sua conta</p>
+            <h1 className="mt-3 text-3xl font-black tracking-[-0.05em] text-[#1b1919]">Preparando o SoundScore.</h1>
+            <p className="mt-3 text-sm leading-6 text-[#6c6562]">Estamos confirmando seu acesso e carregando sua coleção.</p>
           </div>
         )}
       </div>

@@ -48,7 +48,7 @@ export function AlbumSearch({ onSelect, selectedAlbum }: AlbumSearchProps) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search for an album..."
+          placeholder="Busque um álbum..."
           value={query}
           onChange={handleChange}
           className="h-11 pr-12 pl-10"
@@ -59,7 +59,7 @@ export function AlbumSearch({ onSelect, selectedAlbum }: AlbumSearchProps) {
             size="icon"
             className="absolute right-0 top-1/2 h-11 w-11 -translate-y-1/2"
             onClick={handleClear}
-            aria-label="Clear album search"
+            aria-label="Limpar busca de álbum"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -69,7 +69,7 @@ export function AlbumSearch({ onSelect, selectedAlbum }: AlbumSearchProps) {
       {/* Selected Album */}
       {selectedAlbum && !query && (
         <div className="min-w-0 rounded-xl border bg-muted/50 p-3 sm:p-4">
-          <p className="text-sm font-medium mb-2">Selected Album</p>
+          <p className="text-sm font-medium mb-2">Álbum selecionado</p>
           <div className="flex min-w-0 flex-col items-start gap-3 min-[360px]:flex-row min-[360px]:items-center sm:gap-4 [&_[data-slot=card]]:w-28 sm:[&_[data-slot=card]]:w-32">
             <div className="shrink-0">
               <AlbumCard
@@ -88,7 +88,7 @@ export function AlbumSearch({ onSelect, selectedAlbum }: AlbumSearchProps) {
               onClick={() => onSelect(null as unknown as SpotifyAlbumResult)}
               className="min-h-11 min-w-0 max-w-full whitespace-normal"
             >
-              Change album
+              Trocar álbum
             </Button>
           </div>
         </div>
@@ -109,7 +109,7 @@ export function AlbumSearch({ onSelect, selectedAlbum }: AlbumSearchProps) {
             </div>
           ) : results.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No albums found. Try a different search term.
+              Nenhum álbum encontrado. Tente outra busca.
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 [&_[data-slot=card]]:w-full">

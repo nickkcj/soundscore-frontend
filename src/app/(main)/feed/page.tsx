@@ -1,20 +1,30 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import Link from 'next/link';
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Music, TrendingUp, Users, Plus, UsersRound, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+import {
+  ArrowDownUp,
+  Disc3,
+  PenLine,
+  Plus,
+  RefreshCw,
+  Search,
+  TrendingUp,
+  UserPlus,
+  UsersRound,
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { ReviewCard, ReviewCardSkeleton } from '@/components/reviews/review-card';
-import { InfiniteScroll } from '@/components/common/infinite-scroll';
-import { useRequireAuth } from '@/hooks/use-auth';
-import { StarRating } from '@/components/common/star-rating';
-import { useTrendingAlbums, useMyGroups, useSuggestedUsers } from '@/hooks/queries/use-sidebar-queries';
-import { useFeedQuery, useLikeMutation, useDeleteReviewMutation } from '@/hooks/queries/use-feed-query';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { TrendingAlbum } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { InfiniteScroll } from '@/components/common/infinite-scroll';
+import { ReviewCard, ReviewCardSkeleton } from '@/components/reviews/review-card';
+import { StarRating } from '@/components/common/star-rating';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useRequireAuth } from '@/hooks/use-auth';
+import { useFeedQuery, useLikeMutation, useDeleteReviewMutation } from '@/hooks/queries/use-feed-query';
+import { useTrendingAlbums, useMyGroups, useSuggestedUsers } from '@/hooks/queries/use-sidebar-queries';
+import type { TrendingAlbum } from '@/types';
 import {
   Dialog,
   DialogContent,
@@ -25,19 +35,14 @@ import {
 } from '@/components/ui/dialog';
 
 export default function FeedPage() {
-  const { isLoading: authLoading } = useRequireAuth();
-
-  // State
+  const { user, isLoading: authLoading } = useRequireAuth();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
-  // React Query hooks for sidebar data (cached & deduped)
   const { data: trendingData, isLoading: trendingAlbumsLoading } = useTrendingAlbums(3);
   const { data: groupsData, isLoading: myGroupsLoading } = useMyGroups();
-  const { data: suggestedData, isLoading: suggestedUsersLoading } = useSuggestedUsers(5);
-
-  // React Query infinite scroll for feed
+  const { data: suggestedData, isLoading: suggestedUsersLoading } = useSuggestedUsers(4);
   const {
     data: feedData,
     isLoading: feedLoading,
@@ -48,490 +53,187 @@ export default function FeedPage() {
     isRefetching,
     error: feedError,
   } = useFeedQuery(sortOrder);
-
-  // Mutations
   const likeMutation = useLikeMutation();
   const deleteMutation = useDeleteReviewMutation();
 
-  // Derived data
   const trendingAlbums = trendingData?.albums ?? [];
   const myGroups = groupsData?.groups ?? [];
   const suggestedUsers = suggestedData?.users ?? [];
+  const reviews = useMemo(
+    () => feedData?.pages.flatMap((page) => page.reviews) ?? [],
+    [feedData]
+  );
 
-  // Flatten paginated reviews into single array
-  const reviews = useMemo(() => {
-    return feedData?.pages.flatMap((page) => page.reviews) ?? [];
-  }, [feedData]);
-
-  // Handlers
-  const handleSortChange = (newSort: 'desc' | 'asc') => {
-    setSortOrder(newSort);
-  };
-
-  const toggleSort = () => {
-    const newSort = sortOrder === 'desc' ? 'asc' : 'desc';
-    handleSortChange(newSort);
-  };
-
-  const handleReload = () => {
-    refetch();
-  };
-
-  const handleLike = (reviewUuid: string) => {
-    likeMutation.mutate(reviewUuid);
-  };
-
-  const openDeleteDialog = (reviewUuid: string) => {
-    setReviewToDelete(reviewUuid);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!reviewToDelete) return;
-
     const reviewUuid = reviewToDelete;
     setDeleteDialogOpen(false);
     setReviewToDelete(null);
-
-    toast.success('Review deleted');
+    toast.success('Resenha excluída');
     deleteMutation.mutate(reviewUuid, {
       onError: () => {
-        toast.error('Failed to delete review');
+        toast.error('Não foi possível excluir a resenha');
         refetch();
       },
     });
   };
 
-  const handleLoadMore = () => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  };
+  if (authLoading) return <FeedSkeleton />;
 
-  if (authLoading) {
-    return <FeedSkeleton />;
-  }
-
-  const isLoading = feedLoading;
-  const isLoadingMore = isFetchingNextPage;
   const hasMore = hasNextPage ?? false;
-  const error = feedError ? (feedError as Error).message : null;
 
   return (
-    <div className="app-usable-viewport relative min-w-0 bg-background">
-
-      <div className="container mx-auto px-4 py-3 sm:py-6 lg:py-10">
-        <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:gap-10">
-          {/* LEFT SIDEBAR: Groups — hidden on mobile (groups have their own tab in the bottom bar) */}
-          <div className="hidden lg:block lg:w-64 w-full flex-shrink-0">
-            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden sticky top-28">
-              {/* Header */}
-              <div className="px-5 py-4 border-b border-border">
-                <h3 className="font-semibold text-foreground flex items-center">
-                  <UsersRound className="h-4 w-4 text-wine-500 mr-2" />
-                  My Groups
-                </h3>
-              </div>
-
-              {/* Group List */}
-              <div className="p-4">
-                <div className="space-y-3">
-                  {myGroupsLoading ? (
-                    // Skeleton loading
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="flex items-center gap-3 p-2.5">
-                        <Skeleton className="w-10 h-10 rounded-full" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-24" />
-                          <Skeleton className="h-3 w-16" />
-                        </div>
-                      </div>
-                    ))
-                  ) : myGroups.length === 0 ? (
-                    // Empty state
-                    <div className="text-center py-4">
-                      <UsersRound className="h-8 w-8 text-muted-foreground/50 mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">No groups yet</p>
-                      <p className="text-xs text-muted-foreground/70 mt-1">Join or create a group!</p>
-                    </div>
-                  ) : (
-                    // Group list
-                    myGroups.slice(0, 5).map((group) => (
-                      <Link
-                        key={group.id}
-                        href={`/groups/${group.uuid}`}
-                        className="flex items-center gap-3 p-2.5 hover:bg-muted rounded-lg transition-colors"
-                      >
-                        <div className="w-14 h-9 rounded-md bg-wine-100 dark:bg-wine-900/30 flex items-center justify-center overflow-hidden flex-shrink-0">
-                          {group.cover_image ? (
-                            <Image
-                              src={group.cover_image}
-                              alt={group.name}
-                              width={200}
-                              height={120}
-                              className="w-full h-full object-cover"
-                              quality={90}
-                            />
-                          ) : (
-                            <span className="text-wine-600 font-bold text-xs">
-                              {group.name.substring(0, 2).toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm text-foreground truncate">{group.name}</p>
-                          <span className="text-xs text-muted-foreground">{group.member_count} members</span>
-                        </div>
-                      </Link>
-                    ))
-                  )}
-                </div>
-
-                {/* Divider */}
-                <div className="my-4 border-t border-border" />
-
-                {/* Actions */}
-                <div className="space-y-2">
-                  <Link
-                    href="/groups/create"
-                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium bg-wine-100 dark:bg-wine-900/30 text-wine-600 rounded-xl hover:bg-wine-200 dark:hover:bg-wine-900/50 transition-colors"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Create Group
-                  </Link>
-                  <Link
-                    href="/groups"
-                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-muted hover:bg-muted/80 transition-colors rounded-xl text-sm font-medium text-foreground"
-                  >
-                    Browse All Groups
-                  </Link>
-                </div>
-              </div>
+    <div className="app-usable-viewport min-w-0 bg-[#f4f0e8] text-[#1b1919] dark:bg-background dark:text-foreground">
+      <div className="mx-auto w-full max-w-[1180px] px-4 pb-12 pt-6 sm:px-6 sm:pt-10 lg:px-8 lg:pb-20">
+        <div className="mb-7 lg:mb-10">
+          <div>
+            <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-wine-700 dark:text-wine-300">
+              <span className="h-2 w-2 rounded-full bg-[#e99a55]" />
+              Sua comunidade
             </div>
+            <h1 className="text-[2rem] font-black leading-none tracking-[-0.045em] sm:text-[2.5rem]">
+              O que estão ouvindo
+            </h1>
+            <p className="mt-2 text-sm text-[#6f675f] sm:text-base dark:text-muted-foreground">
+              Resenhas, descobertas e conversas de quem vive música.
+            </p>
           </div>
+        </div>
 
-          {/* MAIN CONTENT: Feed */}
-          <div className="min-w-0 lg:mt-3 lg:flex-1">
-            {error && (
-              <div className="mb-4 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600 shadow-sm dark:border-red-900 dark:bg-red-950 sm:mb-8 sm:p-4">
-                {error}
-                <Button variant="link" className="ml-1 min-h-11 px-2" onClick={() => refetch()}>
-                  Try again
-                </Button>
-              </div>
-            )}
+        <div className="grid min-w-0 items-start gap-7 lg:grid-cols-[minmax(0,1fr)_20rem] xl:gap-10">
+          <main className="min-w-0">
+            <Link href="/reviews/create" className="group mb-6 flex items-center gap-3 rounded-[1.35rem] border border-[#dcd4ca] bg-white p-3.5 shadow-[0_10px_35px_rgba(50,38,30,0.045)] transition-all hover:border-wine-700/25 hover:shadow-[0_14px_40px_rgba(50,38,30,0.08)] dark:border-border dark:bg-card sm:p-4">
+              <Avatar className="h-11 w-11 shrink-0">
+                <AvatarImage src={user?.profile_picture || undefined} />
+                <AvatarFallback className="bg-wine-100 font-bold text-wine-700">{user?.username?.charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <span className="min-w-0 flex-1 truncate text-sm text-[#81786f] sm:text-base">Qual álbum está na sua cabeça hoje?</span>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-wine-700 text-white transition-transform group-hover:rotate-[-4deg] group-hover:scale-105"><PenLine className="h-4 w-4" /></span>
+            </Link>
 
-            {/* Painel no mesmo padrão dos sidebars (My Groups/Trending Albums) */}
-            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-              <div className="flex min-h-14 items-center justify-between gap-2 border-b border-border px-3 py-2 sm:px-5 sm:py-4">
-                <h1 className="flex min-w-0 items-center text-sm font-semibold text-foreground sm:text-base">
-                  <Music className="h-4 w-4 mr-2 text-wine-500" />
-                  Latest Reviews
-                </h1>
-                <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-                  {/* Reload Button */}
-                  <button
-                    onClick={handleReload}
-                    disabled={isRefetching}
-                    className="flex h-11 w-11 items-center justify-center rounded-full text-sm font-medium text-wine-600 transition-colors hover:bg-wine-50 disabled:cursor-not-allowed disabled:opacity-50 dark:text-wine-300 dark:hover:bg-wine-950"
-                    title="Reload feed"
-                    aria-label="Reload feed"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${isRefetching ? 'animate-spin' : ''}`} />
-                  </button>
-                  {/* Sort Toggle Button */}
-                  <button
-                    onClick={toggleSort}
-                    className="flex min-h-11 items-center rounded-full px-2 text-xs font-medium text-wine-600 transition-colors hover:bg-wine-50 dark:text-wine-300 dark:hover:bg-wine-950 sm:px-2.5 sm:text-sm"
-                    aria-label={sortOrder === 'desc' ? 'Show oldest reviews first' : 'Show latest reviews first'}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className={`h-4 w-4 transition-transform sm:mr-1 ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" />
-                    </svg>
-                    <span className="hidden min-[390px]:inline">{sortOrder === 'desc' ? 'Latest first' : 'Oldest first'}</span>
-                  </button>
-                </div>
-              </div>
-
-            {isLoading && reviews.length === 0 ? (
-              <div className="divide-y divide-border">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <ReviewCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : reviews.length === 0 ? (
-              <div className="flex flex-col items-center justify-center px-4 py-10 text-center sm:py-16">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="mb-3 h-12 w-12 text-wine-200 dark:text-wine-800 sm:mb-4 sm:h-16 sm:w-16">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
-                </svg>
-                <p className="text-muted-foreground font-medium">No recent reviews yet.</p>
-                <p className="text-muted-foreground/70 text-sm mt-2">Follow users or write your own reviews to see them here!</p>
-              </div>
-            ) : (
-              <InfiniteScroll
-                hasMore={hasMore}
-                isLoading={isLoadingMore}
-                onLoadMore={handleLoadMore}
-                loader={<ReviewCardSkeleton />}
-              >
-                <div className="divide-y divide-border">
-                  {reviews.map((review) => (
-                    <ReviewCard
-                      key={review.uuid}
-                      review={review}
-                      onLike={handleLike}
-                      onDelete={openDeleteDialog}
-                    />
-                  ))}
-                </div>
-              </InfiniteScroll>
-            )}
-            </div>
-
-            {/* Load more button */}
-            {hasMore && !isLoadingMore && reviews.length > 0 && (
-              <div className="mt-5 text-center sm:mt-12">
-                <button
-                  onClick={handleLoadMore}
-                  className="mx-auto flex min-h-11 items-center rounded-full bg-wine-600 px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-wine-700 hover:shadow-md"
-                >
-                  <span>Load more</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+            <div className="mb-4 flex items-center justify-between px-1">
+              <div><h2 className="text-lg font-black tracking-[-0.025em]">Últimas da comunidade</h2><p className="text-xs text-muted-foreground">Opiniões frescas de quem você acompanha</p></div>
+              <div className="flex items-center gap-1">
+                <button onClick={() => refetch()} disabled={isRefetching} aria-label="Atualizar feed" className="flex h-10 w-10 items-center justify-center rounded-full text-[#6f675f] transition-colors hover:bg-white hover:text-wine-700 disabled:opacity-50 dark:hover:bg-muted">
+                  <RefreshCw className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`} />
+                </button>
+                <button onClick={() => setSortOrder((order) => order === 'desc' ? 'asc' : 'desc')} className="flex min-h-10 items-center gap-1.5 rounded-full border border-[#dcd4ca] bg-white/70 px-3 text-xs font-bold text-wine-700 transition-colors hover:bg-white dark:border-border dark:bg-muted dark:text-wine-300">
+                  <ArrowDownUp className="h-3.5 w-3.5" />
+                  {sortOrder === 'desc' ? 'Recentes' : 'Antigas'}
                 </button>
               </div>
-            )}
-          </div>
-
-          {/* RIGHT SIDEBAR: Trending Albums & Suggested Users */}
-          <div className="hidden w-full lg:block lg:w-72">
-            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden sticky top-28">
-              {/* Trending Albums Section */}
-              <div className="px-5 py-4 border-b border-border">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center">
-                  <TrendingUp className="h-4 w-4 text-wine-500 mr-2" />
-                  Trending Albums
-                </h3>
-                <div className="space-y-4">
-                  {trendingAlbumsLoading ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <TrendingAlbumSkeleton key={i} />
-                    ))
-                  ) : trendingAlbums.length === 0 ? (
-                    <div className="p-3 bg-muted rounded-lg">
-                      <p className="text-sm text-muted-foreground text-center">No trending albums found</p>
-                    </div>
-                  ) : (
-                    trendingAlbums.map((album) => (
-                      <TrendingAlbumItem key={album.spotify_id} album={album} />
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Suggested Users Section */}
-              <div className="px-5 py-4">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center">
-                  <Users className="h-4 w-4 text-wine-500 mr-2" />
-                  Suggested Users
-                </h3>
-                <div className="space-y-3.5">
-                  {suggestedUsersLoading ? (
-                    // Skeleton loading
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="flex items-center gap-3 p-2.5">
-                        <Skeleton className="w-10 h-10 rounded-full" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-20" />
-                          <Skeleton className="h-3 w-16" />
-                        </div>
-                        <Skeleton className="h-6 w-14 rounded" />
-                      </div>
-                    ))
-                  ) : suggestedUsers.length === 0 ? (
-                    // Empty state
-                    <div className="text-center py-4">
-                      <Users className="h-8 w-8 text-muted-foreground/50 mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">No suggestions</p>
-                    </div>
-                  ) : (
-                    suggestedUsers.map((user) => (
-                      <Link
-                        key={user.id}
-                        href={`/profile/${user.username}`}
-                        className="flex items-center gap-3 p-2.5 hover:bg-muted rounded-lg transition-colors"
-                      >
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage src={user.profile_picture || undefined} />
-                          <AvatarFallback>
-                            {user.username.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm text-foreground truncate">{user.username}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {user.followers_count || 0} followers
-                          </p>
-                        </div>
-                        <span className="text-xs font-medium px-2 py-1 bg-wine-100 dark:bg-wine-900/30 text-wine-600 rounded hover:bg-wine-200 dark:hover:bg-wine-900/50 transition-colors">
-                          Follow
-                        </span>
-                      </Link>
-                    ))
-                  )}
-                </div>
-
-                {/* See More Link */}
-                {suggestedUsers.length > 0 && (
-                  <div className="mt-5 text-center">
-                    <Link href="/discover?type=users" className="text-xs text-wine-600 hover:underline">
-                      See more suggestions
-                    </Link>
-                  </div>
-                )}
-              </div>
             </div>
-          </div>
+
+            {feedError && (
+              <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                Não foi possível atualizar o feed. <button onClick={() => refetch()} className="font-bold underline">Tentar novamente</button>
+              </div>
+            )}
+
+            {feedLoading && reviews.length === 0 ? (
+              <div className="space-y-4">{Array.from({ length: 3 }).map((_, index) => <ReviewCardSkeleton key={index} />)}</div>
+            ) : reviews.length === 0 ? (
+              <div className="rounded-[1.5rem] border border-[#ded7ce] bg-white px-6 py-14 text-center dark:border-border dark:bg-card">
+                <Disc3 className="mx-auto h-14 w-14 text-wine-200" strokeWidth={1.3} />
+                <h2 className="mt-4 text-xl font-black">O feed está afinando os instrumentos.</h2>
+                <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">Siga pessoas ou publique sua primeira resenha para começar a conversa.</p>
+              </div>
+            ) : (
+              <InfiniteScroll hasMore={hasMore} isLoading={isFetchingNextPage} onLoadMore={() => fetchNextPage()} loader={<ReviewCardSkeleton />}>
+                <div className="space-y-4">{reviews.map((review) => <ReviewCard key={review.uuid} review={review} onLike={(uuid) => likeMutation.mutate(uuid)} onDelete={(uuid) => { setReviewToDelete(uuid); setDeleteDialogOpen(true); }} />)}</div>
+              </InfiniteScroll>
+            )}
+
+            {hasMore && !isFetchingNextPage && reviews.length > 0 && (
+              <button onClick={() => fetchNextPage()} className="mx-auto mt-6 flex min-h-11 items-center rounded-full border border-wine-700/25 bg-white px-6 text-sm font-bold text-wine-700 hover:bg-wine-50 dark:bg-card dark:text-wine-300">Mostrar mais</button>
+            )}
+          </main>
+
+          <aside className="sticky top-24 hidden space-y-5 lg:block">
+            <section className="rounded-[1.65rem] border border-[#ded7ce] bg-white/75 p-5 dark:border-border dark:bg-card">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-extrabold"><TrendingUp className="h-4 w-4 text-[#dc8749]" /> Em alta</h2>
+                <span className="text-[10px] font-bold uppercase tracking-[0.13em] text-muted-foreground">Esta semana</span>
+              </div>
+              <div className="space-y-3">
+                {trendingAlbumsLoading ? Array.from({ length: 3 }).map((_, index) => <TrendingAlbumSkeleton key={index} />) : trendingAlbums.length ? <><FeaturedTrendingAlbum album={trendingAlbums[0]} /><div className="space-y-2 pt-1">{trendingAlbums.slice(1).map((album, index) => <TrendingAlbumItem key={album.spotify_id} album={album} position={index + 2} />)}</div></> : <p className="py-4 text-center text-xs text-muted-foreground">Os álbuns em alta aparecerão aqui.</p>}
+              </div>
+              <button type="button" onClick={() => window.dispatchEvent(new Event('soundscore:open-search'))} className="mt-4 flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full text-xs font-bold text-wine-700 hover:bg-wine-700/5"><Search className="h-3.5 w-3.5" />Buscar álbuns</button>
+            </section>
+
+            <section className="rounded-[1.65rem] border border-[#ded7ce] bg-white/75 p-5 dark:border-border dark:bg-card">
+              <h2 className="mb-3 flex items-center gap-2 text-sm font-extrabold"><UserPlus className="h-4 w-4 text-wine-700" /> Pessoas para conhecer</h2>
+              <div className="space-y-1">
+                {suggestedUsersLoading ? Array.from({ length: 3 }).map((_, index) => <div key={index} className="flex items-center gap-3 py-2"><Skeleton className="h-9 w-9 rounded-full" /><Skeleton className="h-4 flex-1" /></div>) : suggestedUsers.length ? suggestedUsers.map((suggestedUser) => (
+                  <Link key={suggestedUser.id} href={`/profile/${suggestedUser.username}`} className="flex items-center gap-3 rounded-xl py-2">
+                    <Avatar className="h-9 w-9"><AvatarImage src={suggestedUser.profile_picture || undefined} /><AvatarFallback className="bg-wine-100 font-bold text-wine-700">{suggestedUser.username.charAt(0).toUpperCase()}</AvatarFallback></Avatar>
+                    <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">{suggestedUser.username}</p><p className="text-[11px] text-muted-foreground">{suggestedUser.followers_count || 0} seguidores</p></div>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-wine-50 text-wine-700"><Plus className="h-3.5 w-3.5" /></span>
+                  </Link>
+                )) : <p className="py-4 text-center text-xs text-muted-foreground">Novas sugestões aparecerão aqui.</p>}
+              </div>
+            </section>
+
+            <section className="rounded-[1.65rem] border border-[#ded7ce] bg-white/55 p-5 dark:border-border dark:bg-card">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-extrabold"><UsersRound className="h-4 w-4 text-wine-700" /> Seus grupos</h2>
+                <Link href="/groups" className="text-xs font-bold text-wine-700 hover:underline">Ver todos</Link>
+              </div>
+              <div className="space-y-1">
+                {myGroupsLoading ? Array.from({ length: 2 }).map((_, index) => <Skeleton key={index} className="h-11 w-full rounded-xl" />) : myGroups.length ? myGroups.slice(0, 3).map((group) => (
+                  <Link key={group.id} href={`/groups/${group.uuid}`} className="flex items-center gap-3 rounded-xl py-2">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-wine-100 text-[10px] font-black text-wine-700">{group.cover_image ? <Image src={group.cover_image} alt="" width={40} height={40} className="h-full w-full object-cover" /> : group.name.slice(0, 2).toUpperCase()}</div>
+                    <div className="min-w-0"><p className="truncate text-sm font-bold">{group.name}</p><p className="text-[11px] text-muted-foreground">{group.member_count} membros</p></div>
+                  </Link>
+                )) : <p className="py-3 text-center text-xs text-muted-foreground">Seus grupos aparecerão aqui.</p>}
+              </div>
+            </section>
+          </aside>
         </div>
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="rounded-2xl">
-          <DialogHeader>
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-              <svg className="h-10 w-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </div>
-            <DialogTitle className="text-center">Delete Review</DialogTitle>
-            <DialogDescription className="text-center">
-              Are you sure you want to delete this review? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex justify-center gap-4 sm:justify-center">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-              className="rounded-xl flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              className="rounded-xl flex-1"
-            >
-              Delete
-            </Button>
-          </DialogFooter>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader><DialogTitle>Excluir resenha?</DialogTitle><DialogDescription>Essa ação não pode ser desfeita.</DialogDescription></DialogHeader>
+          <DialogFooter><Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancelar</Button><Button variant="destructive" onClick={handleDelete}>Excluir</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
 
-function TrendingAlbumItem({ album }: { album: TrendingAlbum }) {
+function TrendingAlbumItem({ album, position }: { album: TrendingAlbum; position: number }) {
   return (
-    <Link href={`/album/${album.spotify_id}`} className="flex items-start gap-3 hover:bg-muted p-2 rounded-lg transition-colors">
-      <div className="w-14 h-14 flex-shrink-0 rounded-md overflow-hidden shadow-sm">
-        {album.cover_image ? (
-          <Image
-            src={album.cover_image}
-            alt={album.title}
-            width={56}
-            height={56}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-wine-200 to-wine-300 dark:from-wine-800 dark:to-wine-900" />
-        )}
+    <Link href={`/album/${album.spotify_id}`} className="group flex items-center gap-3 rounded-xl py-1.5">
+      <span className="w-3 text-xs font-black text-wine-700/45">{position}</span>
+      <div className="relative h-13 w-13 shrink-0 overflow-hidden rounded-xl bg-muted shadow-sm">
+        {album.cover_image ? <Image src={album.cover_image} alt={album.title} fill className="object-cover transition-transform group-hover:scale-105" /> : <Disc3 className="m-3 h-7 w-7 text-muted-foreground" />}
+      </div>
+      <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-extrabold">{album.title}</h3><p className="truncate text-xs text-muted-foreground">{album.artist}</p>{album.avg_rating ? <div className="mt-1"><StarRating rating={album.avg_rating} size="sm" /></div> : null}</div>
+    </Link>
+  );
+}
+
+function FeaturedTrendingAlbum({ album }: { album: TrendingAlbum }) {
+  return (
+    <Link href={`/album/${album.spotify_id}`} className="group flex items-center gap-3 overflow-hidden rounded-[1.1rem] bg-[#eee8df] p-3 dark:bg-muted/50">
+      <div className="relative h-[5.25rem] w-[5.25rem] shrink-0 overflow-hidden rounded-[0.8rem] bg-muted shadow-sm">
+        {album.cover_image ? <Image src={album.cover_image} alt={album.title} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.035]" /> : <Disc3 className="absolute inset-0 m-auto h-12 w-12 text-muted-foreground" />}
+        <span className="absolute left-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#f0a36b] text-[10px] font-black text-[#1b1919] shadow-sm">1</span>
       </div>
       <div className="min-w-0 flex-1">
-        <h4 className="font-medium text-sm text-foreground line-clamp-1">{album.title}</h4>
-        <p className="text-xs text-muted-foreground line-clamp-1">{album.artist}</p>
-        <div className="flex items-center mt-1">
-          {album.avg_rating ? (
-            <StarRating rating={album.avg_rating} size="sm" />
-          ) : null}
-          <span className="text-xs text-muted-foreground ml-1">
-            ({album.review_count} {album.review_count === 1 ? 'review' : 'reviews'})
-          </span>
-        </div>
+        <h3 className="truncate text-sm font-black tracking-[-0.02em]">{album.title}</h3>
+        <p className="mt-0.5 truncate text-xs text-muted-foreground">{album.artist}</p>
+        {album.avg_rating ? <div className="mt-1.5"><StarRating rating={album.avg_rating} size="sm" /></div> : null}
       </div>
     </Link>
   );
 }
 
 function TrendingAlbumSkeleton() {
-  return (
-    <div className="flex items-center gap-3 p-2">
-      <div className="w-14 h-14 rounded-md bg-muted animate-pulse" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 w-3/4 rounded bg-muted animate-pulse" />
-        <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
-        <div className="h-3 w-1/3 rounded bg-muted animate-pulse" />
-      </div>
-    </div>
-  );
+  return <div className="flex items-center gap-3 py-1.5"><Skeleton className="h-3 w-3" /><Skeleton className="h-13 w-13 rounded-xl" /><div className="flex-1 space-y-2"><Skeleton className="h-3 w-full" /><Skeleton className="h-3 w-2/3" /></div></div>;
 }
 
 function FeedSkeleton() {
-  return (
-    <div className="app-usable-viewport bg-background">
-      <div className="container mx-auto px-4 py-3 sm:py-6 lg:py-10">
-        <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:gap-10">
-          {/* Left Sidebar Skeleton — hidden on mobile */}
-          <div className="hidden lg:block lg:w-64 w-full flex-shrink-0">
-            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-              <div className="px-5 py-4 border-b border-border">
-                <div className="h-5 w-24 bg-muted rounded animate-pulse" />
-              </div>
-              <div className="p-4 space-y-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 p-2">
-                    <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 w-24 bg-muted rounded animate-pulse" />
-                      <div className="h-3 w-16 bg-muted rounded animate-pulse" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content Skeleton */}
-          <div className="min-w-0 space-y-4 lg:flex-1 lg:space-y-10">
-            <div className="mb-3 flex min-h-14 items-center justify-between sm:mb-6">
-              <div className="h-6 w-36 rounded bg-muted animate-pulse sm:h-8 sm:w-40" />
-              <div className="h-11 w-24 rounded-full bg-muted animate-pulse sm:w-28" />
-            </div>
-            {Array.from({ length: 3 }).map((_, i) => (
-              <ReviewCardSkeleton key={i} />
-            ))}
-          </div>
-
-          {/* Right Sidebar Skeleton */}
-          <div className="hidden w-full lg:block lg:w-72">
-            <div className="bg-card rounded-xl shadow-sm border border-border p-5">
-              <div className="space-y-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <TrendingAlbumSkeleton key={i} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <div className="app-usable-viewport bg-[#f4f0e8] px-4 py-10 dark:bg-background"><div className="mx-auto max-w-2xl space-y-4"><Skeleton className="mb-8 h-10 w-72" />{Array.from({ length: 3 }).map((_, index) => <ReviewCardSkeleton key={index} />)}</div></div>;
 }

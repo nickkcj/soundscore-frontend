@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, Music, Search, PenLine, ImagePlus, X } from 'lucide-react';
+import { Disc3, ImagePlus, Loader2, PenLine, Search, Sparkles, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -62,11 +64,11 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
     e.target.value = '';
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toast.error('Selecione um arquivo de imagem.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be less than 5MB');
+      toast.error('A imagem pode ter no máximo 5 MB.');
       return;
     }
 
@@ -81,7 +83,7 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
       setManualCover(res.image_path);
       setCoverPreview(res.image_url);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to upload cover');
+      toast.error(err instanceof Error ? err.message : 'Não foi possível enviar a capa.');
     } finally {
       setIsUploadingCover(false);
     }
@@ -98,7 +100,7 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
       const detail = await api.get<AlbumDetail>(`/reviews/album/${album.spotify_id}/details`);
       setFetchedTracks(detail.tracks.map((t) => t.name));
     } catch {
-      toast.error('Could not fetch tracklist. You can still create the session.');
+      toast.error('Não foi possível carregar as faixas. Tente o modo manual.');
     } finally {
       setIsFetchingTracks(false);
     }
@@ -107,11 +109,11 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
   const handleSubmit = async () => {
     if (mode === 'spotify') {
       if (!selectedAlbum) {
-        toast.error('Please select an album first.');
+        toast.error('Selecione um álbum primeiro.');
         return;
       }
       if (fetchedTracks.length === 0) {
-        toast.error('Could not load tracks for this album. Try manual mode.');
+        toast.error('Não foi possível carregar as faixas. Tente o modo manual.');
         return;
       }
 
@@ -128,7 +130,7 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
         resetState();
         router.push(`/session/${session.code}`);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to create session');
+        toast.error(err instanceof Error ? err.message : 'Não foi possível criar a sessão.');
       } finally {
         setIsSubmitting(false);
       }
@@ -141,11 +143,11 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
         .filter(Boolean);
 
       if (!trimmedArtist || !trimmedTitle) {
-        toast.error('Please enter artist name and album title.');
+        toast.error('Informe o artista e o título do álbum.');
         return;
       }
       if (tracks.length === 0) {
-        toast.error('Please enter at least one track.');
+        toast.error('Informe pelo menos uma faixa.');
         return;
       }
 
@@ -162,7 +164,7 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
         resetState();
         router.push(`/session/${session.code}`);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to create session');
+        toast.error(err instanceof Error ? err.message : 'Não foi possível criar a sessão.');
       } finally {
         setIsSubmitting(false);
       }
@@ -174,201 +176,41 @@ export function CreateSessionModal({ open, onOpenChange }: CreateSessionModalPro
     : manualArtist.trim().length > 0 && manualTitle.trim().length > 0 && manualTracksText.trim().length > 0;
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(v) => {
-        if (!v) resetState();
-        onOpenChange(v);
-      }}
-    >
-      <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-lg overflow-y-auto p-4 sm:max-h-[90vh] sm:w-full sm:p-6">
-        <DialogHeader>
-          <DialogTitle>Create Listening Party</DialogTitle>
+    <Dialog open={open} onOpenChange={(value) => { if (!value) resetState(); onOpenChange(value); }}>
+      <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-xl gap-0 overflow-y-auto rounded-[1.75rem] border-[#dcd4ca] bg-[#fdfcf9] p-0 dark:border-border dark:bg-card sm:max-h-[92dvh] sm:w-full">
+        <DialogHeader className="border-b border-[#e8e0d7] px-5 pb-5 pt-6 text-left dark:border-border sm:px-7">
+          <p className="mb-1 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-wine-700"><Sparkles className="h-3.5 w-3.5 text-[#d98524]" />Um álbum, várias opiniões</p>
+          <DialogTitle className="text-2xl font-black tracking-[-0.04em]">Criar Listening Party</DialogTitle>
+          <DialogDescription className="leading-relaxed">Escolha o disco que todo mundo vai ouvir e avaliar junto.</DialogDescription>
         </DialogHeader>
 
-        {/* Mode Selector */}
-        <div className="flex gap-2 p-1 bg-muted rounded-lg">
-          <button
-            type="button"
-            onClick={() => setMode('spotify')}
-            className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-2 py-2 text-sm font-medium transition-all sm:px-3 ${
-              mode === 'spotify'
-                ? 'bg-background shadow-sm text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Search className="h-4 w-4" />
-            Search Spotify
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode('manual')}
-            className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-2 py-2 text-sm font-medium transition-all sm:px-3 ${
-              mode === 'manual'
-                ? 'bg-background shadow-sm text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <PenLine className="h-4 w-4" />
-            Manual Entry
-          </button>
+        <div className="space-y-5 px-5 py-5 sm:px-7 sm:py-6">
+          <div className="grid grid-cols-2 gap-1 rounded-full bg-[#eee8df] p-1 dark:bg-muted">
+            <button type="button" onClick={() => setMode('spotify')} className={`flex min-h-10 items-center justify-center gap-2 rounded-full px-3 text-sm font-bold transition-all ${mode === 'spotify' ? 'bg-white text-wine-700 shadow-sm dark:bg-card' : 'text-muted-foreground hover:text-foreground'}`}><Search className="h-4 w-4" />Buscar álbum</button>
+            <button type="button" onClick={() => setMode('manual')} className={`flex min-h-10 items-center justify-center gap-2 rounded-full px-3 text-sm font-bold transition-all ${mode === 'manual' ? 'bg-white text-wine-700 shadow-sm dark:bg-card' : 'text-muted-foreground hover:text-foreground'}`}><PenLine className="h-4 w-4" />Adicionar manualmente</button>
+          </div>
+
+          {mode === 'spotify' && (
+            <div className="space-y-4">
+              <AlbumSearch onSelect={handleAlbumSelect} selectedAlbum={selectedAlbum} />
+              {isFetchingTracks && <div className="flex items-center gap-2 rounded-xl bg-[#f7f3ed] p-3 text-sm text-muted-foreground dark:bg-muted/30"><Loader2 className="h-4 w-4 animate-spin text-wine-700" />Carregando as faixas…</div>}
+              {fetchedTracks.length > 0 && <div className="max-h-48 overflow-y-auto rounded-xl border border-[#e3dbd1] bg-[#f8f5f0] p-3 dark:border-border dark:bg-muted/25"><p className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-wine-700">{fetchedTracks.length} faixas encontradas</p><ol className="space-y-1.5">{fetchedTracks.map((track, index) => <li key={track} className="flex gap-2 text-sm"><span className="w-5 shrink-0 text-right text-xs text-muted-foreground">{index + 1}</span><span>{track}</span></li>)}</ol></div>}
+            </div>
+          )}
+
+          {mode === 'manual' && (
+            <div className="space-y-4">
+              <div className="space-y-1.5"><Label htmlFor="manual-artist" className="font-bold">Artista</Label><Input id="manual-artist" placeholder="Nome do artista" value={manualArtist} onChange={(event) => setManualArtist(event.target.value)} className="h-11 rounded-xl border-[#ded6cc] bg-white shadow-none dark:border-border dark:bg-muted/30" /></div>
+              <div className="space-y-1.5"><Label htmlFor="manual-title" className="font-bold">Título do álbum</Label><Input id="manual-title" placeholder="Nome do álbum" value={manualTitle} onChange={(event) => setManualTitle(event.target.value)} className="h-11 rounded-xl border-[#ded6cc] bg-white shadow-none dark:border-border dark:bg-muted/30" /></div>
+              <div className="space-y-1.5"><Label className="font-bold">Capa <span className="font-normal text-muted-foreground">(opcional)</span></Label>{coverPreview ? <div className="flex items-center gap-3 rounded-xl border border-[#e3dbd1] bg-white p-3 dark:border-border dark:bg-muted/30"><Image src={coverPreview} alt="Prévia da capa" width={64} height={64} unoptimized className="h-16 w-16 rounded-lg object-cover" /><Button type="button" variant="outline" size="sm" onClick={() => { setManualCover(''); setCoverPreview(null); }} className="rounded-full"><X className="mr-1 h-4 w-4" />Remover</Button></div> : <label className={`flex h-20 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#cfc4b8] bg-white text-sm font-semibold text-muted-foreground transition-colors hover:border-wine-700/45 hover:text-wine-700 dark:border-border dark:bg-muted/25 ${isUploadingCover ? 'pointer-events-none opacity-60' : ''}`}>{isUploadingCover ? <><Loader2 className="h-4 w-4 animate-spin" />Enviando…</> : <><ImagePlus className="h-4 w-4" />Escolher uma capa</>}<input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleCoverUpload} /></label>}</div>
+              <div className="space-y-1.5"><Label htmlFor="manual-tracks" className="font-bold">Faixas <span className="font-normal text-muted-foreground">(uma por linha)</span></Label><Textarea id="manual-tracks" placeholder={'Faixa 1\nFaixa 2\nFaixa 3'} value={manualTracksText} onChange={(event) => setManualTracksText(event.target.value)} className="min-h-32 resize-none rounded-xl border-[#ded6cc] bg-white p-3 shadow-none dark:border-border dark:bg-muted/30" />{manualTracksText.trim() && <p className="text-right text-xs text-muted-foreground">{manualTracksText.split('\n').filter((track) => track.trim()).length} faixas</p>}</div>
+            </div>
+          )}
         </div>
 
-        {/* Spotify Mode */}
-        {mode === 'spotify' && (
-          <div className="space-y-4">
-            <AlbumSearch
-              onSelect={handleAlbumSelect}
-              selectedAlbum={selectedAlbum}
-            />
-
-            {isFetchingTracks && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Loading tracklist...
-              </div>
-            )}
-
-            {fetchedTracks.length > 0 && (
-              <div className="bg-muted/50 rounded-lg p-3 max-h-48 overflow-y-auto">
-                <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
-                  Tracklist ({fetchedTracks.length} tracks)
-                </p>
-                <ol className="space-y-1">
-                  {fetchedTracks.map((track, i) => (
-                    <li key={i} className="text-sm flex gap-2">
-                      <span className="text-muted-foreground w-5 text-right shrink-0">{i + 1}.</span>
-                      <span>{track}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Manual Mode */}
-        {mode === 'manual' && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="manual-artist">Artist</Label>
-                <Input
-                  id="manual-artist"
-                  placeholder="Artist name"
-                  value={manualArtist}
-                  onChange={(e) => setManualArtist(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="manual-title">Album Title</Label>
-                <Input
-                  id="manual-title"
-                  placeholder="Album title"
-                  value={manualTitle}
-                  onChange={(e) => setManualTitle(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label>Cover Image (optional)</Label>
-              {coverPreview ? (
-                <div className="flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={coverPreview}
-                    alt="Cover preview"
-                    className="h-16 w-16 rounded-lg object-cover border border-border"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setManualCover('');
-                      setCoverPreview(null);
-                    }}
-                  >
-                    <X className="h-4 w-4 mr-1" />
-                    Remove
-                  </Button>
-                </div>
-              ) : (
-                <label
-                  className={`flex items-center justify-center gap-2 h-16 rounded-lg border-2 border-dashed border-border text-sm text-muted-foreground cursor-pointer transition-colors hover:border-wine-400 hover:text-wine-600 ${
-                    isUploadingCover ? 'opacity-60 pointer-events-none' : ''
-                  }`}
-                >
-                  {isUploadingCover ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <ImagePlus className="h-4 w-4" />
-                      Upload cover image
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    className="hidden"
-                    onChange={handleCoverUpload}
-                  />
-                </label>
-              )}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="manual-tracks">
-                Tracklist
-                <span className="text-muted-foreground font-normal ml-1">(one track per line)</span>
-              </Label>
-              <Textarea
-                id="manual-tracks"
-                placeholder={`Track 1\nTrack 2\nTrack 3`}
-                value={manualTracksText}
-                onChange={(e) => setManualTracksText(e.target.value)}
-                className="min-h-32 resize-none"
-              />
-              {manualTracksText.trim() && (
-                <p className="text-xs text-muted-foreground">
-                  {manualTracksText.split('\n').filter((t) => t.trim()).length} tracks
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="grid grid-cols-2 gap-2 pt-2 sm:gap-3">
-          <Button
-            variant="outline"
-            className="h-11 w-full"
-            onClick={() => onOpenChange(false)}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            className="h-11 w-full bg-wine-600 text-white hover:bg-wine-700"
-            onClick={handleSubmit}
-            disabled={!canSubmit || isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Creating...
-              </>
-            ) : (
-              <>
-                <Music className="h-4 w-4" />
-                Create Party
-              </>
-            )}
-          </Button>
+        <div className="grid grid-cols-2 gap-2 border-t border-[#e8e0d7] bg-white px-5 py-4 dark:border-border dark:bg-card sm:gap-3 sm:px-7">
+          <Button variant="outline" className="h-11 rounded-full border-[#d5ccc1] font-bold dark:border-border" onClick={() => onOpenChange(false)} disabled={isSubmitting}>Cancelar</Button>
+          <Button className="h-11 rounded-full bg-wine-700 font-bold text-white hover:bg-wine-800" onClick={handleSubmit} disabled={!canSubmit || isSubmitting}>{isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" />Criando…</> : <><Disc3 className="h-4 w-4" />Criar sessão</>}</Button>
         </div>
       </DialogContent>
     </Dialog>

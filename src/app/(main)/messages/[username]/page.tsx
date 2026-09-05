@@ -256,7 +256,19 @@ export default function DMChatPage({ params }: { params: Promise<{ username: str
       const serverMessage = await sendMessage(content, imagePath);
       if (serverMessage) {
         setMessages((prev) =>
-          prev.map((m) => (m.id === optimisticId ? { ...serverMessage } : m))
+          prev.map((m) => (
+            m.id === optimisticId
+              ? {
+                  ...serverMessage,
+                  // A API assina novamente a mesma foto e devolve outra URL.
+                  // Preservar a URL já carregada evita o fallback com a inicial
+                  // enquanto o navegador baixa a nova assinatura.
+                  sender_username: m.sender_username || serverMessage.sender_username,
+                  sender_profile_picture:
+                    m.sender_profile_picture ?? serverMessage.sender_profile_picture,
+                }
+              : m
+          ))
         );
       }
     } catch (err) {

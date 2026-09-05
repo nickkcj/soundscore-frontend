@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X, LogOut, User, Settings, ClipboardList, Moon, Sun, Music, MessageCircle, Radio } from 'lucide-react';
-import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
+import { useState, useEffect, useCallback, useSyncExternalStore, type MouseEvent } from 'react';
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { NotificationDropdown } from './notification-dropdown';
 import { GlobalSearch } from './global-search';
 import { api } from '@/lib/api';
+import type { ConversationListResponse } from '@/types';
 
 const NAV_ITEMS = [
   { label: 'Sobre', href: '/about' },
@@ -62,6 +63,20 @@ export function Header() {
     logout();
     router.push('/');
   }, [logout, router]);
+
+  const openMessages = useCallback(async (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+
+    try {
+      const data = await api.get<ConversationListResponse>('/dm/conversations');
+      const mostRecent = [...data.conversations].sort(
+        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      )[0];
+      router.push(mostRecent ? `/messages/${mostRecent.other_user.username}` : '/messages');
+    } catch {
+      router.push('/messages');
+    }
+  }, [router]);
   const { theme, setTheme } = useTheme();
   const mounted = useSyncExternalStore(
     subscribeToHydration,
@@ -159,7 +174,7 @@ export function Header() {
                 <div className="flex items-center gap-3">
                   {/* Messages — mesmo wrapper/estilo do sino de notificações */}
                   <Button variant="ghost" size="icon" className={cn('relative h-10 w-10 rounded-full p-0 text-foreground/70 transition-colors hover:bg-wine-700/8 hover:text-wine-700', isActive('/messages') && 'bg-wine-700/8 text-wine-700 dark:text-wine-300')} asChild>
-                    <Link href="/messages" aria-label="Mensagens">
+                    <Link href="/messages" onClick={openMessages} aria-label="Mensagens">
                       <MessageCircle className="size-5 stroke-[1.9]" />
                       {unreadDMs > 0 && (
                         <span className="absolute right-0 top-0 flex h-[17px] min-w-[17px] -translate-y-px translate-x-px items-center justify-center rounded-full border-2 border-background bg-wine-700 px-1 text-[9px] font-black leading-none text-white">
@@ -303,7 +318,7 @@ export function Header() {
                   </div>
                   <div className="py-1">
                     <DropdownMenuItem asChild>
-                      <Link href="/messages" className="flex items-center justify-between gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
+                      <Link href="/messages" onClick={openMessages} className="flex items-center justify-between gap-2 px-3 py-2 cursor-pointer hover:bg-wine-50 hover:text-wine-600 dark:hover:bg-wine-950/30 dark:hover:text-wine-300">
                         <div className="flex items-center gap-2">
                           <MessageCircle className="h-4 w-4 stroke-[1.9]" />
                           <span>Mensagens</span>

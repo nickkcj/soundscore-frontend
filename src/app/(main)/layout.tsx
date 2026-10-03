@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { CommunityTermsGate } from '@/components/auth/community-terms-gate';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { BottomNav } from '@/components/layout/bottom-nav';
@@ -34,7 +35,7 @@ export default function MainLayout({
     >
       <Header />
       {isAuthenticated && <NotificationStreamConnector />}
-      <main className="app-main flex-1">{children}</main>
+      <main className="app-main flex-1"><CommunityTermsGate>{children}</CommunityTermsGate></main>
       {!isAuthenticated && <Footer />}
       <BottomNav />
     </div>

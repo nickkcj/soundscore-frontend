@@ -1,12 +1,15 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "br.com.soundscore.app",
       "sha256_cert_fingerprints": [
         "8F:9B:FD:12:20:28:4B:2C:37:A1:79:F5:79:EA:98:FF:15:33:AB:94:DD:81:16:E4:73:D0:D1:D0:38:39:30:92",
-        "23:00:EE:56:B2:0A:7D:13:CE:40:D9:02:6E:B3:28:21:63:EF:DE:3A:E8:4F:8B:B9:A4:14:DA:0F:67:24:95:3B"
+        "23:00:EE:56:B2:0A:7D:13:CE:40:D9:02:6E:B3:28:21:63:EF:DE:3A:E8:4F:8B:B9:A4:14:DA:0F:67:24:95:3B",
+        "EB:8A:90:96:7A:0B:7B:52:3C:C4:51:B8:3B:B2:5E:2C:E1:DA:7E:DC:FD:27:99:01:1D:7D:48:E2:D6:B0:8F:23"
       ]
     }
   }
